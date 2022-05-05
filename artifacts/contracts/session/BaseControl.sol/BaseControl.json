@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "BaseControl",
+  "sourceName": "contracts/session/BaseControl.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea264697066735822122082cc51a6cc2d6936a98932e080d721b733aad25ce3740e74ca50252b6772d53d64736f6c63430008030033",
+  "deployedBytecode": "0x6080604052600080fdfea264697066735822122082cc51a6cc2d6936a98932e080d721b733aad25ce3740e74ca50252b6772d53d64736f6c63430008030033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
