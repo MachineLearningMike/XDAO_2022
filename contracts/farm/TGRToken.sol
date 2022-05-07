@@ -8,14 +8,14 @@ import "../session/SessionRegistrar.sol";
 import "../session/SessionManager.sol";
 import "../session/SessionFees.sol";
 import "../session/Node.sol";
-import "../libraries/WireLibrary.sol";
+import "../libraries/WireLib.sol";
 import "../periphery/interfaces/IMaker.sol";
 import "../periphery/interfaces/ITaker.sol";
 import "../core/interfaces/IXDAOFactory.sol"; 
 import "../core/interfaces/IXDAOPair.sol";
 import "../farm/interfaces/IXDAOFarm.sol";
 import "../libraries/math/SafeMath.sol";
-import "../libraries/GovernanceLibrary.sol";
+import "../libraries/GovLib.sol";
 
 import "hardhat/console.sol";
 
@@ -82,6 +82,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
     }
 
     constructor() Ownable() {
+        GovLib.test();
 
         sessionRegistrar = ISessionRegistrar(address(this));
         sessionFees = ISessionFees(address(this));                               
@@ -118,13 +119,13 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
 
     function setFeeStores(FeeStores memory _feeStores, address caller) public override virtual {
         super.setFeeStores(_feeStores, caller);
-        WireLibrary.setFeeStores(feeStores, _feeStores);
+        WireLib.setFeeStores(feeStores, _feeStores);
         emit SetFeeStores(_feeStores);
     }
 
     function setFeeRates(SessionType _sessionType, FeeRates memory _feeRates, address caller) public override virtual {
         if (caller != address(this)) {
-            WireLibrary.setFeeRates(_sessionType, feeRates, _feeRates);
+            WireLib.setFeeRates(_sessionType, feeRates, _feeRates);
             emit SetFeeRates(_sessionType, _feeRates);
             super.setFeeRates(_sessionType, _feeRates, caller);
         }

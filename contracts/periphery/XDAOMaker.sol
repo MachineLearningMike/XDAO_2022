@@ -6,12 +6,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 import "../session/Node.sol";
-import "../libraries/WireLibrary.sol";
+import "../libraries/WireLib.sol";
 import "./interfaces/IMaker.sol";
 import "../session/SessionManager.sol";
 import "../session/LiquidityControl.sol";
 import "../libraries/utils/TransferHelper.sol";
-import "../libraries/XDAOLibrary.sol";
+import "../libraries/CyberSwapLib.sol";
 import "../libraries/math/SafeMath.sol";
 import "../core/interfaces/IXDAOFactory.sol";
 import "./interfaces/IWETH.sol";
@@ -71,13 +71,13 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
 
     function setFeeStores(FeeStores memory _feeStores, address caller) public override virtual {
         super.setFeeStores(_feeStores, caller);
-        WireLibrary.setFeeStores(feeStores, _feeStores);
+        WireLib.setFeeStores(feeStores, _feeStores);
         emit SetFeeStores(_feeStores);
     }
 
     function setFeeRates(SessionType _sessionType, FeeRates memory _feeRates, address caller) public override virtual {
         if (caller != address(this)) {
-            WireLibrary.setFeeRates(_sessionType, feeRates, _feeRates);
+            WireLib.setFeeRates(_sessionType, feeRates, _feeRates);
             emit SetFeeRates(_sessionType, _feeRates);
             super.setFeeRates(_sessionType, _feeRates, caller);
         }
@@ -85,8 +85,8 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
 
 
     function getReserveOnETHPair(address _token) external view override virtual returns (uint256 reserve) {
-        (uint256 reserve0, uint256 reserve1) = XDAOLibrary.getReserves(nodes.factory, _token, WETH);
-        (address token0, ) = XDAOLibrary.sortTokens(_token, WETH);
+        (uint256 reserve0, uint256 reserve1) = CyberSwapLib.getReserves(nodes.factory, _token, WETH);
+        (address token0, ) = CyberSwapLib.sortTokens(_token, WETH);
         reserve = token0 == _token? reserve0 : reserve1;
     }
 
@@ -103,16 +103,16 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
   if (IXDAOFactory(nodes.factory).getPair(tokenA, tokenB) == address(0)) {
             IXDAOFactory(nodes.factory).createPair(tokenA, tokenB);
         }
-        (uint256 reserveA, uint256 reserveB) = XDAOLibrary.getReserves(nodes.factory, tokenA, tokenB);
+        (uint256 reserveA, uint256 reserveB) = CyberSwapLib.getReserves(nodes.factory, tokenA, tokenB);
         if (reserveA == 0 && reserveB == 0) {
             (amountA, amountB) = (amountADesired, amountBDesired);
         } else {
-            uint256 amountBOptimal = XDAOLibrary.quote(amountADesired, reserveA, reserveB);
+            uint256 amountBOptimal = CyberSwapLib.quote(amountADesired, reserveA, reserveB);
             if (amountBOptimal <= amountBDesired) {
                 require(amountBOptimal >= amountBMin, sInsufficientB);
                 (amountA, amountB) = (amountADesired, amountBOptimal);
             } else {
-                uint256 amountAOptimal = XDAOLibrary.quote(amountBDesired, reserveB, reserveA);
+                uint256 amountAOptimal = CyberSwapLib.quote(amountBDesired, reserveB, reserveA);
                 assert(amountAOptimal <= amountADesired);
                 require(amountAOptimal >= amountAMin, sInsufficientA);
                 (amountA, amountB) = (amountAOptimal, amountBDesired);
@@ -147,7 +147,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
 
         (amountA, amountB) = _addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin);
 
-        address pair = XDAOLibrary.pairFor(nodes.factory, tokenA, tokenB);
+        address pair = CyberSwapLib.pairFor(nodes.factory, tokenA, tokenB);
         TransferHelper.safeTransferFrom(tokenA, msg.sender, pair, amountA);
         TransferHelper.safeTransferFrom(tokenB, msg.sender, pair, amountB);
         liquidity = IXDAOPair(pair).mint(address(this));
@@ -161,7 +161,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
 
     function _payTransactionFeeLP(address lp, uint256 principal) internal virtual returns (uint256 feesPaid) {
         if (sessionParams.isOriginAction) { 
-            feesPaid = XDAOLibrary.payFeeLP(lp, principal, feeRates[sessionParams.sessionType], feeStores);
+            feesPaid = CyberSwapLib.payFeeLP(lp, principal, feeRates[sessionParams.sessionType], feeStores);
         }
     }
 
@@ -186,7 +186,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
     {
         _openSession(SessionType.AddLiquidity);
 
-        address pair = XDAOLibrary.pairFor(nodes.factory, _token, WETH);
+        address pair = CyberSwapLib.pairFor(nodes.factory, _token, WETH);
 
         (amountToken, amountETH) = _addLiquidity(
             _token,
@@ -220,7 +220,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
         uint256 amountBMin,
         address to
     ) internal virtual returns (uint256 amountA, uint256 amountB) {
-        address pair = XDAOLibrary.pairFor(nodes.factory, tokenA, tokenB);
+        address pair = CyberSwapLib.pairFor(nodes.factory, tokenA, tokenB);
 
         PairSnapshot memory pairSnapshot = PairSnapshot(pair, address(0), address(0), 0, 0, 0, 0);
         (pairSnapshot.reserve0, pairSnapshot.reserve1, ) = IXDAOPair(pair).getReserves();
@@ -239,7 +239,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
         (pairSnapshot.reserve0, pairSnapshot.reserve1, ) = IXDAOPair(pair).getReserves();
         if (msg.sender != owner())  _ruleOutInvalidLiquidity(pairSnapshot); // Liquidity control
 
-        (pairSnapshot.token0, pairSnapshot.token1 ) = XDAOLibrary.sortTokens(tokenA, tokenB);
+        (pairSnapshot.token0, pairSnapshot.token1 ) = CyberSwapLib.sortTokens(tokenA, tokenB);
         (amountA, amountB) = tokenA == pairSnapshot.token0 ? (amount0, amount1) : (amount1, amount0);
 
         require(amountA >= amountAMin, sInsufficientA);
@@ -300,7 +300,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
         bytes32 r,
         bytes32 s
     ) external override virtual returns (uint256 amountA, uint256 amountB) {
-        address pair = XDAOLibrary.pairFor(nodes.factory, tokenA, tokenB);
+        address pair = CyberSwapLib.pairFor(nodes.factory, tokenA, tokenB);
         uint256 value = approveMax ? type(uint256).max : liquidity;
         IXDAOPair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
         (amountA, amountB) = removeLiquidity(tokenA, tokenB, liquidity, amountAMin, amountBMin, to, deadline);
@@ -318,7 +318,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
         bytes32 r,
         bytes32 s
     ) external override virtual returns (uint256 amountToken, uint256 amountETH) {
-        address pair = XDAOLibrary.pairFor(nodes.factory, _token, WETH);
+        address pair = CyberSwapLib.pairFor(nodes.factory, _token, WETH);
         uint256 value = approveMax ? type(uint256).max : liquidity;
         IXDAOPair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
         (amountToken, amountETH) = removeLiquidityETH(_token, liquidity, amountTokenMin, amountETHMin, to, deadline);
@@ -356,7 +356,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
         bytes32 r,
         bytes32 s
     ) external override virtual returns (uint256 amountETH) {
-        address pair = XDAOLibrary.pairFor(nodes.factory, _token, WETH);
+        address pair = CyberSwapLib.pairFor(nodes.factory, _token, WETH);
         uint256 value = approveMax ? type(uint256).max : liquidity;
         IXDAOPair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
         amountETH = removeLiquidityETHSupportingFeeOnTransferTokens(
@@ -375,7 +375,7 @@ contract XDAOMaker is Node, IMaker, Ownable, SessionManager, LiquidityControl {
         uint256 reserveA,
         uint256 reserveB
     ) public pure override virtual returns (uint256 amountB) {
-        return XDAOLibrary.quote(amountA, reserveA, reserveB);
+        return CyberSwapLib.quote(amountA, reserveA, reserveB);
     }
 
     function getPair(address tokenA, address tokenB) external view override virtual returns (address pair) {

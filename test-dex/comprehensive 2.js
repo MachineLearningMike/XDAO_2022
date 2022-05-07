@@ -10,11 +10,12 @@ const XDAOPairArtifacts = require("../artifacts/contracts/core/XDAOPair.sol/XDAO
 const ERC20Abi = require("../artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json");
 
 const {
-  deployWireLibrary,
+  deployWireLib,
+  deployGovLib,
   deployTGR,
   deployWBNB,
   deployFactory,
-  deployFarmLibrary,
+  deployFarmLib,
   deployFarm,
   deployMaker,
   deployTaker,
@@ -36,7 +37,7 @@ const { zeroAddress } = require("ethereumjs-util");
 const { doesNotMatch } = require("assert");
 const zero_address = "0x0000000000000000000000000000000000000000";
 
-let wireLib, factory, wbnb, maker, taker, TGR, mock, mock2, farm, farmLib, xTGR, referral, rTGR, rSyrup, repay;
+let wireLib, factory, wbnb, maker, taker, governanceLib, TGR, mock, mock2, farm, farmLib, xTGR, referral, rTGR, rSyrup, repay;
 let owner, alice, bob, carol, dev, buyback, liquidity, treasury;
 let TGR_bnb, TGR_mck, TGR_mck2;
 let tx;
@@ -491,10 +492,10 @@ describe("====================== Stage 1: Deploy contracts =====================
     console.log("\tBob address: ".cyan, bob.address);
     console.log("\tCarol address: ".cyan, carol.address);
 
-    // WireLibrary Deployment for Farm, TGR, Maker, and Taker.
-    wireLib = await deployWireLibrary(owner);
+    // WireLib Deployment for Farm, TGR, Maker, and Taker.
+    wireLib = await deployWireLib(owner);
     const wireLibAddr = wireLib.address;
-    consoleLogWithTab(`WireLibrary deployed at: ${wireLibAddr}`);
+    consoleLogWithTab(`WireLib deployed at: ${wireLibAddr}`);
 
     // Factory Deployment.
     factory = await deployFactory(owner, owner.address, wireLibAddr);
@@ -503,7 +504,7 @@ describe("====================== Stage 1: Deploy contracts =====================
 
     console.log("\tXDAOFactory contract was deployed at: ", factory.address);
     console.log("\t!!! Pair's bytecode hash = \n\t", (await factory.INIT_CODE_PAIR_HASH()).substring(2) ); 
-    console.log("\t!!! Please make sure the pairFor(...) function of XDAOLibrary.sol file has the same hash.");
+    console.log("\t!!! Please make sure the pairFor(...) function of CyberSwapLib.sol file has the same hash.");
 
     //========================== Deploy ============================
     console.log("\n\tDeploying contracts...".green);  
@@ -523,8 +524,13 @@ describe("====================== Stage 1: Deploy contracts =====================
     const takerAddr = taker.address;
     consoleLogWithTab(`Taker deployed at: ${taker.address}`);
 
+    // GovLib Deployment for Farm.
+    governanceLib = await deployGovLib(owner);
+    const governanceLibAddr = governanceLib.address;
+    consoleLogWithTab(`GovLib deployed at: ${governanceLib.address}`);
+
     // TGR Deployment.
-    TGR = await deployTGR(owner, wireLibAddr);
+    TGR = await deployTGR(owner, wireLibAddr, governanceLibAddr);
     const TGRAddr = TGR.address;
     TGRTokenAddress = TGR.address;
     consoleLogWithTab(`TGR Token deployed at: ${TGR.address}`);
@@ -534,10 +540,10 @@ describe("====================== Stage 1: Deploy contracts =====================
     const referralAddr = referral.address;
     consoleLogWithTab(`Referral deployed at: ${referral.address}`);
 
-    // FarmLibrary Deployment for Farm.
-    farmLib = await deployFarmLibrary(owner);
+    // FarmLib Deployment for Farm.
+    farmLib = await deployFarmLib(owner);
     const farmLibAddr = farmLib.address;
-    consoleLogWithTab(`FarmLibrary deployed at: ${farmLib.address}`);
+    consoleLogWithTab(`FarmLib deployed at: ${farmLib.address}`);
 
     // Farm Deployment.
     const startBlock = (await ethers.provider.getBlock("latest")).number + 10;

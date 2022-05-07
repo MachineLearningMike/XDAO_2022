@@ -4,8 +4,8 @@ const { getAddress, keccak256, solidityPack } = require("ethers/lib/utils");
 const ONE = ethers.BigNumber.from(1);
 const TWO = ethers.BigNumber.from(2);
 
-exports.deployWireLibrary = async function (deployer) {
-  const WireLib = await ethers.getContractFactory("WireLibrary", {
+exports.deployWireLib = async function (deployer) {
+  const WireLib = await ethers.getContractFactory("WireLib", {
     signer: deployer,
   });
   const wireLib = await WireLib.deploy();
@@ -18,7 +18,7 @@ exports.deployFactory = async function (deployer, feeToSetter, wireLib) {
   const Factory = await ethers.getContractFactory("XDAOFactory", {
     signer: deployer,
     libraries: {
-      WireLibrary: wireLib,
+      WireLib: wireLib,
     },
   });
 
@@ -36,11 +36,23 @@ exports.deployWBNB = async function (deployer) {
   return wbnb;
 };
 
-exports.deployTGR = async function (deployer, wireLib) {
+exports.deployGovLib = async function (deployer) {
+  const GovernanceLib = await ethers.getContractFactory("GovLib", {
+    signer: deployer,
+  });
+  const governanceLib = await GovernanceLib.deploy();
+  await governanceLib.deployed();
+
+  return governanceLib;
+};
+
+
+exports.deployTGR = async function (deployer, wireLib, governanceLib) {
   const TGRToken = await ethers.getContractFactory("TGRToken", {
     signer: deployer,
     libraries: {
-      WireLibrary: wireLib,
+      WireLib: wireLib,
+      GovLib: governanceLib,
     },
   });
 
@@ -79,7 +91,7 @@ exports.deployMaker = async function (deployer, wbnb, wireLib) {
   const Router = await ethers.getContractFactory("XDAOMaker", {
     signer: deployer,
     libraries: {
-      WireLibrary: wireLib,
+      WireLib: wireLib,
     },
   });
 
@@ -93,7 +105,7 @@ exports.deployTaker = async function (deployer, wbnb, wireLib) {
   const Router = await ethers.getContractFactory("XDAOTaker", {
     signer: deployer,
     libraries: {
-      WireLibrary: wireLib,
+      WireLib: wireLib,
     },
   });
 
@@ -120,8 +132,8 @@ exports.verifyUpgradeable = async function (address) {
   }
 };
 
-exports.deployFarmLibrary = async function (deployer) {
-  const FarmLib = await ethers.getContractFactory("FarmLibrary", {
+exports.deployFarmLib = async function (deployer) {
+  const FarmLib = await ethers.getContractFactory("FarmLib", {
     signer: deployer,
   });
   const farmLib = await FarmLib.deploy();
@@ -134,8 +146,8 @@ exports.deployFarm = async function (deployer, crssAddr, crssPerBlock, startBloc
   const XDAOFarm = await ethers.getContractFactory("XDAOFarm", {
     signer: deployer,
     libraries: {
-      WireLibrary: wireLib,
-      FarmLibrary: farmLib
+      WireLib: wireLib,
+      FarmLib: farmLib
     },
   });
 
@@ -149,7 +161,7 @@ exports.deployXTGR = async function (deployer, name, symbol, wireLib) {
   const XTGRToken = await ethers.getContractFactory("XTGRToken", {
     signer: deployer,
     libraries: {
-      WireLibrary: wireLib
+      WireLib: wireLib
     },
   });
 
@@ -196,7 +208,7 @@ exports.deployRepay = async function (deployer, crssAddr, rTGRAddr, rSyrupAddr, 
   const Repay = await ethers.getContractFactory("Repay", {
     signer: deployer,
     libraries: {
-      WireLibrary: wireLib
+      WireLib: wireLib
     },
   });
 

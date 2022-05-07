@@ -9,7 +9,7 @@ import "./interfaces/IXDAOFarm.sol";
 
 import "../session/SessionManager.sol";
 import "../session/Node.sol";
-import "../libraries/WireLibrary.sol";
+import "../libraries/WireLib.sol";
 import "../periphery/interfaces/IMaker.sol";
 import "../periphery/interfaces/ITaker.sol";
 import "./interfaces/ITGRToken.sol"; 
@@ -18,10 +18,10 @@ import "../core/interfaces/IXDAOPair.sol";
 import "./interfaces/ITGRReferral.sol";
 import "./BaseRelayRecipient.sol";
 import "../libraries/math/SafeMath.sol";
-import "../libraries/FarmLibrary.sol";
+import "../libraries/FarmLib.sol";
 
 import "../libraries/utils/TransferHelper.sol";
-import "../libraries/XDAOLibrary.sol";
+import "../libraries/CyberSwapLib.sol";
 
 import "hardhat/console.sol";
 
@@ -155,14 +155,14 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
     function setFeeStores(FeeStores memory _feeStores, address caller) public override virtual {
         super.setFeeStores(_feeStores, caller);
-        WireLibrary.setFeeStores(feeStores, _feeStores);
+        WireLib.setFeeStores(feeStores, _feeStores);
         feeParams.treasury = _feeStores.treasury; // ---------------------- crooked.
         emit SetFeeStores(_feeStores);
     }
 
     function setFeeRates(SessionType _sessionType, FeeRates memory _feeRates, address caller) public override virtual {
         if (caller != address(this)) {
-            WireLibrary.setFeeRates(_sessionType, feeRates, _feeRates);
+            WireLib.setFeeRates(_sessionType, feeRates, _feeRates);
             emit SetFeeRates(_sessionType, _feeRates);
             super.setFeeRates(_sessionType, _feeRates, caller);
         }
@@ -228,7 +228,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
             require( poolInfo[i].lpToken != lpToken, "Used LP");
         }
 
-        totalAllocPoint = FarmLibrary.addPool(_allocPoint, _lpToken, _depositFeeRate, startBlock, poolInfo);
+        totalAllocPoint = FarmLib.addPool(_allocPoint, _lpToken, _depositFeeRate, startBlock, poolInfo);
     }
 
     /**
@@ -243,7 +243,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         require(_pid != 0, sInvalidPoolId);
         require(_depositFeeRate <= depositFeeLimit, sInvalidFee);
         if (_withUpdate) massUpdatePools();
-        totalAllocPoint = FarmLibrary.setPool(poolInfo, _pid, _allocPoint, _depositFeeRate);
+        totalAllocPoint = FarmLib.setPool(poolInfo, _pid, _allocPoint, _depositFeeRate);
     }
 
     // Migrate lp token to another lp contract. Can be called by anyone. We trust that migrator contract is good.
@@ -273,7 +273,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         uint256 length = poolInfo.length;
         for (uint256 pid = 0; pid < length; ++pid) {
             PoolInfo storage pool = poolInfo[pid];
-            FarmLibrary.updatePool(pool, totalAllocPoint, crssPerBlock, bonusMultiplier, nodes);
+            FarmLib.updatePool(pool, totalAllocPoint, crssPerBlock, bonusMultiplier, nodes);
         }
     }
 
@@ -283,7 +283,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     */
     function updatePool(uint256 _pid) public override validPid(_pid) {
         PoolInfo storage pool = poolInfo[_pid];
-        FarmLibrary.updatePool(pool, totalAllocPoint, crssPerBlock, bonusMultiplier, nodes);
+        FarmLib.updatePool(pool, totalAllocPoint, crssPerBlock, bonusMultiplier, nodes);
     }
 
     /**
@@ -300,7 +300,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     */
 
     function dailyPatrol() public override virtual returns (bool done) {
-        uint256 newLastPatrolDay = FarmLibrary.dailyPatrol(poolInfo, totalAllocPoint, crssPerBlock, bonusMultiplier, feeParams, nodes, lastPatrolDay);
+        uint256 newLastPatrolDay = FarmLib.dailyPatrol(poolInfo, totalAllocPoint, crssPerBlock, bonusMultiplier, feeParams, nodes, lastPatrolDay);
         if (newLastPatrolDay != 0) {
             lastPatrolDay = newLastPatrolDay;
             done = true;
@@ -310,7 +310,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
     function getUserState(uint256 pid, address userAddress) external view validPid(pid)
     returns ( UserState memory) {
-        return FarmLibrary.getUserState(userAddress, pid, poolInfo, userInfo, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier, vestMonths);
+        return FarmLib.getUserState(userAddress, pid, poolInfo, userInfo, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier, vestMonths);
     }
 
     function getVestList(uint256 pid, address userAddress) external view validPid(pid) returns(VestChunk[] memory) {
@@ -318,7 +318,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     }
 
     function getSubPooledTGR(uint256 pid, address userAddress) external view validPid(pid) returns(SubPooledTGR memory) {
-        return FarmLibrary.getSubPooledTGR(poolInfo[pid], userInfo[pid][userAddress]);
+        return FarmLib.getSubPooledTGR(poolInfo[pid], userInfo[pid][userAddress]);
     }
 
     // ============================== Session (Transaction) Area ==============================
@@ -335,15 +335,15 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         UserInfo storage user = userInfo[_pid][msgSender];
 
         if (! patroled)
-        FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
 
         if (_amount > 0) {
-            _amount = FarmLibrary.pullFromUser(pool, msgSender, _amount);
+            _amount = FarmLib.pullFromUser(pool, msgSender, _amount);
             _amount -= _payTransactonFee(address(pool.lpToken), address(this), _amount, false);
-            _amount -= FarmLibrary.payDepositFeeLPFromFarm(pool, _amount, feeStores);
+            _amount -= FarmLib.payDepositFeeLPFromFarm(pool, _amount, feeStores);
             deposited = _amount;
             emit Deposit(_msgSender(), _pid, deposited);
-            FarmLibrary.startRewardCycle(pool, user, deposited, feeParams, true); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, deposited, feeParams, true); // false: addNotSubract
         }
 
         _closeSession();
@@ -361,7 +361,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         UserInfo storage user = userInfo[_pid][msgSender];
 
         if (! patroled)
-        FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
         if (user.amount < _amount) _amount = user.amount;
 
         if (_amount > 0) {
@@ -369,7 +369,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
             _amount -= _payTransactonFee(address(pool.lpToken), address(this), _amount, false);
             pool.lpToken.safeTransfer(msgSender, _amount);  // withdraw
             emit Withdraw(msgSender, _pid, withdrawn);
-            FarmLibrary.startRewardCycle(pool, user, withdrawn, feeParams, false); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, withdrawn, feeParams, false); // false: addNotSubract
         }
 
         _closeSession();
@@ -388,13 +388,13 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         UserInfo storage user = userInfo[_pid][msgSender];
 
         if (! patroled)
-        FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
 
         if (_amount > 0) {
-            _amount -= FarmLibrary.withdrawVestPieces(user.vestList, vestMonths, _amount);
+            _amount -= FarmLib.withdrawVestPieces(user.vestList, vestMonths, _amount);
             withdrawn = _amount;
             _amount -= _payTransactonFee(nodes.token, nodes.xToken, _amount, false);
-            FarmLibrary.tolerableTGRTransferFromXTokenAccount(nodes.xToken, msgSender, _amount);
+            FarmLib.tolerableTGRTransferFromXTokenAccount(nodes.xToken, msgSender, _amount);
             emit WithdrawVest(msgSender, _pid, withdrawn);
         }
 
@@ -414,7 +414,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         UserInfo storage user = userInfo[_pid][msgSender];
       
         if (! patroled)
-        FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
 
         uint256 amount = user.accumulated;
         if (amount > 0) {
@@ -437,16 +437,16 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     //     UserInfo storage user = userInfo[_pid][msgSender];
 
     //     if (! patroled)
-    //     FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+    //     FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
 
     //     uint256 amount = user.accumulated;
     //     uint256 newLpAmount;
     //     if (amount > 0) {
     //         amount -= _payTransactonFee(nodes.token, nodes.xToken, amount, false);
-    //         amount -= FarmLibrary.payCompoundFee(nodes.token, feeParams, amount, nodes);
+    //         amount -= FarmLib.payCompoundFee(nodes.token, feeParams, amount, nodes);
     //         compounded = amount;
-    //         newLpAmount = FarmLibrary.changeTGRInXTokenToLpInFarm(address(pool.lpToken), nodes, amount, feeParams.treasury);
-    //         FarmLibrary.startRewardCycle(pool, user, newLpAmount, true);  // true: addNotSubract
+    //         newLpAmount = FarmLib.changeTGRInXTokenToLpInFarm(address(pool.lpToken), nodes, amount, feeParams.treasury);
+    //         FarmLib.startRewardCycle(pool, user, newLpAmount, true);  // true: addNotSubract
     //         user.accumulated = 0;
     //         emit CompoundAccumulated(msgSender, _pid, compounded, newLpAmount);
     //     }    
@@ -462,13 +462,13 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         UserInfo storage user = userInfo[_pid][msgSender];
 
         if (! patroled)
-        FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
 
         uint256 amount = user.accumulated;
         if (amount > 0) {
             amount -= _payTransactonFee(nodes.token, nodes.xToken, amount, false);
             harvested = amount;
-            FarmLibrary.tolerableTGRTransferFromXTokenAccount(nodes.xToken, msgSender, amount);
+            FarmLib.tolerableTGRTransferFromXTokenAccount(nodes.xToken, msgSender, amount);
             user.accumulated = 0;
             emit HarvestAccumulated(msgSender, _pid, amount);
         }
@@ -485,20 +485,20 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         UserInfo storage user = userInfo[_pid][msgSender];
 
         if (! patroled)
-        FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
 
         uint256 amount = user.accumulated;
         if (amount > 0) {
             amount -= _payTransactonFee(nodes.token, nodes.xToken, amount, false);
             pool = poolInfo[0];
             user = userInfo[0][msgSender];
-            FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+            FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
             uint256 balance0 = IERC20(nodes.token).balanceOf(address(this));
-            FarmLibrary.tolerableTGRTransferFromXTokenAccount(nodes.xToken, address(this), amount);
+            FarmLib.tolerableTGRTransferFromXTokenAccount(nodes.xToken, address(this), amount);
             amount = IERC20(nodes.token).balanceOf(address(this)) - balance0;           
-            amount -= FarmLibrary.payDepositFeeLPFromFarm(pool, amount, feeStores);
+            amount -= FarmLib.payDepositFeeLPFromFarm(pool, amount, feeStores);
             staked = amount;
-            FarmLibrary.startRewardCycle(pool, user, staked, feeParams, true); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, staked, feeParams, true); // false: addNotSubract
             user.accumulated = 0;
             emit StakeAccumulated(msgSender, _pid, amount);
         }
@@ -513,13 +513,13 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msgSender];
 
-        // give up: FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        // give up: FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
         uint256 amount = user.amount;
 
         if (amount > 0) {
             uint256 withdrawn = amount;
             pool.lpToken.safeTransfer(msgSender, amount);  // withdraw
-            FarmLibrary.startRewardCycle(pool, user, withdrawn, feeParams, false); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, withdrawn, feeParams, false); // false: addNotSubract
             emit EmergencyWithdraw(msgSender, _pid, withdrawn);
         }
 
@@ -535,11 +535,11 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
         address msgSender = _msgSender();
 
-        uint256 amount = FarmLibrary.collectAccumulated(msgSender, poolInfo, userInfo, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        uint256 amount = FarmLib.collectAccumulated(msgSender, poolInfo, userInfo, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
         if (amount > 0) {
             rewards = amount;
             amount -= _payTransactonFee(nodes.token, nodes.xToken, amount, false);
-            FarmLibrary.tolerableTGRTransferFromXTokenAccount(nodes.xToken, msgSender, amount);
+            FarmLib.tolerableTGRTransferFromXTokenAccount(nodes.xToken, msgSender, amount);
             emit MassHarvestRewards(msgSender, rewards);
         }
 
@@ -554,19 +554,19 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         dailyPatrol();
 
         address msgSender = _msgSender();
-        uint256 amount = FarmLibrary.collectAccumulated(msgSender, poolInfo, userInfo, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+        uint256 amount = FarmLib.collectAccumulated(msgSender, poolInfo, userInfo, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
         if (amount > 0) {
             amount -= _payTransactonFee(nodes.token, nodes.xToken, amount, false);
             PoolInfo storage pool = poolInfo[0];
-            amount -= FarmLibrary.payDepositFeeTGRFromXTGR(pool, nodes.xToken, amount, feeStores);
+            amount -= FarmLib.payDepositFeeTGRFromXTGR(pool, nodes.xToken, amount, feeStores);
             uint256 balance0 = IERC20(nodes.token).balanceOf(address(this));
-            FarmLibrary.tolerableTGRTransferFromXTokenAccount(nodes.xToken, address(this), amount);
+            FarmLib.tolerableTGRTransferFromXTokenAccount(nodes.xToken, address(this), amount);
             amount = IERC20(nodes.token).balanceOf(address(this)) - balance0;
 
             rewards = amount;
 
             UserInfo storage user = userInfo[0][msgSender];
-            FarmLibrary.startRewardCycle(pool, user, rewards, feeParams, true); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, rewards, feeParams, true); // false: addNotSubract
             emit MassStakeRewards(msgSender, rewards);
         }
 
@@ -579,7 +579,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
         address msgSender = _msgSender();
         (uint256 totalCompounded, )
-        = FarmLibrary.massCompoundRewards(msgSender, poolInfo, userInfo, nodes, feeParams);
+        = FarmLib.massCompoundRewards(msgSender, poolInfo, userInfo, nodes, feeParams);
         emit MassCompoundRewards(msgSender, totalCompounded);
 
         _closeSession();
@@ -595,7 +595,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msgSender];
 
-        if (FarmLibrary.switchCollectOption(pool, user, newOption,
+        if (FarmLib.switchCollectOption(pool, user, newOption,
         msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier
         )) {
             emit SwitchCollectOption(msgSender, _pid, newOption);
@@ -612,7 +612,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
             if (address(payerToken) == nodes.token) {
                 feesPaid = _payFeeTGR(payerAddress, principal, feeRates[sessionParams.sessionType], fromAllowance);
             } else {
-                feesPaid = XDAOLibrary.payFeeLP(payerToken, principal, feeRates[sessionParams.sessionType], feeStores); // payerAddress: address(this).
+                feesPaid = CyberSwapLib.payFeeLP(payerToken, principal, feeRates[sessionParams.sessionType], feeStores); // payerAddress: address(this).
             }
         }
     }

@@ -6,13 +6,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 import "../session/Node.sol";
-import "../libraries/WireLibrary.sol";
+import "../libraries/WireLib.sol";
 import "./interfaces/ITaker.sol";
 import "../session/SessionManager.sol";
 import "../session/PriceControl.sol";
 import "./ChainLinkControl.sol";
 import "../libraries/utils/TransferHelper.sol";
-import "../libraries/XDAOLibrary.sol";
+import "../libraries/CyberSwapLib.sol";
 import "../libraries/math/SafeMath.sol";
 import "../core/interfaces/IXDAOFactory.sol";
 import "./interfaces/IWETH.sol";
@@ -74,13 +74,13 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
 
     function setFeeStores(FeeStores memory _feeStores, address caller) public override virtual {
         super.setFeeStores(_feeStores, caller);
-        WireLibrary.setFeeStores(feeStores, _feeStores);
+        WireLib.setFeeStores(feeStores, _feeStores);
         emit SetFeeStores(_feeStores);
     }
 
     function setFeeRates(SessionType _sessionType, FeeRates memory _feeRates, address caller) public override virtual {
         if (caller != address(this)) {
-            WireLibrary.setFeeRates(_sessionType, feeRates, _feeRates);
+            WireLib.setFeeRates(_sessionType, feeRates, _feeRates);
             emit SetFeeRates(_sessionType, _feeRates);
             super.setFeeRates(_sessionType, _feeRates, caller);
         }
@@ -105,7 +105,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
             (uint256 amount0Out, uint256 amount1Out) = input == pairSnapshot.token0
                 ? (uint256(0), amountOut)
                 : (amountOut, uint256(0));
-            address to = i < path.length - 2 ? XDAOLibrary.pairFor(nodes.factory, output, path[i + 2]) : _to;
+            address to = i < path.length - 2 ? CyberSwapLib.pairFor(nodes.factory, output, path[i + 2]) : _to;
             pair.swap(amount0Out, amount1Out, to, new bytes(0));
             
             if(_msgSender() != owner()) _ruleOutInvalidPairState(isNichePair, pairSnapshot);
@@ -113,7 +113,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
     }
 
     function _captureInitialPairState(address input, address output) internal virtual returns (PairSnapshot memory pairSnapshot, bool isNichePair) {
-        pairSnapshot.pair = XDAOLibrary.pairFor(nodes.factory, input, output);
+        pairSnapshot.pair = CyberSwapLib.pairFor(nodes.factory, input, output);
         (pairSnapshot.token0, pairSnapshot.token1) = (IXDAOPair(pairSnapshot.pair).token0(), IXDAOPair(pairSnapshot.pair).token1());
         isNichePair = chainlinkFeeds[pairSnapshot.token0].proxy == address(0) || chainlinkFeeds[pairSnapshot.token1].proxy == address(0);
         if (isNichePair)  {
@@ -144,13 +144,13 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
 
         amountIn -= _payPossibleSellFee(path[0], msg.sender, amountIn);
 
-        amounts = XDAOLibrary.getAmountsOut(nodes.factory, amountIn, path);
+        amounts = CyberSwapLib.getAmountsOut(nodes.factory, amountIn, path);
         require(amounts[amounts.length - 1] >= amountOutMin, sInsufficientOutput);
 
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender, 
-            XDAOLibrary.pairFor(nodes.factory, path[0], path[1]),
+            CyberSwapLib.pairFor(nodes.factory, path[0], path[1]),
             amounts[0]
         );
 
@@ -189,7 +189,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
     ) external override virtual ensure(deadline) returns (uint256[] memory amounts) {
         _openSession(SessionType.Swap);
 
-        amounts = XDAOLibrary.getAmountsIn(nodes.factory, amountOut, path);
+        amounts = CyberSwapLib.getAmountsIn(nodes.factory, amountOut, path);
 
         require(amounts[0] <= amountInMax, sExcessiveInput);
         _payPossibleSellFee(path[0], msg.sender, amounts[0]);
@@ -197,7 +197,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,
-            XDAOLibrary.pairFor(nodes.factory, path[0], path[1]),
+            CyberSwapLib.pairFor(nodes.factory, path[0], path[1]),
             amounts[0]
         );
 
@@ -215,10 +215,10 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         _openSession(SessionType.Swap);
 
         require(path[0] == WETH, sInvalidPath);       
-        amounts = XDAOLibrary.getAmountsOut(nodes.factory, msg.value, path);
+        amounts = CyberSwapLib.getAmountsOut(nodes.factory, msg.value, path);
         require(amounts[amounts.length - 1] >= amountOutMin, sInsufficientOutput);
         IWETH(WETH).deposit{value: amounts[0]}();
-        assert(IWETH(WETH).transfer(XDAOLibrary.pairFor(nodes.factory, path[0], path[1]), amounts[0]));
+        assert(IWETH(WETH).transfer(CyberSwapLib.pairFor(nodes.factory, path[0], path[1]), amounts[0]));
 
         _swapWithPossibleBuyFee(amounts, path, feeRates[sessionParams.sessionType], to);
 
@@ -235,7 +235,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         _openSession(SessionType.Swap);
 
         require(path[path.length - 1] == WETH, sInvalidPath);
-        amounts = XDAOLibrary.getAmountsIn(nodes.factory, amountOut, path);
+        amounts = CyberSwapLib.getAmountsIn(nodes.factory, amountOut, path);
 
         require(amounts[0] <= amountInMax, sExcessiveInput);
         _payPossibleSellFee(path[0], msg.sender, amounts[0]);
@@ -243,7 +243,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,
-            XDAOLibrary.pairFor(nodes.factory, path[0], path[1]),
+            CyberSwapLib.pairFor(nodes.factory, path[0], path[1]),
             amounts[0]
         );
         _swap(amounts, path, address(this));
@@ -264,13 +264,13 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
 
         amountIn -= _payPossibleSellFee(path[0], msg.sender, amountIn);
         require(path[path.length - 1] == WETH, sInvalidPath);
-        amounts = XDAOLibrary.getAmountsOut(nodes.factory, amountIn, path);
+        amounts = CyberSwapLib.getAmountsOut(nodes.factory, amountIn, path);
         require(amounts[amounts.length - 1] >= amountOutMin, sInsufficientOutput);
 
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,
-            XDAOLibrary.pairFor(nodes.factory, path[0], path[1]),
+            CyberSwapLib.pairFor(nodes.factory, path[0], path[1]),
             amounts[0]
         );
 
@@ -290,11 +290,11 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         _openSession(SessionType.Swap);
 
         require(path[0] == WETH, sInvalidPath);
-        amounts = XDAOLibrary.getAmountsIn(nodes.factory, amountOut, path);
+        amounts = CyberSwapLib.getAmountsIn(nodes.factory, amountOut, path);
 
         require(amounts[0] <= msg.value, sExcessiveInput);
         IWETH(WETH).deposit{value: amounts[0]}();
-        assert(IWETH(WETH).transfer(XDAOLibrary.pairFor(nodes.factory, path[0], path[1]), amounts[0]));
+        assert(IWETH(WETH).transfer(CyberSwapLib.pairFor(nodes.factory, path[0], path[1]), amounts[0]));
 
         _swapWithPossibleBuyFee(amounts, path, feeRates[sessionParams.sessionType], to);
 
@@ -320,11 +320,11 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
                 (uint256 reserveInput, uint256 reserveOutput) = input == pairSnapshot.token0
                     ? (pairSnapshot.reserve0, pairSnapshot.reserve1) : (pairSnapshot.reserve1, pairSnapshot.reserve0);
                 amountInput = IERC20(input).balanceOf(address(pair)).sub(reserveInput);
-                amountOutput = XDAOLibrary.getAmountOut(amountInput, reserveInput, reserveOutput);
+                amountOutput = CyberSwapLib.getAmountOut(amountInput, reserveInput, reserveOutput);
             }
             (uint256 amount0Out, uint256 amount1Out) = input == pairSnapshot.token0
                 ? (uint256(0), amountOutput) : (amountOutput, uint256(0));
-            address to = i < path.length - 2 ? XDAOLibrary.pairFor(nodes.factory, output, path[i + 2]) : _to;
+            address to = i < path.length - 2 ? CyberSwapLib.pairFor(nodes.factory, output, path[i + 2]) : _to;
             pair.swap(amount0Out, amount1Out, to, new bytes(0));
 
             if(_msgSender() != owner()) _ruleOutInvalidPairState(isNichePair, pairSnapshot);
@@ -342,7 +342,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
 
         amountIn -= _payPossibleSellFee(path[0], msg.sender, amountIn);
 
-        TransferHelper.safeTransferFrom(path[0], msg.sender, XDAOLibrary.pairFor(nodes.factory, path[0], path[1]), amountIn);
+        TransferHelper.safeTransferFrom(path[0], msg.sender, CyberSwapLib.pairFor(nodes.factory, path[0], path[1]), amountIn);
         uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
         
         _swapSupportingFeeOnTransferTokensWithPossibleBuyFee(path, feeRates[sessionParams.sessionType], to);
@@ -381,7 +381,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         require(path[0] == WETH, sInvalidPath);
         uint256 amountIn = msg.value;
         IWETH(WETH).deposit{value: amountIn}();
-        assert(IWETH(WETH).transfer(XDAOLibrary.pairFor(nodes.factory, path[0], path[1]), amountIn));
+        assert(IWETH(WETH).transfer(CyberSwapLib.pairFor(nodes.factory, path[0], path[1]), amountIn));
         uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
 
         _swapSupportingFeeOnTransferTokensWithPossibleBuyFee(path, feeRates[sessionParams.sessionType], to);
@@ -407,7 +407,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
 
         amountIn -= _payPossibleSellFee(path[0], msg.sender, amountIn);
 
-        TransferHelper.safeTransferFrom(path[0], msg.sender, XDAOLibrary.pairFor(nodes.factory, path[0], path[1]), amountIn);
+        TransferHelper.safeTransferFrom(path[0], msg.sender, CyberSwapLib.pairFor(nodes.factory, path[0], path[1]), amountIn);
         _swapSupportingFeeOnTransferTokens(path, address(this));
         uint256 amountOut = IERC20(WETH).balanceOf(address(this));
         require(amountOut >= amountOutMin, sInsufficientOutput);
@@ -423,7 +423,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         uint256 reserveA,
         uint256 reserveB
     ) public pure override virtual returns (uint256 amountB) {
-        return XDAOLibrary.quote(amountA, reserveA, reserveB);
+        return CyberSwapLib.quote(amountA, reserveA, reserveB);
     }
 
     function getAmountOut(
@@ -431,7 +431,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         uint256 reserveIn,
         uint256 reserveOut
     ) public pure override virtual returns (uint256 amountOut) {
-        return XDAOLibrary.getAmountOut(amountIn, reserveIn, reserveOut);
+        return CyberSwapLib.getAmountOut(amountIn, reserveIn, reserveOut);
     }
 
     function getAmountIn(
@@ -439,7 +439,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         uint256 reserveIn,
         uint256 reserveOut
     ) public pure override virtual returns (uint256 amountIn) {
-        return XDAOLibrary.getAmountIn(amountOut, reserveIn, reserveOut);
+        return CyberSwapLib.getAmountIn(amountOut, reserveIn, reserveOut);
     }
 
     function getAmountsOut(uint256 amountIn, address[] memory path)
@@ -449,7 +449,7 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         override
         returns (uint256[] memory amounts)
     {
-        return XDAOLibrary.getAmountsOut(nodes.factory, amountIn, path);
+        return CyberSwapLib.getAmountsOut(nodes.factory, amountIn, path);
     }
 
     function getAmountsIn(uint256 amountOut, address[] memory path)
@@ -459,13 +459,13 @@ contract XDAOTaker is Node, ITaker, Ownable, SessionManager, PriceControl, Chain
         override
         returns (uint256[] memory amounts)
     {
-        return XDAOLibrary.getAmountsIn(nodes.factory, amountOut, path);
+        return CyberSwapLib.getAmountsIn(nodes.factory, amountOut, path);
     }
 
 
     function getReserveOnETHPair(address _token) external view override virtual returns (uint256 reserve) {
-        (uint256 reserve0, uint256 reserve1) = XDAOLibrary.getReserves(nodes.factory, _token, WETH);
-        (address token0, ) = XDAOLibrary.sortTokens(_token, WETH);
+        (uint256 reserve0, uint256 reserve1) = CyberSwapLib.getReserves(nodes.factory, _token, WETH);
+        (address token0, ) = CyberSwapLib.sortTokens(_token, WETH);
         reserve = token0 == _token? reserve0 : reserve1;
     }
 }
