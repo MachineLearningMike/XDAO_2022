@@ -170,7 +170,7 @@ export class FarmLibrary extends BaseContract {
           lpToken: string;
           allocPoint: BigNumber;
           lastRewardBlock: BigNumber;
-          accCrssPerShare: BigNumber;
+          accTGRPerShare: BigNumber;
           depositFeeRate: BigNumber;
           reward: BigNumber;
           OnOff: [
@@ -298,7 +298,7 @@ export class FarmLibrary extends BaseContract {
           lpToken: string;
           allocPoint: BigNumber;
           lastRewardBlock: BigNumber;
-          accCrssPerShare: BigNumber;
+          accTGRPerShare: BigNumber;
           depositFeeRate: BigNumber;
           reward: BigNumber;
           OnOff: [
@@ -437,7 +437,7 @@ export class FarmLibrary extends BaseContract {
       lpToken: string;
       allocPoint: BigNumber;
       lastRewardBlock: BigNumber;
-      accCrssPerShare: BigNumber;
+      accTGRPerShare: BigNumber;
       depositFeeRate: BigNumber;
       reward: BigNumber;
       OnOff: [
@@ -569,7 +569,7 @@ export class FarmLibrary extends BaseContract {
         lpToken: string;
         allocPoint: BigNumber;
         lastRewardBlock: BigNumber;
-        accCrssPerShare: BigNumber;
+        accTGRPerShare: BigNumber;
         depositFeeRate: BigNumber;
         reward: BigNumber;
         OnOff: [

@@ -1,10 +1,52 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\CrossFactory.sol": {
-      "lastModificationDate": 1651880919744,
-      "contentHash": "85adf9777b981e1c9cf2869ad60cd8c4",
-      "sourceName": "contracts/core/CrossFactory.sol",
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\IPancakeFactory.sol": {
+      "lastModificationDate": 1651856985780,
+      "contentHash": "396803b83875c5a1967fd69180b5b88b",
+      "sourceName": "contracts/core/interfaces/IPancakeFactory.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IPancakeFactory"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\IXDAOFactory.sol": {
+      "lastModificationDate": 1651920207417,
+      "contentHash": "1ff48fb2096a72297c7d8c852312c6ca",
+      "sourceName": "contracts/core/interfaces/IXDAOFactory.sol",
       "solcConfig": {
         "version": "0.8.3",
         "settings": {
@@ -36,16 +78,202 @@
         }
       },
       "imports": [
-        "../session/Node.sol",
-        "../periphery/interfaces/ICrossRouter.sol",
-        "./CrossPair.sol",
-        "./interfaces/ICrossFactory.sol"
+        "./IPancakeFactory.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
       ],
       "artifacts": [
-        "CrossFactory"
+        "IXDAOFactory"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\XDAOTaker.sol": {
+      "lastModificationDate": 1651920610133,
+      "contentHash": "cba36c33e6df335fa2682f4a169697e0",
+      "sourceName": "contracts/periphery/XDAOTaker.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "../session/Node.sol",
+        "../libraries/WireLibrary.sol",
+        "./interfaces/ITaker.sol",
+        "../session/SessionManager.sol",
+        "../session/PriceControl.sol",
+        "./ChainLinkControl.sol",
+        "../libraries/utils/TransferHelper.sol",
+        "../libraries/XDAOLibrary.sol",
+        "../libraries/math/SafeMath.sol",
+        "../core/interfaces/IXDAOFactory.sol",
+        "./interfaces/IWETH.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IBalanceLedger",
+        "XDAOTaker"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
+      "lastModificationDate": 1651763737615,
+      "contentHash": "ad7c2d0af148c8f9f097d65deeb4da6b",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\access\\Ownable.sol": {
+      "lastModificationDate": 1651763761810,
+      "contentHash": "8398972af73b4e9e5ff3b31cad86234f",
+      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
+      "lastModificationDate": 1651763737944,
+      "contentHash": "909ab67fc5c25033fe6cd364f8c056f9",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "../IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20Metadata"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\Node.sol": {
@@ -94,189 +322,6 @@
         "Node"
       ]
     },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\ICrossFactory.sol": {
-      "lastModificationDate": 1649486874914,
-      "contentHash": "724eac77875a492f52e37933a77d9f55",
-      "sourceName": "contracts/core/interfaces/ICrossFactory.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IPancakeFactory.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ICrossFactory"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\ICrossRouter.sol": {
-      "lastModificationDate": 1649486874924,
-      "contentHash": "5ae5cc4c99f4e8e21da8e1fb1b4e7e26",
-      "sourceName": "contracts/periphery/interfaces/ICrossRouter.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IPancakeRouter02.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ICrossRouter"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\CrossPair.sol": {
-      "lastModificationDate": 1651897445219,
-      "contentHash": "057328ae06650ebdc225ddce898b5597",
-      "sourceName": "contracts/core/CrossPair.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "@openzeppelin/contracts/utils/math/Math.sol",
-        "../libraries/math/SafeMath.sol",
-        "../libraries/math/UQ112x112.sol",
-        "./interfaces/ICrossPair.sol",
-        "./interfaces/ICrossFactory.sol",
-        "./interfaces/ICrossCallee.sol",
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "CrossPair"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\INode.sol": {
-      "lastModificationDate": 1651654655367,
-      "contentHash": "fa457486ce7a5cfda8b09a2b8aae16a8",
-      "sourceName": "contracts/session/interfaces/INode.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IConstants.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "INode"
-      ]
-    },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\WireLibrary.sol": {
       "lastModificationDate": 1651171820119,
       "contentHash": "1fd5548bd162dea019df0bbb45faea4f",
@@ -320,1018 +365,6 @@
       ],
       "artifacts": [
         "WireLibrary"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\hardhat\\console.sol": {
-      "lastModificationDate": 1651763927696,
-      "contentHash": "cc4777addd464ea56fa35b1c45df0591",
-      "sourceName": "hardhat/console.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">=0.4.22 <0.9.0"
-      ],
-      "artifacts": [
-        "console"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\IConstants.sol": {
-      "lastModificationDate": 1651685627762,
-      "contentHash": "f5306dc549f1db67674c06441e240483",
-      "sourceName": "contracts/session/interfaces/IConstants.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": []
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\IPancakeFactory.sol": {
-      "lastModificationDate": 1651856985780,
-      "contentHash": "396803b83875c5a1967fd69180b5b88b",
-      "sourceName": "contracts/core/interfaces/IPancakeFactory.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IPancakeFactory"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IPancakeRouter02.sol": {
-      "lastModificationDate": 1649486874924,
-      "contentHash": "becebeee4389a35e68181d6ddea93269",
-      "sourceName": "contracts/periphery/interfaces/IPancakeRouter02.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IPancakeRouter01.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IPancakeRouter02"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IPancakeRouter01.sol": {
-      "lastModificationDate": 1649486874924,
-      "contentHash": "7a5d419be6b5eb6c2b15b26cc091310d",
-      "sourceName": "contracts/periphery/interfaces/IPancakeRouter01.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IPancakeRouter01"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
-      "lastModificationDate": 1651763737615,
-      "contentHash": "ad7c2d0af148c8f9f097d65deeb4da6b",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC20"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\utils\\math\\Math.sol": {
-      "lastModificationDate": 1651763760847,
-      "contentHash": "339b9793dcbd7b5d55af725ef47de74c",
-      "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Math"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\math\\SafeMath.sol": {
-      "lastModificationDate": 1649486874924,
-      "contentHash": "e916116a3947573d5b729810a82177eb",
-      "sourceName": "contracts/libraries/math/SafeMath.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "SafeMath"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\math\\UQ112x112.sol": {
-      "lastModificationDate": 1649486874924,
-      "contentHash": "17e4a288eec63cf9ad845471aebf54d4",
-      "sourceName": "contracts/libraries/math/UQ112x112.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "UQ112x112"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\ICrossPair.sol": {
-      "lastModificationDate": 1651171091635,
-      "contentHash": "1042526cbb1ecb5ebb3db50b26fd52f6",
-      "sourceName": "contracts/core/interfaces/ICrossPair.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IPancakePair.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ICrossPair"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\ICrossCallee.sol": {
-      "lastModificationDate": 1649486874914,
-      "contentHash": "3542532511f2a9c75051f7b4334161c2",
-      "sourceName": "contracts/core/interfaces/ICrossCallee.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ICrossCallee"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\IPancakePair.sol": {
-      "lastModificationDate": 1651857162598,
-      "contentHash": "1c48659f03071916b39d7c60b4b6e69a",
-      "sourceName": "contracts/core/interfaces/IPancakePair.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IPancakePair"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\repay\\RSyrupBar.sol": {
-      "lastModificationDate": 1651656559474,
-      "contentHash": "c644fea96f134adfe6601c83d298e929",
-      "sourceName": "contracts/repay/RSyrupBar.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "../farm/CrssToken.sol",
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "RSyrupBar"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
-      "lastModificationDate": 1651763666283,
-      "contentHash": "a9d2146925da52142435d3bb8df53c3c",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IERC20.sol",
-        "./extensions/IERC20Metadata.sol",
-        "../../utils/Context.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ERC20"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\access\\Ownable.sol": {
-      "lastModificationDate": 1651763761810,
-      "contentHash": "8398972af73b4e9e5ff3b31cad86234f",
-      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "../utils/Context.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Ownable"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\CrssToken.sol": {
-      "lastModificationDate": 1651897678855,
-      "contentHash": "a53a9f345cc8c42a5736f10356d60a14",
-      "sourceName": "contracts/farm/CrssToken.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "./interfaces/ICrssToken.sol",
-        "../session/SessionRegistrar.sol",
-        "../session/SessionManager.sol",
-        "../session/SessionFees.sol",
-        "../session/Node.sol",
-        "../libraries/WireLibrary.sol",
-        "../periphery/interfaces/IMaker.sol",
-        "../periphery/interfaces/ITaker.sol",
-        "../core/interfaces/ICrossFactory.sol",
-        "../core/interfaces/ICrossPair.sol",
-        "../farm/interfaces/ICrossFarm.sol",
-        "../libraries/math/SafeMath.sol",
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "CrssToken"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
-      "lastModificationDate": 1651763737944,
-      "contentHash": "909ab67fc5c25033fe6cd364f8c056f9",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "../IERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC20Metadata"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
-      "lastModificationDate": 1651763623649,
-      "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
-      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Context"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\ICrssToken.sol": {
-      "lastModificationDate": 1651123560760,
-      "contentHash": "7ce560001105cc016e13ecdf01018e82",
-      "sourceName": "contracts/farm/interfaces/ICrssToken.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ICrssToken"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionRegistrar.sol": {
-      "lastModificationDate": 1651580722694,
-      "contentHash": "0f6da9a7c54a1b6cf8d46e17cc3114e3",
-      "sourceName": "contracts/session/SessionRegistrar.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./interfaces/IConstants.sol",
-        "./interfaces/ISessionRegistrar.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "SessionRegistrar"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionManager.sol": {
-      "lastModificationDate": 1651652951078,
-      "contentHash": "bf1422b910b3ca803d5408b54d073b65",
-      "sourceName": "contracts/session/SessionManager.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./interfaces/IConstants.sol",
-        "./interfaces/ISessionRegistrar.sol",
-        "./interfaces/ISessionManager.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "SessionManager"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionFees.sol": {
-      "lastModificationDate": 1651076705271,
-      "contentHash": "bde0a3272dd8cc258e08fe49e3b88535",
-      "sourceName": "contracts/session/SessionFees.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./interfaces/IConstants.sol",
-        "./interfaces/ISessionRegistrar.sol",
-        "./interfaces/ISessionFees.sol",
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "SessionFees"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IMaker.sol": {
-      "lastModificationDate": 1651168701460,
-      "contentHash": "54edd32cadf2ab3daaa56584dfe8e306",
-      "sourceName": "contracts/periphery/interfaces/IMaker.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "../../session/interfaces/IConstants.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IMaker"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\ITaker.sol": {
@@ -1378,10 +411,10 @@
         "ITaker"
       ]
     },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\ICrossFarm.sol": {
-      "lastModificationDate": 1651726544399,
-      "contentHash": "8d137dec9a0fabe07f6ac53e98c8d86b",
-      "sourceName": "contracts/farm/interfaces/ICrossFarm.sol",
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionManager.sol": {
+      "lastModificationDate": 1651920610310,
+      "contentHash": "0a47cd8813ab979cdbff1c1bba0fe8f7",
+      "sourceName": "contracts/session/SessionManager.sol",
       "solcConfig": {
         "version": "0.8.3",
         "settings": {
@@ -1413,666 +446,15 @@
         }
       },
       "imports": [
-        "./IMigratorChef.sol",
-        "../xCrssToken.sol",
-        "./ICrossFarmTypes.sol",
-        "../../session/interfaces/IConstants.sol",
-        "../../session/interfaces/INode.sol"
+        "./interfaces/IConstants.sol",
+        "./interfaces/ISessionRegistrar.sol",
+        "./interfaces/ISessionManager.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
       ],
       "artifacts": [
-        "ICrossFarm"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionRegistrar.sol": {
-      "lastModificationDate": 1649486874945,
-      "contentHash": "04cd5cb2a09edf773feb8ca506c978e1",
-      "sourceName": "contracts/session/interfaces/ISessionRegistrar.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IConstants.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ISessionRegistrar"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionManager.sol": {
-      "lastModificationDate": 1649486874944,
-      "contentHash": "06645eb9ad6ff403684f26f6a619c8b3",
-      "sourceName": "contracts/session/interfaces/ISessionManager.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IConstants.sol",
-        "./ISessionRegistrar.sol",
-        "./ISessionFees.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ISessionManager"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionFees.sol": {
-      "lastModificationDate": 1651076465378,
-      "contentHash": "a88445f0fbbbdb02fdc946a9d98d3e39",
-      "sourceName": "contracts/session/interfaces/ISessionFees.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./IConstants.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ISessionFees"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\IMigratorChef.sol": {
-      "lastModificationDate": 1651120780543,
-      "contentHash": "4cfaeca5eea7a51b4ed4f28ef1e9519f",
-      "sourceName": "contracts/farm/interfaces/IMigratorChef.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IMigratorChef"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\xCrssToken.sol": {
-      "lastModificationDate": 1651897650250,
-      "contentHash": "648f614ac1b9e4f3a7cef09db7e9a307",
-      "sourceName": "contracts/farm/xCrssToken.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        "../session/Node.sol",
-        "./interfaces/IXCrssToken.sol",
-        "./interfaces/ICrssToken.sol",
-        "../libraries/math/SafeMath.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "xCrssToken"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\ICrossFarmTypes.sol": {
-      "lastModificationDate": 1651678412172,
-      "contentHash": "0abf15d6eef21162779d7f9709a4522b",
-      "sourceName": "contracts/farm/interfaces/ICrossFarmTypes.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": []
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\IXCrssToken.sol": {
-      "lastModificationDate": 1651837324497,
-      "contentHash": "5ae6ba7c24fa210f06f2a0fcdb467bb7",
-      "sourceName": "contracts/farm/interfaces/IXCrssToken.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IXCrssToken"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\utils\\SafeERC20.sol": {
-      "lastModificationDate": 1651763778463,
-      "contentHash": "76814c83c32552ed2b521c816b4d801a",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "../IERC20.sol",
-        "../../../utils/Address.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "SafeERC20"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\utils\\Address.sol": {
-      "lastModificationDate": 1651763615314,
-      "contentHash": "ad714a6368ee7d43cded6bbe8af0b155",
-      "sourceName": "@openzeppelin/contracts/utils/Address.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.1"
-      ],
-      "artifacts": [
-        "Address"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\repay\\Repay.sol": {
-      "lastModificationDate": 1651837324494,
-      "contentHash": "42b9f9d969038d4b964c7a99b87d0ebe",
-      "sourceName": "contracts/repay/Repay.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "../session/Node.sol",
-        "../session/SessionManager.sol",
-        "../libraries/math/SafeMath.sol",
-        "../farm/CrssToken.sol",
-        "./RCrssToken.sol",
-        "./RSyrupBar.sol",
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Repay"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\repay\\RCrssToken.sol": {
-      "lastModificationDate": 1651658583260,
-      "contentHash": "dd8ebab62ffa91a4cb19ddac2520f9ed",
-      "sourceName": "contracts/repay/RCrssToken.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/proxy/utils/Initializable.sol",
-        "./interfaces/IRCrssToken.sol",
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "RCrssToken"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\proxy\\utils\\Initializable.sol": {
-      "lastModificationDate": 1651763752009,
-      "contentHash": "f0c92df5bfd98a90d0eda04719bafda5",
-      "sourceName": "@openzeppelin/contracts/proxy/utils/Initializable.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "../../utils/Address.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.2"
-      ],
-      "artifacts": [
-        "Initializable"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\repay\\interfaces\\IRCrssToken.sol": {
-      "lastModificationDate": 1651580972514,
-      "contentHash": "758dbdb6e31e31199a4d8478692658b1",
-      "sourceName": "contracts/repay/interfaces/IRCrssToken.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IRCrssToken"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\CrossTaker.sol": {
-      "lastModificationDate": 1651657579937,
-      "contentHash": "00615e83e27e4df39dc5c3b7faddec67",
-      "sourceName": "contracts/periphery/CrossTaker.sol",
-      "solcConfig": {
-        "version": "0.8.3",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
-        "../session/Node.sol",
-        "../libraries/WireLibrary.sol",
-        "./interfaces/ITaker.sol",
-        "../session/SessionManager.sol",
-        "../session/PriceControl.sol",
-        "./ChainLinkControl.sol",
-        "../libraries/utils/TransferHelper.sol",
-        "../libraries/CrossLibrary.sol",
-        "../libraries/math/SafeMath.sol",
-        "../core/interfaces/ICrossFactory.sol",
-        "./interfaces/IWETH.sol",
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "CrossTaker",
-        "IBalanceLedger"
+        "SessionManager"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\PriceControl.sol": {
@@ -2206,10 +588,10 @@
         "TransferHelper"
       ]
     },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\CrossLibrary.sol": {
-      "lastModificationDate": 1651899417520,
-      "contentHash": "45b53bd22bc0d1055e73f84bd754f862",
-      "sourceName": "contracts/libraries/CrossLibrary.sol",
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\XDAOLibrary.sol": {
+      "lastModificationDate": 1651921143005,
+      "contentHash": "daf53aad43c2e0c2e13009ba5400d722",
+      "sourceName": "contracts/libraries/XDAOLibrary.sol",
       "solcConfig": {
         "version": "0.8.3",
         "settings": {
@@ -2242,7 +624,7 @@
       },
       "imports": [
         "./math/SafeMath.sol",
-        "../core/interfaces/ICrossPair.sol",
+        "../core/interfaces/IXDAOPair.sol",
         "../session/interfaces/IConstants.sol",
         "../libraries/utils/TransferHelper.sol",
         "hardhat/console.sol"
@@ -2251,7 +633,49 @@
         "^0.8.0"
       ],
       "artifacts": [
-        "CrossLibrary"
+        "XDAOLibrary"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\math\\SafeMath.sol": {
+      "lastModificationDate": 1649486874924,
+      "contentHash": "e916116a3947573d5b729810a82177eb",
+      "sourceName": "contracts/libraries/math/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SafeMath"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IWETH.sol": {
@@ -2294,6 +718,308 @@
       ],
       "artifacts": [
         "IWETH"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\hardhat\\console.sol": {
+      "lastModificationDate": 1651763927696,
+      "contentHash": "cc4777addd464ea56fa35b1c45df0591",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
+      "lastModificationDate": 1651763623649,
+      "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\INode.sol": {
+      "lastModificationDate": 1651654655367,
+      "contentHash": "fa457486ce7a5cfda8b09a2b8aae16a8",
+      "sourceName": "contracts/session/interfaces/INode.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IConstants.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "INode"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\IConstants.sol": {
+      "lastModificationDate": 1651920610310,
+      "contentHash": "42abe761881c881af70a6f08c6278a60",
+      "sourceName": "contracts/session/interfaces/IConstants.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": []
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionRegistrar.sol": {
+      "lastModificationDate": 1649486874945,
+      "contentHash": "04cd5cb2a09edf773feb8ca506c978e1",
+      "sourceName": "contracts/session/interfaces/ISessionRegistrar.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IConstants.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ISessionRegistrar"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionManager.sol": {
+      "lastModificationDate": 1649486874944,
+      "contentHash": "06645eb9ad6ff403684f26f6a619c8b3",
+      "sourceName": "contracts/session/interfaces/ISessionManager.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IConstants.sol",
+        "./ISessionRegistrar.sol",
+        "./ISessionFees.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ISessionManager"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionFees.sol": {
+      "lastModificationDate": 1651920610310,
+      "contentHash": "e71d63aedf1b6b50f3c9e79310cf7fdb",
+      "sourceName": "contracts/session/interfaces/ISessionFees.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IConstants.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ISessionFees"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\BaseControl.sol": {
@@ -2383,10 +1109,930 @@
         "AggregatorV3Interface"
       ]
     },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\CrossMaker.sol": {
-      "lastModificationDate": 1651651694053,
-      "contentHash": "c0078cbe5888c5bf25ee7ff158e6e265",
-      "sourceName": "contracts/periphery/CrossMaker.sol",
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\IXDAOPair.sol": {
+      "lastModificationDate": 1651920207417,
+      "contentHash": "b4104d5c6128c93cedf91a25c14bd936",
+      "sourceName": "contracts/core/interfaces/IXDAOPair.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IPancakePair.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IXDAOPair"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\IPancakePair.sol": {
+      "lastModificationDate": 1651857162598,
+      "contentHash": "1c48659f03071916b39d7c60b4b6e69a",
+      "sourceName": "contracts/core/interfaces/IPancakePair.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IPancakePair"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\repay\\RSyrupBar.sol": {
+      "lastModificationDate": 1651920956143,
+      "contentHash": "55c1ddcc9c453f217168e98db42ed0e1",
+      "sourceName": "contracts/repay/RSyrupBar.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "../farm/TGRToken.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "RSyrupBar"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
+      "lastModificationDate": 1651763666283,
+      "contentHash": "a9d2146925da52142435d3bb8df53c3c",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "./extensions/IERC20Metadata.sol",
+        "../../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\TGRToken.sol": {
+      "lastModificationDate": 1651922087605,
+      "contentHash": "028127798b025db594e8092bf8ab5a4a",
+      "sourceName": "contracts/farm/TGRToken.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./interfaces/ITGRToken.sol",
+        "../session/SessionRegistrar.sol",
+        "../session/SessionManager.sol",
+        "../session/SessionFees.sol",
+        "../session/Node.sol",
+        "../libraries/WireLibrary.sol",
+        "../periphery/interfaces/IMaker.sol",
+        "../periphery/interfaces/ITaker.sol",
+        "../core/interfaces/IXDAOFactory.sol",
+        "../core/interfaces/IXDAOPair.sol",
+        "../farm/interfaces/IXDAOFarm.sol",
+        "../libraries/math/SafeMath.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TGRToken"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\ITGRToken.sol": {
+      "lastModificationDate": 1651920389881,
+      "contentHash": "c2076a6fde2e993d13e4aa288a7f1224",
+      "sourceName": "contracts/farm/interfaces/ITGRToken.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ITGRToken"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionRegistrar.sol": {
+      "lastModificationDate": 1651920207902,
+      "contentHash": "f56f11155ae0a210f9d3481e7d7fee04",
+      "sourceName": "contracts/session/SessionRegistrar.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IConstants.sol",
+        "./interfaces/ISessionRegistrar.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SessionRegistrar"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionFees.sol": {
+      "lastModificationDate": 1651920610310,
+      "contentHash": "b69cc0783c295d080102546a824a592e",
+      "sourceName": "contracts/session/SessionFees.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IConstants.sol",
+        "./interfaces/ISessionRegistrar.sol",
+        "./interfaces/ISessionFees.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SessionFees"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IMaker.sol": {
+      "lastModificationDate": 1651168701460,
+      "contentHash": "54edd32cadf2ab3daaa56584dfe8e306",
+      "sourceName": "contracts/periphery/interfaces/IMaker.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "../../session/interfaces/IConstants.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IMaker"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\IXDAOFarm.sol": {
+      "lastModificationDate": 1651920890331,
+      "contentHash": "97d144470f7650c0d9abff0a2d47e86f",
+      "sourceName": "contracts/farm/interfaces/IXDAOFarm.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IMigratorChef.sol",
+        "../XTGRToken.sol",
+        "./IXDAOFarmTypes.sol",
+        "../../session/interfaces/IConstants.sol",
+        "../../session/interfaces/INode.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IXDAOFarm"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\IMigratorChef.sol": {
+      "lastModificationDate": 1651922124545,
+      "contentHash": "c97959fb44bf1dba4e4e5b93a48fdb81",
+      "sourceName": "contracts/farm/interfaces/IMigratorChef.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IMigratorChef"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\XTGRToken.sol": {
+      "lastModificationDate": 1651920834914,
+      "contentHash": "6e25fcd6245fe66ce819c796b364e606",
+      "sourceName": "contracts/farm/XTGRToken.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "../session/Node.sol",
+        "./interfaces/IXTGRToken.sol",
+        "./interfaces/ITGRToken.sol",
+        "../libraries/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "XTGRToken"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\IXDAOFarmTypes.sol": {
+      "lastModificationDate": 1651920610309,
+      "contentHash": "ef877ede0f5d9e0528a10d7fa7f10688",
+      "sourceName": "contracts/farm/interfaces/IXDAOFarmTypes.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": []
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\IXTGRToken.sol": {
+      "lastModificationDate": 1651920610310,
+      "contentHash": "8e7fa1a5562407579842b955ff9b22e1",
+      "sourceName": "contracts/farm/interfaces/IXTGRToken.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IXTGRToken"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\utils\\SafeERC20.sol": {
+      "lastModificationDate": 1651763778463,
+      "contentHash": "76814c83c32552ed2b521c816b4d801a",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "../IERC20.sol",
+        "../../../utils/Address.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SafeERC20"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\utils\\Address.sol": {
+      "lastModificationDate": 1651763615314,
+      "contentHash": "ad714a6368ee7d43cded6bbe8af0b155",
+      "sourceName": "@openzeppelin/contracts/utils/Address.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.1"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\repay\\Repay.sol": {
+      "lastModificationDate": 1651920989812,
+      "contentHash": "f0f17bbc7561ac9d66ec8564c933570b",
+      "sourceName": "contracts/repay/Repay.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "../session/Node.sol",
+        "../session/SessionManager.sol",
+        "../libraries/math/SafeMath.sol",
+        "../farm/TGRToken.sol",
+        "./RTGRToken.sol",
+        "./RSyrupBar.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Repay"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\repay\\RTGRToken.sol": {
+      "lastModificationDate": 1651920962597,
+      "contentHash": "a5d146834bbef5cfac1060a81298e3e1",
+      "sourceName": "contracts/repay/RTGRToken.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/proxy/utils/Initializable.sol",
+        "./interfaces/IRTGRToken.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "RTGRToken"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\proxy\\utils\\Initializable.sol": {
+      "lastModificationDate": 1651763752009,
+      "contentHash": "f0c92df5bfd98a90d0eda04719bafda5",
+      "sourceName": "@openzeppelin/contracts/proxy/utils/Initializable.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "../../utils/Address.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.2"
+      ],
+      "artifacts": [
+        "Initializable"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\repay\\interfaces\\IRTGRToken.sol": {
+      "lastModificationDate": 1651920644529,
+      "contentHash": "a05ec82ba9d43a4534c87aaed3d2859a",
+      "sourceName": "contracts/repay/interfaces/IRTGRToken.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IRTGRToken"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\XDAOMaker.sol": {
+      "lastModificationDate": 1651920207783,
+      "contentHash": "8969e4f5c4d52463992484036eb19b09",
+      "sourceName": "contracts/periphery/XDAOMaker.sol",
       "solcConfig": {
         "version": "0.8.3",
         "settings": {
@@ -2427,9 +2073,9 @@
         "../session/SessionManager.sol",
         "../session/LiquidityControl.sol",
         "../libraries/utils/TransferHelper.sol",
-        "../libraries/CrossLibrary.sol",
+        "../libraries/XDAOLibrary.sol",
         "../libraries/math/SafeMath.sol",
-        "../core/interfaces/ICrossFactory.sol",
+        "../core/interfaces/IXDAOFactory.sol",
         "./interfaces/IWETH.sol",
         "hardhat/console.sol"
       ],
@@ -2437,8 +2083,8 @@
         "^0.8.0"
       ],
       "artifacts": [
-        "CrossMaker",
-        "IBalanceLedger"
+        "IBalanceLedger",
+        "XDAOMaker"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\LiquidityControl.sol": {
@@ -2530,10 +2176,10 @@
         "FixedPoint"
       ]
     },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\CrossOracleLibrary.sol": {
-      "lastModificationDate": 1649543374422,
-      "contentHash": "c818aa4c4734aedbb864bed53f4739a6",
-      "sourceName": "contracts/libraries/CrossOracleLibrary.sol",
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\XDAOOracleLibrary.sol": {
+      "lastModificationDate": 1651920207783,
+      "contentHash": "ae82cb6f4586079bbbbfbd8dca18d114",
+      "sourceName": "contracts/libraries/XDAOOracleLibrary.sol",
       "solcConfig": {
         "version": "0.8.3",
         "settings": {
@@ -2565,19 +2211,19 @@
         }
       },
       "imports": [
-        "../core/interfaces/ICrossPair.sol",
+        "../core/interfaces/IXDAOPair.sol",
         "../libraries/utils/FixedPoint.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
       ],
       "artifacts": [
-        "CrossOracleLibrary"
+        "XDAOOracleLibrary"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\FarmLibrary.sol": {
-      "lastModificationDate": 1651837324496,
-      "contentHash": "42ae8f56cce1496fbea45efa42910b2b",
+      "lastModificationDate": 1651920610034,
+      "contentHash": "da3a77ca22848ffd46073b319a1580b9",
       "sourceName": "contracts/libraries/FarmLibrary.sol",
       "solcConfig": {
         "version": "0.8.3",
@@ -2617,13 +2263,13 @@
         "../session/interfaces/ISessionFees.sol",
         "../periphery/interfaces/IMaker.sol",
         "../periphery/interfaces/ITaker.sol",
-        "../farm/interfaces/ICrssToken.sol",
-        "../farm/interfaces/IXCrssToken.sol",
-        "../core/interfaces/ICrossPair.sol",
-        "../farm/interfaces/ICrssReferral.sol",
+        "../farm/interfaces/ITGRToken.sol",
+        "../farm/interfaces/IXTGRToken.sol",
+        "../core/interfaces/IXDAOPair.sol",
+        "../farm/interfaces/ITGRReferral.sol",
         "../farm/interfaces/IMigratorChef.sol",
-        "../farm/interfaces/ICrossFarmTypes.sol",
-        "../farm/interfaces/ICrossFarm.sol",
+        "../farm/interfaces/IXDAOFarmTypes.sol",
+        "../farm/interfaces/IXDAOFarm.sol",
         "../libraries/utils/TransferHelper.sol",
         "./math/SafeMath.sol",
         "hardhat/console.sol"
@@ -2635,10 +2281,10 @@
         "FarmLibrary"
       ]
     },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\ICrssReferral.sol": {
-      "lastModificationDate": 1649486874922,
-      "contentHash": "5fef65123915e6178e79baefa85b9473",
-      "sourceName": "contracts/farm/interfaces/ICrssReferral.sol",
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\ITGRReferral.sol": {
+      "lastModificationDate": 1651920610309,
+      "contentHash": "a726705bc0c24b9e7fd92e9808040aa8",
+      "sourceName": "contracts/farm/interfaces/ITGRReferral.sol",
       "solcConfig": {
         "version": "0.8.3",
         "settings": {
@@ -2674,12 +2320,12 @@
         "^0.8.0"
       ],
       "artifacts": [
-        "ICrssReferral"
+        "ITGRReferral"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\mock\\MockTransfer.sol": {
-      "lastModificationDate": 1649489964494,
-      "contentHash": "02210721f51b7832d786d81a12f69e15",
+      "lastModificationDate": 1651920207902,
+      "contentHash": "9cc425d97954ffa0a671dd6f4ea08079",
       "sourceName": "contracts/mock/MockTransfer.sol",
       "solcConfig": {
         "version": "0.8.3",
@@ -2713,8 +2359,8 @@
       },
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
-        "../farm/interfaces/ICrssToken.sol",
-        "../farm/interfaces/ICrossFarm.sol",
+        "../farm/interfaces/ITGRToken.sol",
+        "../farm/interfaces/IXDAOFarm.sol",
         "hardhat/console.sol"
       ],
       "versionPragmas": [
@@ -2724,10 +2370,10 @@
         "MockTransfer"
       ]
     },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\CrossFarm.sol": {
-      "lastModificationDate": 1651767259669,
-      "contentHash": "d8102a853b52ffbb3c62677203ba7335",
-      "sourceName": "contracts/farm/CrossFarm.sol",
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\XDAOFarm.sol": {
+      "lastModificationDate": 1651920610133,
+      "contentHash": "1393d6307102a750621d1d3583d9157f",
+      "sourceName": "contracts/farm/XDAOFarm.sol",
       "solcConfig": {
         "version": "0.8.3",
         "settings": {
@@ -2761,29 +2407,29 @@
       "imports": [
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
-        "./interfaces/ICrossFarmTypes.sol",
-        "./interfaces/ICrossFarm.sol",
+        "./interfaces/IXDAOFarmTypes.sol",
+        "./interfaces/IXDAOFarm.sol",
         "../session/SessionManager.sol",
         "../session/Node.sol",
         "../libraries/WireLibrary.sol",
         "../periphery/interfaces/IMaker.sol",
         "../periphery/interfaces/ITaker.sol",
-        "./interfaces/ICrssToken.sol",
-        "./interfaces/IXCrssToken.sol",
-        "../core/interfaces/ICrossPair.sol",
-        "./interfaces/ICrssReferral.sol",
+        "./interfaces/ITGRToken.sol",
+        "./interfaces/IXTGRToken.sol",
+        "../core/interfaces/IXDAOPair.sol",
+        "./interfaces/ITGRReferral.sol",
         "./BaseRelayRecipient.sol",
         "../libraries/math/SafeMath.sol",
         "../libraries/FarmLibrary.sol",
         "../libraries/utils/TransferHelper.sol",
-        "../libraries/CrossLibrary.sol",
+        "../libraries/XDAOLibrary.sol",
         "hardhat/console.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
       ],
       "artifacts": [
-        "CrossFarm"
+        "XDAOFarm"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\BaseRelayRecipient.sol": {
@@ -2872,10 +2518,10 @@
         "IRelayRecipient"
       ]
     },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\CrssReferral.sol": {
-      "lastModificationDate": 1651583803200,
-      "contentHash": "74096426a9ad14221fbabbb09071036f",
-      "sourceName": "contracts/farm/CrssReferral.sol",
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\TGRReferral.sol": {
+      "lastModificationDate": 1651920610034,
+      "contentHash": "8ec8e45a2d17ad6ffe9999ee7f4dc990",
+      "sourceName": "contracts/farm/TGRReferral.sol",
       "solcConfig": {
         "version": "0.8.3",
         "settings": {
@@ -2908,13 +2554,13 @@
       },
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
-        "./interfaces/ICrssReferral.sol"
+        "./interfaces/ITGRReferral.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
       ],
       "artifacts": [
-        "CrssReferral"
+        "TGRReferral"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\mock\\MockToken.sol": {
@@ -3006,6 +2652,360 @@
         "UpgradableOwnable"
       ]
     },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\XDAOFactory.sol": {
+      "lastModificationDate": 1651920330566,
+      "contentHash": "72092acdaeb6c23f9d24cc62e4e670dd",
+      "sourceName": "contracts/core/XDAOFactory.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "../session/Node.sol",
+        "../periphery/interfaces/IXDAORouter.sol",
+        "./XDAOPair.sol",
+        "./interfaces/IXDAOFactory.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "XDAOFactory"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IXDAORouter.sol": {
+      "lastModificationDate": 1651920422498,
+      "contentHash": "805fcbe4af2bd0a0fa5a157d4f8c816f",
+      "sourceName": "contracts/periphery/interfaces/IXDAORouter.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IPancakeRouter02.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IXDAORouter"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\XDAOPair.sol": {
+      "lastModificationDate": 1651920207588,
+      "contentHash": "34cc5a1381fb049b21777f0eee5da761",
+      "sourceName": "contracts/core/XDAOPair.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/utils/math/Math.sol",
+        "../libraries/math/SafeMath.sol",
+        "../libraries/math/UQ112x112.sol",
+        "./interfaces/IXDAOPair.sol",
+        "./interfaces/IXDAOFactory.sol",
+        "./interfaces/IXDAOCallee.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "XDAOPair"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IPancakeRouter02.sol": {
+      "lastModificationDate": 1649486874924,
+      "contentHash": "becebeee4389a35e68181d6ddea93269",
+      "sourceName": "contracts/periphery/interfaces/IPancakeRouter02.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IPancakeRouter01.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IPancakeRouter02"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IPancakeRouter01.sol": {
+      "lastModificationDate": 1649486874924,
+      "contentHash": "7a5d419be6b5eb6c2b15b26cc091310d",
+      "sourceName": "contracts/periphery/interfaces/IPancakeRouter01.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IPancakeRouter01"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\utils\\math\\Math.sol": {
+      "lastModificationDate": 1651763760847,
+      "contentHash": "339b9793dcbd7b5d55af725ef47de74c",
+      "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Math"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\math\\UQ112x112.sol": {
+      "lastModificationDate": 1649486874924,
+      "contentHash": "17e4a288eec63cf9ad845471aebf54d4",
+      "sourceName": "contracts/libraries/math/UQ112x112.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "UQ112x112"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\IXDAOCallee.sol": {
+      "lastModificationDate": 1651920207417,
+      "contentHash": "cb3d7f05614b521d83e74091d44a7e89",
+      "sourceName": "contracts/core/interfaces/IXDAOCallee.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IXDAOCallee"
+      ]
+    },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\IStrategy.sol": {
       "lastModificationDate": 1649486874923,
       "contentHash": "40258ce651b2202cd4b26c63fe0b77ae",
@@ -3047,6 +3047,44 @@
       "artifacts": [
         "IStrategy"
       ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\GovernanceLibrary.sol": {
+      "lastModificationDate": 1651899587040,
+      "contentHash": "d41d8cd98f00b204e9800998ecf8427e",
+      "sourceName": "contracts/libraries/GovernanceLibrary.sol",
+      "solcConfig": {
+        "version": "0.8.3",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [],
+      "artifacts": []
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\token\\WBNB.sol": {
       "lastModificationDate": 1649486874924,

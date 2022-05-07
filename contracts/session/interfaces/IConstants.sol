@@ -25,7 +25,7 @@ enum SessionType {
 }
 
 uint256 constant NumberSessionTypes = 19;
-uint256 constant CrssPoolAllocPercent = 25;
+uint256 constant TGRPoolAllocPercent = 25;
 uint256 constant CompensationPoolAllocPercent = 2;
 
 

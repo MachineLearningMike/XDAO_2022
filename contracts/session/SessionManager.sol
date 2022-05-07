@@ -18,7 +18,7 @@ abstract contract SessionManager is ISessionManager {
         sessionRegistrar.unregisterSession();
     }
 
-    function _payFeeCrss(address account, uint256 principal, FeeRates memory rates, bool fromAllowance ) internal virtual returns (uint256 feesPaid) {
-        feesPaid = sessionFees.payFeeCrssLogic(account, principal, rates, fromAllowance);
+    function _payFeeTGR(address account, uint256 principal, FeeRates memory rates, bool fromAllowance ) internal virtual returns (uint256 feesPaid) {
+        feesPaid = sessionFees.payFeeTGRLogic(account, principal, rates, fromAllowance);
     }
 }

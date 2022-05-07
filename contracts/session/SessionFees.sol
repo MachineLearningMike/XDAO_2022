@@ -9,7 +9,7 @@ import "hardhat/console.sol";
 
 abstract contract SessionFees is ISessionFees {
     modifier onlySessionManager virtual;
-    function payFeeCrssLogic(address account, uint256 principal, FeeRates calldata rates, bool fromAllowance ) 
+    function payFeeTGRLogic(address account, uint256 principal, FeeRates calldata rates, bool fromAllowance ) 
     public override virtual onlySessionManager returns (uint256 feesPaid) {
     }
 

@@ -23,10 +23,10 @@ interface MockTransferInterface extends ethers.utils.Interface {
   functions: {
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "transferCross(address,address,address,uint256,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "transferTo(address,uint256)": FunctionFragment;
+    "transferXDAO(address,address,address,uint256,uint256)": FunctionFragment;
     "withdrawVest(address,uint256,uint256)": FunctionFragment;
   };
 
@@ -34,10 +34,6 @@ interface MockTransferInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferCross",
-    values: [string, string, string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "transferFrom",
@@ -52,6 +48,10 @@ interface MockTransferInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "transferXDAO",
+    values: [string, string, string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "withdrawVest",
     values: [string, BigNumberish, BigNumberish]
   ): string;
@@ -59,10 +59,6 @@ interface MockTransferInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferCross",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -74,6 +70,10 @@ interface MockTransferInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "transferTo", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "transferXDAO",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "withdrawVest",
     data: BytesLike
@@ -140,15 +140,6 @@ export class MockTransfer extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferCross(
-      _userA: string,
-      _userB: string,
-      _userC: string,
-      _amountB: BigNumberish,
-      _amountC: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     transferFrom(
       _from: string,
       _to: string,
@@ -167,6 +158,15 @@ export class MockTransfer extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    transferXDAO(
+      _userA: string,
+      _userB: string,
+      _userC: string,
+      _amountB: BigNumberish,
+      _amountC: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     withdrawVest(
       _farm: string,
       _pid: BigNumberish,
@@ -178,15 +178,6 @@ export class MockTransfer extends BaseContract {
   owner(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  transferCross(
-    _userA: string,
-    _userB: string,
-    _userC: string,
-    _amountB: BigNumberish,
-    _amountC: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -208,6 +199,15 @@ export class MockTransfer extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  transferXDAO(
+    _userA: string,
+    _userB: string,
+    _userC: string,
+    _amountB: BigNumberish,
+    _amountC: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   withdrawVest(
     _farm: string,
     _pid: BigNumberish,
@@ -219,15 +219,6 @@ export class MockTransfer extends BaseContract {
     owner(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    transferCross(
-      _userA: string,
-      _userB: string,
-      _userC: string,
-      _amountB: BigNumberish,
-      _amountC: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     transferFrom(
       _from: string,
@@ -244,6 +235,15 @@ export class MockTransfer extends BaseContract {
     transferTo(
       _to: string,
       _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    transferXDAO(
+      _userA: string,
+      _userB: string,
+      _userC: string,
+      _amountB: BigNumberish,
+      _amountC: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -280,15 +280,6 @@ export class MockTransfer extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferCross(
-      _userA: string,
-      _userB: string,
-      _userC: string,
-      _amountB: BigNumberish,
-      _amountC: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     transferFrom(
       _from: string,
       _to: string,
@@ -304,6 +295,15 @@ export class MockTransfer extends BaseContract {
     transferTo(
       _to: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    transferXDAO(
+      _userA: string,
+      _userB: string,
+      _userC: string,
+      _amountB: BigNumberish,
+      _amountC: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -322,15 +322,6 @@ export class MockTransfer extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferCross(
-      _userA: string,
-      _userB: string,
-      _userC: string,
-      _amountB: BigNumberish,
-      _amountC: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     transferFrom(
       _from: string,
       _to: string,
@@ -346,6 +337,15 @@ export class MockTransfer extends BaseContract {
     transferTo(
       _to: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    transferXDAO(
+      _userA: string,
+      _userB: string,
+      _userC: string,
+      _amountB: BigNumberish,
+      _amountC: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

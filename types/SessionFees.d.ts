@@ -21,11 +21,11 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SessionFeesInterface extends ethers.utils.Interface {
   functions: {
-    "payFeeCrssLogic(address,uint256,(uint32,uint32,uint32,uint32),bool)": FunctionFragment;
+    "payFeeTGRLogic(address,uint256,(uint32,uint32,uint32,uint32),bool)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "payFeeCrssLogic",
+    functionFragment: "payFeeTGRLogic",
     values: [
       string,
       BigNumberish,
@@ -40,7 +40,7 @@ interface SessionFeesInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "payFeeCrssLogic",
+    functionFragment: "payFeeTGRLogic",
     data: BytesLike
   ): Result;
 
@@ -91,7 +91,7 @@ export class SessionFees extends BaseContract {
   interface: SessionFeesInterface;
 
   functions: {
-    payFeeCrssLogic(
+    payFeeTGRLogic(
       account: string,
       principal: BigNumberish,
       rates: {
@@ -105,7 +105,7 @@ export class SessionFees extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  payFeeCrssLogic(
+  payFeeTGRLogic(
     account: string,
     principal: BigNumberish,
     rates: {
@@ -119,7 +119,7 @@ export class SessionFees extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    payFeeCrssLogic(
+    payFeeTGRLogic(
       account: string,
       principal: BigNumberish,
       rates: {
@@ -136,7 +136,7 @@ export class SessionFees extends BaseContract {
   filters: {};
 
   estimateGas: {
-    payFeeCrssLogic(
+    payFeeTGRLogic(
       account: string,
       principal: BigNumberish,
       rates: {
@@ -151,7 +151,7 @@ export class SessionFees extends BaseContract {
   };
 
   populateTransaction: {
-    payFeeCrssLogic(
+    payFeeTGRLogic(
       account: string,
       principal: BigNumberish,
       rates: {

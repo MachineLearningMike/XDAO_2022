@@ -15,11 +15,11 @@ abstract contract SessionRegistrar is ISessionRegistrar {
     modifier dsManagersOnly virtual;
 
     function registerSession(SessionType sessionType) external override virtual dsManagersOnly returns (SessionParams memory sessionParams) {
-        require(sessionType != SessionType.None, "Cross: Invalid SessionType Type");
+        require(sessionType != SessionType.None, "XDAO: Invalid SessionType Type");
         // reading stackPointer costs 5,000 gas, while updating costs 20,000 gas.
         if ( ! (stackPointer == 0 && stackSTypes[0] == SessionType.None) ) stackPointer ++;
-        require(stackPointer < stackSTypes.length, "Cross: Session stack overflow");
-        require(stackSTypes[stackPointer] == SessionType.None, "Cross: Session stack inconsistent");
+        require(stackPointer < stackSTypes.length, "XDAO: Session stack overflow");
+        require(stackSTypes[stackPointer] == SessionType.None, "XDAO: Session stack inconsistent");
 
         stackSTypes[stackPointer] = sessionType;
 
@@ -32,9 +32,9 @@ abstract contract SessionRegistrar is ISessionRegistrar {
 
     function unregisterSession() external override dsManagersOnly {
         // reading stackPointer costs 5,000 gas, while updating costs 20,000 gas.
-        require(stackPointer < stackSTypes.length, "Cross: Session stack overflow");
+        require(stackPointer < stackSTypes.length, "XDAO: Session stack overflow");
         SessionType sessionType = stackSTypes[stackPointer];
-        require(sessionType != SessionType.None, "Cross: Session stack inconsistent");
+        require(sessionType != SessionType.None, "XDAO: Session stack inconsistent");
         stackSTypes[stackPointer] = SessionType.None;
 
         if (stackPointer > 0) stackPointer --;      

@@ -9,8 +9,8 @@ import "../session/Node.sol";
 import "../session/SessionManager.sol";
 import "../libraries/math/SafeMath.sol";
 
-import "../farm/CrssToken.sol";
-import "./RCrssToken.sol";
+import "../farm/TGRToken.sol";
+import "./RTGRToken.sol";
 import "./RSyrupBar.sol";
 
 import "hardhat/console.sol";
@@ -33,8 +33,8 @@ contract Repay is Node, Ownable, SessionManager {
         uint256 accCakePerShare; // Accumulated CAKEs per share, times 1e12. See below.
     }
 
-    CrssToken public crss;
-    RCrssToken public rCrss;
+    TGRToken public crss;
+    RTGRToken public rTGR;
     RSyrupBar public rSyrup;
     uint256 public cakePerBlock;
     uint256 public BONUS_MULTIPLIER = 1;
@@ -55,15 +55,15 @@ contract Repay is Node, Ownable, SessionManager {
 
     constructor(
         address payable _crss,
-        address _rCrss,
+        address _rTGR,
         address _rSyrup,
         uint256 _cakePerBlock,
         uint256 _startBlock
     ) Ownable() {
-        require(_rCrss != address(0), sZeroAddress);
-        crss = CrssToken(_crss);
-        require(_rCrss != address(0), sZeroAddress);
-        rCrss = RCrssToken(_rCrss);
+        require(_rTGR != address(0), sZeroAddress);
+        crss = TGRToken(_crss);
+        require(_rTGR != address(0), sZeroAddress);
+        rTGR = RTGRToken(_rTGR);
         require(_rSyrup != address(0), sZeroAddress);
         rSyrup = RSyrupBar(_rSyrup);
         cakePerBlock = _cakePerBlock;
@@ -71,7 +71,7 @@ contract Repay is Node, Ownable, SessionManager {
 
         // staking pool
         poolInfo.push(PoolInfoRepay({
-            lpToken: IERC20(_rCrss),
+            lpToken: IERC20(_rTGR),
             allocPoint: 1000,
             lastRewardBlock: startBlock,
             accCakePerShare: 0
@@ -82,7 +82,7 @@ contract Repay is Node, Ownable, SessionManager {
         paused = false;
     }
 
-    function updatgeCrssPerBlock(uint256 _crssPerBlock) external onlyOwner {
+    function updatgeTGRPerBlock(uint256 _crssPerBlock) external onlyOwner {
         cakePerBlock = _crssPerBlock;
     }
 
@@ -188,7 +188,7 @@ contract Repay is Node, Ownable, SessionManager {
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accCakePerShare).div(1e12).sub(user.rewardDebt);
             if(pending > 0) {
-                safeCrssTransfer(msg.sender, pending);
+                safeTGRTransfer(msg.sender, pending);
             }
         }
         if(_amount > 0) {
@@ -198,7 +198,7 @@ contract Repay is Node, Ownable, SessionManager {
         user.rewardDebt = user.amount.mul(pool.accCakePerShare).div(1e12);
 
         // This makes this funciton different from deposit.
-        // rCrss.mint(address(rSyrup), cakeReward) was called in the updatePool funciton.
+        // rTGR.mint(address(rSyrup), cakeReward) was called in the updatePool funciton.
 
         emit Deposit(msg.sender, 0, _amount);
     }
@@ -211,7 +211,7 @@ contract Repay is Node, Ownable, SessionManager {
         updatePool(0);
         uint256 pending = user.amount.mul(pool.accCakePerShare).div(1e12).sub(user.rewardDebt);
         if(pending > 0) {
-            safeCrssTransfer(msg.sender, pending);
+            safeTGRTransfer(msg.sender, pending);
         }
         if(_amount > 0) {
             user.amount = user.amount.sub(_amount);
@@ -232,9 +232,9 @@ contract Repay is Node, Ownable, SessionManager {
         user.rewardDebt = 0;
     }
 
-    // Safe rCrss transfer function, just in case if rounding error causes pool to not have enough CAKEs.
-    function safeCrssTransfer(address _to, uint256 _amount) internal {
-        rSyrup.saferCrssTransfer(_to, _amount);
+    // Safe rTGR transfer function, just in case if rounding error causes pool to not have enough CAKEs.
+    function safeTGRTransfer(address _to, uint256 _amount) internal {
+        rSyrup.saferTGRTransfer(_to, _amount);
     }
 
     function setNode(NodeType nodeType, address node, address caller) public override virtual {
@@ -263,16 +263,16 @@ contract Repay is Node, Ownable, SessionManager {
 
     function setUpRepayPool(
     ) external {
-        uint256 victimsLen = rCrss.victimsLen();
+        uint256 victimsLen = rTGR.victimsLen();
 
         for(uint256 victimId; victimId < victimsLen; victimId ++) {
-            address victimAddr = rCrss.victims(victimId);
+            address victimAddr = rTGR.victims(victimId);
             UserInfoRepay storage victim = userInfo[0][victimAddr];
 
             // deposit a victim's loss on the compensation pool on behalf of the victim.
-            uint256 loss = rCrss.balanceOf(victimAddr);
-            rCrss.burn(victimAddr, loss);
-            rCrss.mint(address(this), loss);
+            uint256 loss = rTGR.balanceOf(victimAddr);
+            rTGR.burn(victimAddr, loss);
+            rTGR.mint(address(this), loss);
 
             victim.amount = loss;
         }
@@ -281,7 +281,7 @@ contract Repay is Node, Ownable, SessionManager {
     function getUserState(address userAddress) public view 
     returns (
         uint256 _deposit,
-        uint256 pendingCrss,
+        uint256 pendingTGR,
         uint256 lpBalance,
         uint256 crssBalance
     ) {
@@ -290,7 +290,7 @@ contract Repay is Node, Ownable, SessionManager {
         PoolInfoRepay storage pool = poolInfo[pid];
         UserInfoRepay storage user = userInfo[pid][userAddress];
         _deposit = user.amount;
-        pendingCrss = pendingCake(0, userAddress);
+        pendingTGR = pendingCake(0, userAddress);
         lpBalance = pool.lpToken.balanceOf(userAddress);
         crssBalance = crss.balanceOf(userAddress);
     }
@@ -306,7 +306,7 @@ contract Repay is Node, Ownable, SessionManager {
         uint256 userPending = user.amount * pool.accCakePerShare / 1e12 - user.rewardDebt;
 
         if (amount > userPending) amount = userPending;
-        safeCrssTransfer(userAddress, amount);
+        safeTGRTransfer(userAddress, amount);
         
         // (userPending - amount) is saved.
         user.rewardDebt = user.amount * pool.accCakePerShare / 1e12 - (userPending - amount); 

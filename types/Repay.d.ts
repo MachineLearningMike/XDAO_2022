@@ -43,8 +43,8 @@ interface RepayInterface extends ethers.utils.Interface {
     "poolInfo(uint256)": FunctionFragment;
     "poolLength()": FunctionFragment;
     "prevNode()": FunctionFragment;
-    "rCrss()": FunctionFragment;
     "rSyrup()": FunctionFragment;
+    "rTGR()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "resume()": FunctionFragment;
     "setFeeRates(uint8,(uint32,uint32,uint32,uint32),address)": FunctionFragment;
@@ -57,7 +57,7 @@ interface RepayInterface extends ethers.utils.Interface {
     "transferOwnership(address)": FunctionFragment;
     "updateMultiplier(uint256)": FunctionFragment;
     "updatePool(uint256)": FunctionFragment;
-    "updatgeCrssPerBlock(uint256)": FunctionFragment;
+    "updatgeTGRPerBlock(uint256)": FunctionFragment;
     "userInfo(uint256,address)": FunctionFragment;
     "wire(address,address)": FunctionFragment;
   };
@@ -126,8 +126,8 @@ interface RepayInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "prevNode", values?: undefined): string;
-  encodeFunctionData(functionFragment: "rCrss", values?: undefined): string;
   encodeFunctionData(functionFragment: "rSyrup", values?: undefined): string;
+  encodeFunctionData(functionFragment: "rTGR", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
@@ -183,7 +183,7 @@ interface RepayInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "updatgeCrssPerBlock",
+    functionFragment: "updatgeTGRPerBlock",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -250,8 +250,8 @@ interface RepayInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "poolInfo", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "poolLength", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "prevNode", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "rCrss", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "rSyrup", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "rTGR", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -289,7 +289,7 @@ interface RepayInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "updatePool", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "updatgeCrssPerBlock",
+    functionFragment: "updatgeTGRPerBlock",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "userInfo", data: BytesLike): Result;
@@ -464,7 +464,7 @@ export class Repay extends BaseContract {
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         _deposit: BigNumber;
-        pendingCrss: BigNumber;
+        pendingTGR: BigNumber;
         lpBalance: BigNumber;
         crssBalance: BigNumber;
       }
@@ -531,9 +531,9 @@ export class Repay extends BaseContract {
 
     prevNode(overrides?: CallOverrides): Promise<[string]>;
 
-    rCrss(overrides?: CallOverrides): Promise<[string]>;
-
     rSyrup(overrides?: CallOverrides): Promise<[string]>;
+
+    rTGR(overrides?: CallOverrides): Promise<[string]>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -601,7 +601,7 @@ export class Repay extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    updatgeCrssPerBlock(
+    updatgeTGRPerBlock(
       _crssPerBlock: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -653,7 +653,7 @@ export class Repay extends BaseContract {
   ): Promise<
     [BigNumber, BigNumber, BigNumber, BigNumber] & {
       _deposit: BigNumber;
-      pendingCrss: BigNumber;
+      pendingTGR: BigNumber;
       lpBalance: BigNumber;
       crssBalance: BigNumber;
     }
@@ -720,9 +720,9 @@ export class Repay extends BaseContract {
 
   prevNode(overrides?: CallOverrides): Promise<string>;
 
-  rCrss(overrides?: CallOverrides): Promise<string>;
-
   rSyrup(overrides?: CallOverrides): Promise<string>;
+
+  rTGR(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -790,7 +790,7 @@ export class Repay extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  updatgeCrssPerBlock(
+  updatgeTGRPerBlock(
     _crssPerBlock: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -840,7 +840,7 @@ export class Repay extends BaseContract {
     ): Promise<
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         _deposit: BigNumber;
-        pendingCrss: BigNumber;
+        pendingTGR: BigNumber;
         lpBalance: BigNumber;
         crssBalance: BigNumber;
       }
@@ -900,9 +900,9 @@ export class Repay extends BaseContract {
 
     prevNode(overrides?: CallOverrides): Promise<string>;
 
-    rCrss(overrides?: CallOverrides): Promise<string>;
-
     rSyrup(overrides?: CallOverrides): Promise<string>;
+
+    rTGR(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -958,7 +958,7 @@ export class Repay extends BaseContract {
 
     updatePool(_pid: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    updatgeCrssPerBlock(
+    updatgeTGRPerBlock(
       _crssPerBlock: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1241,9 +1241,9 @@ export class Repay extends BaseContract {
 
     prevNode(overrides?: CallOverrides): Promise<BigNumber>;
 
-    rCrss(overrides?: CallOverrides): Promise<BigNumber>;
-
     rSyrup(overrides?: CallOverrides): Promise<BigNumber>;
+
+    rTGR(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1311,7 +1311,7 @@ export class Repay extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    updatgeCrssPerBlock(
+    updatgeTGRPerBlock(
       _crssPerBlock: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1415,9 +1415,9 @@ export class Repay extends BaseContract {
 
     prevNode(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    rCrss(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     rSyrup(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    rTGR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1485,7 +1485,7 @@ export class Repay extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    updatgeCrssPerBlock(
+    updatgeTGRPerBlock(
       _crssPerBlock: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

@@ -52,7 +52,7 @@ const _abi = [
         type: "bool",
       },
     ],
-    name: "payFeeCrssLogic",
+    name: "payFeeTGRLogic",
     outputs: [
       {
         internalType: "uint256",

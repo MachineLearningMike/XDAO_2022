@@ -43,7 +43,7 @@ interface RSyrupBarInterface extends ethers.utils.Interface {
     "numCheckpoints(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "saferCrssTransfer(address,uint256)": FunctionFragment;
+    "saferTGRTransfer(address,uint256)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -123,7 +123,7 @@ interface RSyrupBarInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "saferCrssTransfer",
+    functionFragment: "saferTGRTransfer",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
@@ -197,7 +197,7 @@ interface RSyrupBarInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "saferCrssTransfer",
+    functionFragment: "saferTGRTransfer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
@@ -398,7 +398,7 @@ export class RSyrupBar extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    saferCrssTransfer(
+    saferTGRTransfer(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -519,7 +519,7 @@ export class RSyrupBar extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  saferCrssTransfer(
+  saferTGRTransfer(
     _to: string,
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -635,7 +635,7 @@ export class RSyrupBar extends BaseContract {
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    saferCrssTransfer(
+    saferTGRTransfer(
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
@@ -847,7 +847,7 @@ export class RSyrupBar extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    saferCrssTransfer(
+    saferTGRTransfer(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -983,7 +983,7 @@ export class RSyrupBar extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    saferCrssTransfer(
+    saferTGRTransfer(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }

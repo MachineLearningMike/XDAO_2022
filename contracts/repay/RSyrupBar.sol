@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../farm/CrssToken.sol";
+import "../farm/TGRToken.sol";
 
 import "hardhat/console.sol";
 
@@ -22,15 +22,15 @@ contract RSyrupBar is ERC20("RSyrupBar Token", "RSYRUP"), Ownable {
     }
 
     // The crss TOKEN!
-    CrssToken public crss;
+    TGRToken public crss;
 
 
     constructor( address payable _crss) Ownable() {
-        crss = CrssToken(_crss);
+        crss = TGRToken(_crss);
     }
 
-    // Safe crss transfer function, just in case if rounding error causes pool to not have enough rCrsss.
-    function saferCrssTransfer(address _to, uint256 _amount) public onlyOwner {
+    // Safe crss transfer function, just in case if rounding error causes pool to not have enough rTGRs.
+    function saferTGRTransfer(address _to, uint256 _amount) public onlyOwner {
         uint256 crssBal = crss.balanceOf(address(this));
 
         if (_amount > crssBal) {
@@ -210,7 +210,7 @@ contract RSyrupBar is ERC20("RSyrupBar Token", "RSYRUP"), Ownable {
         internal
     {
         address currentDelegate = _delegates[delegator];
-        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying rCrsss (not scaled);
+        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying rTGRs (not scaled);
         _delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);

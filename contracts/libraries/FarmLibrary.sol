@@ -10,13 +10,13 @@ import "../session/interfaces/ISessionManager.sol";
 import "../session/interfaces/ISessionFees.sol";
 import "../periphery/interfaces/IMaker.sol";
 import "../periphery/interfaces/ITaker.sol";
-import "../farm/interfaces/ICrssToken.sol"; 
-import "../farm/interfaces/IXCrssToken.sol";
-import "../core/interfaces/ICrossPair.sol";
-import "../farm/interfaces/ICrssReferral.sol";
+import "../farm/interfaces/ITGRToken.sol"; 
+import "../farm/interfaces/IXTGRToken.sol";
+import "../core/interfaces/IXDAOPair.sol";
+import "../farm/interfaces/ITGRReferral.sol";
 import "../farm/interfaces/IMigratorChef.sol";
-import "../farm/interfaces/ICrossFarmTypes.sol";
-import "../farm/interfaces/ICrossFarm.sol";
+import "../farm/interfaces/IXDAOFarmTypes.sol";
+import "../farm/interfaces/IXDAOFarm.sol";
 import "../libraries/utils/TransferHelper.sol";
 import "./math/SafeMath.sol";
 
@@ -26,21 +26,21 @@ library FarmLibrary {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    function changeLpTokensToCrssInFarm(
+    function changeLpTokensToTGRInFarm(
         address sourceLpToken, 
         IMaker maker, 
         ITaker taker, 
         address token, 
         uint256 lpAmount
-        ) external returns(uint256 newCrss) {
+        ) external returns(uint256 newTGR) {
         if (address(sourceLpToken) != address(0) && lpAmount > 0) {
 
             if (sourceLpToken == token) {
-                newCrss = lpAmount;
+                newTGR = lpAmount;
 
             } else {
-                address token0 = ICrossPair(sourceLpToken).token0();
-                address token1 = ICrossPair(sourceLpToken).token1();
+                address token0 = IXDAOPair(sourceLpToken).token0();
+                address token1 = IXDAOPair(sourceLpToken).token1();
                 bool foundDirectSwapPath;
                 {
                     address pair0 = maker.getPair(token, token0);
@@ -56,26 +56,26 @@ library FarmLibrary {
                 uint256 amount1 = IERC20(token1).balanceOf(address(this)) - balance1_old;
 
                 require( amount0 > 0 && amount1 > 0, "RemoveLiqudity failed");
-                newCrss += _swapExactNonCrssToCrss(taker, token, token0, token, amount0);
-                newCrss += _swapExactNonCrssToCrss(taker, token, token1, token, amount1);
+                newTGR += _swapExactNonTGRToTGR(taker, token, token0, token, amount0);
+                newTGR += _swapExactNonTGRToTGR(taker, token, token1, token, amount1);
             }
         }
     }
 
-    function changeCrssInXTokenToLpInFarm(address targetLpToken, Nodes storage nodes, uint256 amountCrssInXToken, address dustBin) 
+    function changeTGRInXTokenToLpInFarm(address targetLpToken, Nodes storage nodes, uint256 amountTGRInXToken, address dustBin) 
     public returns (uint256 newLpAmountInFarm) {
-        if (targetLpToken != address(0) && amountCrssInXToken > 0) {
-            uint256 balance0 = ICrssToken(nodes.token).balanceOf(address(this));
-            tolerableCrssTransferFromXTokenAccount(nodes.xToken, address(this), amountCrssInXToken);
-            uint256 balance1 = ICrssToken(nodes.token).balanceOf(address(this));
-            uint256 amountCrssInFarm = balance1 - balance0;
+        if (targetLpToken != address(0) && amountTGRInXToken > 0) {
+            uint256 balance0 = ITGRToken(nodes.token).balanceOf(address(this));
+            tolerableTGRTransferFromXTokenAccount(nodes.xToken, address(this), amountTGRInXToken);
+            uint256 balance1 = ITGRToken(nodes.token).balanceOf(address(this));
+            uint256 amountTGRInFarm = balance1 - balance0;
 
             if (targetLpToken == nodes.token) {
-                newLpAmountInFarm = amountCrssInFarm;  // pending rewards, by definition, reside in token.balanceOf[address(this)].
+                newLpAmountInFarm = amountTGRInFarm;  // pending rewards, by definition, reside in token.balanceOf[address(this)].
 
             } else {
-                address token0 = ICrossPair(targetLpToken).token0();
-                address token1 = ICrossPair(targetLpToken).token1();
+                address token0 = IXDAOPair(targetLpToken).token0();
+                address token1 = IXDAOPair(targetLpToken).token1();
                 bool foundDirectSwapPath;
                 {
                     address pair0 = IMaker(nodes.maker).getPair(nodes.token, token0);
@@ -84,17 +84,17 @@ library FarmLibrary {
                 }
                 require(foundDirectSwapPath, "Swap path not found");
 
-                uint256 amount0 = amountCrssInFarm / 2;
-                uint256 amount1 = amountCrssInFarm - amount0;
-                amount0 = _swapExactCrssToNonCrss(ITaker(nodes.taker), nodes.token, nodes.token, token0, amount0);
-                amount1 = _swapExactCrssToNonCrss(ITaker(nodes.taker), nodes.token, nodes.token, token1, amount1);
+                uint256 amount0 = amountTGRInFarm / 2;
+                uint256 amount1 = amountTGRInFarm - amount0;
+                amount0 = _swapExactTGRToNonTGR(ITaker(nodes.taker), nodes.token, nodes.token, token0, amount0);
+                amount1 = _swapExactTGRToNonTGR(ITaker(nodes.taker), nodes.token, nodes.token, token1, amount1);
                 
                 require( amount0 > 0 && amount1 > 0, "Swap failed");
-                balance0 = ICrossPair(targetLpToken).balanceOf(address(this));
+                balance0 = IXDAOPair(targetLpToken).balanceOf(address(this));
                 IERC20(token0).safeIncreaseAllowance(nodes.maker, amount0);
                 IERC20(token1).safeIncreaseAllowance(nodes.maker, amount1);
                 (uint256 _amount0, uint256 _amount1, ) =IMaker(nodes.maker).addLiquidity(token0, token1, amount0, amount1, 0, 0, address(this), block.timestamp);
-                balance1 = ICrossPair(targetLpToken).balanceOf(address(this));
+                balance1 = IXDAOPair(targetLpToken).balanceOf(address(this));
 
                 if (_amount0 < amount0) TransferHelper.safeTransfer(token0, dustBin, amount0 - _amount0); // remove dust
                 if (_amount1 < amount1) TransferHelper.safeTransfer(token1, dustBin, amount1 - _amount1); // remove dust
@@ -105,7 +105,7 @@ library FarmLibrary {
     }
 
 
-    function _swapExactCrssToNonCrss(
+    function _swapExactTGRToNonTGR(
         ITaker taker,
         address token,
         address tokenFr,
@@ -119,7 +119,7 @@ library FarmLibrary {
         } else if (tokenFr != tokenTo) {
             uint256 balance0 = IERC20(tokenTo).balanceOf(address(this));
 
-            ICrssToken(tokenFr).approve(address(taker), amount);
+            ITGRToken(tokenFr).approve(address(taker), amount);
             address[] memory path = new address[](2);
             path[0] = tokenFr;
             path[1] = tokenTo;
@@ -136,7 +136,7 @@ library FarmLibrary {
         }
     }
 
-    function _swapExactNonCrssToCrss(
+    function _swapExactNonTGRToTGR(
         ITaker taker,
         address token,
         address tokenFr,
@@ -150,7 +150,7 @@ library FarmLibrary {
         } else if (tokenFr != tokenTo) {
             uint256 balance0 = IERC20(tokenTo).balanceOf(address(this));
 
-            ICrssToken(tokenFr).approve(address(taker), amount);
+            ITGRToken(tokenFr).approve(address(taker), amount);
             address[] memory path = new address[](2);
             path[0] = tokenFr;
             path[1] = tokenTo;
@@ -177,7 +177,7 @@ library FarmLibrary {
         if (tokenFr != tokenTo) {
             uint256 _tokenToAmt = IERC20(tokenTo).balanceOf(address(this));
 
-            ICrssToken(token).approve(address(taker), amount);
+            ITGRToken(token).approve(address(taker), amount);
             address[] memory path = new address[](2);
             path[0] = tokenFr;
             path[1] = tokenTo;
@@ -236,10 +236,10 @@ library FarmLibrary {
     }
     
     /**
-    * @dev Transfer Crss amount with tolerance against (small?) numeric errors.
+    * @dev Transfer TGR amount with tolerance against (small?) numeric errors.
     */
-    function tolerableCrssTransferFromXTokenAccount(address xToken, address _to, uint256 _amount) public {
-        IXCrssToken(xToken).safeCrssTransfer(_to, _amount);
+    function tolerableTGRTransferFromXTokenAccount(address xToken, address _to, uint256 _amount) public {
+        IXTGRToken(xToken).safeTGRTransfer(_to, _amount);
     }
 
 
@@ -261,10 +261,10 @@ library FarmLibrary {
         totalRewards += subPoolPending;
         if (subPoolPending > 0) {
             uint256 feePaid = subPoolPending * feeParams.nonVestBurnRate / FeeMagnifier;
-            ICrssToken(nodes.token).burn(nodes.xToken, feePaid);
+            ITGRToken(nodes.token).burn(nodes.xToken, feePaid);
             subPoolPending -= feePaid;
             subPoolPending -= payCompoundFee(nodes.token, feeParams, subPoolPending, nodes);
-            uint256 newLpAmountInFarm = changeCrssInXTokenToLpInFarm(address(pool.lpToken), nodes, subPoolPending, feeParams.treasury);
+            uint256 newLpAmountInFarm = changeTGRInXTokenToLpInFarm(address(pool.lpToken), nodes, subPoolPending, feeParams.treasury);
             _addToSubPool(pool.OnOff.Comp, pool.OnOff.sumAmount, newLpAmountInFarm); // updates bulk & accPerShare.
         }
 
@@ -279,7 +279,7 @@ library FarmLibrary {
             uint256 halfToCompound = subPoolPending / 2;
             uint256 halfToVest = subPoolPending - halfToCompound;
             halfToCompound -= payCompoundFee(nodes.token, feeParams, halfToCompound, nodes);
-            uint256 newLpAmountInFarm = changeCrssInXTokenToLpInFarm(address(pool.lpToken), nodes, halfToCompound, feeParams.treasury);
+            uint256 newLpAmountInFarm = changeTGRInXTokenToLpInFarm(address(pool.lpToken), nodes, halfToCompound, feeParams.treasury);
             _addToSubPool(pool.OnOn.Comp, pool.OnOn.sumAmount, newLpAmountInFarm); // updates bulk & accPerShare.
             _addToSubPool(pool.OnOn.Vest, pool.OnOn.sumAmount, halfToVest); // updates bulk & accPerShare.
         }
@@ -307,7 +307,7 @@ library FarmLibrary {
         totalRewards += subPoolPending;
         if (subPoolPending > 0) {
             uint256 feePaid = subPoolPending * feeParams.nonVestBurnRate / FeeMagnifier;
-            ICrssToken(nodes.token).burn(nodes.xToken, feePaid);
+            ITGRToken(nodes.token).burn(nodes.xToken, feePaid);
             subPoolPending -= feePaid;
             _addToSubPool(pool.OffOff.Accum, pool.OffOff.sumAmount, subPoolPending); // updates bulk & accPerShare.
         }
@@ -361,8 +361,8 @@ library FarmLibrary {
         if (feesPaid > 0) {
             uint256 half = feesPaid / 2;
             if (payerToken == nodes.token) {
-                tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.stakeholders, half);
-                tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, feesPaid - half);
+                tolerableTGRTransferFromXTokenAccount(nodes.xToken, feeParams.stakeholders, half);
+                tolerableTGRTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, feesPaid - half);
             } else {
                 TransferHelper.safeTransfer(payerToken, feeParams.stakeholders, half);
                 TransferHelper.safeTransfer(payerToken, feeParams.treasury, feesPaid - half);
@@ -374,10 +374,10 @@ library FarmLibrary {
     address msgSender, FarmFeeParams storage feeParams, Nodes storage nodes)
     public {
         //-------------------- Pay referral fee outside of user's pending reward --------------------
-        uint256 userPending = getRewardPayroll(pool, user) * pool.accCrssPerShare / 1e12 - user.rewardDebt; // This is the only place user.rewardDebt works explicitly.
+        uint256 userPending = getRewardPayroll(pool, user) * pool.accTGRPerShare / 1e12 - user.rewardDebt; // This is the only place user.rewardDebt works explicitly.
         if (userPending > 0) {
             _mintReferralCommission(msgSender, userPending, feeParams, nodes);
-            //user.rewardDebt = getRewardPayroll(pool, user) * pool.accCrssPerShare / 1e12;
+            //user.rewardDebt = getRewardPayroll(pool, user) * pool.accTGRPerShare / 1e12;
         }
     }
 
@@ -445,7 +445,7 @@ library FarmLibrary {
             }
         }
 
-        user.rewardDebt = getRewardPayroll(pool, user) * pool.accCrssPerShare / 1e12;
+        user.rewardDebt = getRewardPayroll(pool, user) * pool.accTGRPerShare / 1e12;
     }
 
     /**
@@ -498,7 +498,7 @@ library FarmLibrary {
             user.debt1 = user.amount * pool.OffOff.Accum.accPerShare / 1e12;
         }
 
-        user.rewardDebt = getRewardPayroll(pool, user) * pool.accCrssPerShare / 1e12;
+        user.rewardDebt = getRewardPayroll(pool, user) * pool.accTGRPerShare / 1e12;
     }
 
     /**
@@ -525,10 +525,10 @@ library FarmLibrary {
     function _mintReferralCommission(address _user, uint256 principal, FarmFeeParams storage feeParams, Nodes storage nodes) internal {
         uint256 commission = principal.mul(feeParams.referralCommissionRate).div(FeeMagnifier);
         if (feeParams.crssReferral != address(0) && commission > 0) {
-            address referrer = ICrssReferral(feeParams.crssReferral).getReferrer(_user);
+            address referrer = ITGRReferral(feeParams.crssReferral).getReferrer(_user);
             if (referrer != address(0)) {
-                ICrssToken(nodes.token).mint(referrer, commission);
-                ICrssReferral(feeParams.crssReferral).recordReferralCommission(referrer, commission);
+                ITGRToken(nodes.token).mint(referrer, commission);
+                ITGRReferral(feeParams.crssReferral).recordReferralCommission(referrer, commission);
             }
         }
     }
@@ -601,23 +601,23 @@ library FarmLibrary {
         for (uint256 pid = 0; pid < len; pid ++) {
             PoolInfo storage pool = poolInfo[pid];
             UserInfo storage user = userInfo[pid][msgSender];
-            uint256 accumCrss = user.accumulated;
+            uint256 accumTGR = user.accumulated;
             if (feeParams.compoundFeeRate > 0) {
-                uint256 fee = accumCrss * feeParams.compoundFeeRate / FeeMagnifier;
-                accumCrss -= fee;
+                uint256 fee = accumTGR * feeParams.compoundFeeRate / FeeMagnifier;
+                accumTGR -= fee;
                 crssToPay += fee;
             }
-            totalCompounded += accumCrss;
-            uint256 newLpAmount = changeCrssInXTokenToLpInFarm(
-                address(pool.lpToken), nodes, accumCrss, feeParams.treasury);
+            totalCompounded += accumTGR;
+            uint256 newLpAmount = changeTGRInXTokenToLpInFarm(
+                address(pool.lpToken), nodes, accumTGR, feeParams.treasury);
             startRewardCycle(pool, user, newLpAmount, feeParams, true);  // true: addNotSubract
             user.accumulated = 0;
         }
 
         if (crssToPay > 0) {
             uint256 half = crssToPay / 2;
-            tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.stakeholders, half);
-            tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, crssToPay - half);
+            tolerableTGRTransferFromXTokenAccount(nodes.xToken, feeParams.stakeholders, half);
+            tolerableTGRTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, crssToPay - half);
         }
     }
 
@@ -632,8 +632,8 @@ library FarmLibrary {
         uint256 pointsForStakingPool;
 
         if (points != 0) {
-            pointsPerPercent = points * 1e5 / ( 100 - CrssPoolAllocPercent ); // 25% for Crss staking pool.
-            pointsForStakingPool = pointsPerPercent * CrssPoolAllocPercent / 1e5;
+            pointsPerPercent = points * 1e5 / ( 100 - TGRPoolAllocPercent ); // 25% for TGR staking pool.
+            pointsForStakingPool = pointsPerPercent * TGRPoolAllocPercent / 1e5;
             totalAllocPoint = points + pointsForStakingPool;
             poolInfo[0].allocPoint = pointsForStakingPool;
         } else {
@@ -653,7 +653,7 @@ library FarmLibrary {
         pool.depositFeeRate = _depositFeeRate;
 
         totalAllocPoint = updateSpecialPools(poolInfo);
-        require(poolInfo.length <= 1 || _allocPoint * 99 <= totalAllocPoint * (100 - CrssPoolAllocPercent), "Invalid allocPoint");
+        require(poolInfo.length <= 1 || _allocPoint * 99 <= totalAllocPoint * (100 - TGRPoolAllocPercent), "Invalid allocPoint");
     }
 
     function addPool(
@@ -666,7 +666,7 @@ library FarmLibrary {
         poolInfo.push( buildStandardPool(_lpToken, _allocPoint, startBlock, _depositFeeRate) );
 
         totalAllocPoint = updateSpecialPools(poolInfo);
-        require(poolInfo.length <= 1 || _allocPoint * 99 <= totalAllocPoint * (100 - CrssPoolAllocPercent), "Invalid allocPoint");
+        require(poolInfo.length <= 1 || _allocPoint * 99 <= totalAllocPoint * (100 - TGRPoolAllocPercent), "Invalid allocPoint");
     }
 
 
@@ -675,8 +675,8 @@ library FarmLibrary {
     }
 
     /**
-    * @dev Mint rewards, and increase the pool's accCrssPerShare, accordingly.
-    * accCrssPerShare: the amount of rewards that a user would have gaind NOW 
+    * @dev Mint rewards, and increase the pool's accTGRPerShare, accordingly.
+    * accTGRPerShare: the amount of rewards that a user would have gaind NOW 
     * if they had maintained 1e12 LP tokens as user.amount since the very beginning.
     */
 
@@ -690,9 +690,9 @@ library FarmLibrary {
             if (lpSupply > 0) {
                 uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number, bonusMultiplier);
                 uint256 crssReward = multiplier * crssPerBlock * pool.allocPoint / totalAllocPoint;
-                ICrssToken(nodes.token).mint(nodes.xToken, crssReward);
+                ITGRToken(nodes.token).mint(nodes.xToken, crssReward);
                 pool.reward = crssReward; // used as a checksum
-                pool.accCrssPerShare += (crssReward * 1e12 / lpSupply);
+                pool.accTGRPerShare += (crssReward * 1e12 / lpSupply);
                 pool.lastRewardBlock = block.number;
             }
 
@@ -700,22 +700,22 @@ library FarmLibrary {
         }
     }
 
-    function pendingCrss(
+    function pendingTGR(
     PoolInfo storage pool, 
     UserInfo storage user, 
     uint256 bonusMultiplier,
     uint256 crssPerBlock, 
     uint256 totalAllocPoint
     ) public view returns (uint256) {
-        uint256 accCrssPerShare = pool.accCrssPerShare;
+        uint256 accTGRPerShare = pool.accTGRPerShare;
         uint256  lpSupply = pool.lpToken.balanceOf(address(this));
 
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number, bonusMultiplier);
             uint256 crssReward = multiplier.mul(crssPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-            accCrssPerShare += (crssReward * 1e12 / lpSupply);
+            accTGRPerShare += (crssReward * 1e12 / lpSupply);
         }       
-        return getRewardPayroll(pool, user) * accCrssPerShare / 1e12 - user.rewardDebt;
+        return getRewardPayroll(pool, user) * accTGRPerShare / 1e12 - user.rewardDebt;
     }
 
     function finishRewardCycle(
@@ -755,16 +755,16 @@ library FarmLibrary {
         userState.accRewards = user.accumulated;
         userState.totalVest = getTotalVestPrincipals(user.vestList);
         userState.totalMatureVest = getTotalMatureVestPieces(user.vestList, vestMonths);
-        userState.pendingCrss = pendingCrss(pool, user, bonusMultiplier, crssPerBlock, totalAllocPoint);
+        userState.pendingTGR = pendingTGR(pool, user, bonusMultiplier, crssPerBlock, totalAllocPoint);
         userState.rewardPayroll = getRewardPayroll(pool, user);
         userState.lpBalance = pool.lpToken.balanceOf(msgSender);
-        userState.crssBalance = ICrssToken(nodes.token).balanceOf(msgSender);
+        userState.crssBalance = ITGRToken(nodes.token).balanceOf(msgSender);
         for(pid = 0; pid < poolInfo.length; pid++) {
             userState.totalAccRewards += userInfo[pid][msgSender].accumulated;
         }
     }
 
-    function getSubPooledCrss(PoolInfo storage pool, UserInfo storage user) external view returns (SubPooledCrss memory spc) {
+    function getSubPooledTGR(PoolInfo storage pool, UserInfo storage user) external view returns (SubPooledTGR memory spc) {
 
         if (user.collectOption == CollectOption.OnOff && user.amount > 0) {
 
@@ -793,7 +793,7 @@ library FarmLibrary {
         }
     }
 
-    function payDepositFeeCrssFromXCrss(
+    function payDepositFeeTGRFromXTGR(
         PoolInfo storage pool,
         address xToken,
         uint256 amount,
@@ -802,8 +802,8 @@ library FarmLibrary {
         if (pool.depositFeeRate > 0) {
             feePaid = amount * pool.depositFeeRate / FeeMagnifier;
             uint256 treasury = feePaid / 2;
-            tolerableCrssTransferFromXTokenAccount(xToken, feeStores.treasury, treasury);
-            tolerableCrssTransferFromXTokenAccount(xToken, feeStores.develop, feePaid - treasury);
+            tolerableTGRTransferFromXTokenAccount(xToken, feeStores.treasury, treasury);
+            tolerableTGRTransferFromXTokenAccount(xToken, feeStores.develop, feePaid - treasury);
         }
     }
 
@@ -843,7 +843,7 @@ library FarmLibrary {
             lpToken: IERC20(lp),
             allocPoint: allocPoint,
             lastRewardBlock: (block.number > startBlock ? block.number : startBlock),
-            accCrssPerShare: 0,
+            accTGRPerShare: 0,
             depositFeeRate: depositFeeRate,
             reward: 0,
 
