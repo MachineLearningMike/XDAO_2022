@@ -186,7 +186,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "safeCakeTransfer",
+    name: "safeCrssTransfer",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

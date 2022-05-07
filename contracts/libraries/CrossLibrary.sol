@@ -33,7 +33,7 @@ library CrossLibrary {
                             hex"ff",
                             factory,
                             keccak256(abi.encodePacked(token0, token1)),
-                            hex"e75222cb4f691b535d61a83e0e21bb68c6856bc50c8492ce1b2403560bfedb78" // init code hash
+                            hex"cdd1cdcc0bd7f43f9f57cc9aaf8911c0a5a36ecdd5469f4aa0dd3ef8035ec64b" // init code hash
                         )
                     )
                 )

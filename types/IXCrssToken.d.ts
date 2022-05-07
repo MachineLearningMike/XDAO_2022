@@ -27,7 +27,7 @@ interface IXCrssTokenInterface extends ethers.utils.Interface {
     "burn(address,uint256)": FunctionFragment;
     "getOwner()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
-    "safeCakeTransfer(address,uint256)": FunctionFragment;
+    "safeCrssTransfer(address,uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
@@ -52,7 +52,7 @@ interface IXCrssTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "safeCakeTransfer",
+    functionFragment: "safeCrssTransfer",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -75,7 +75,7 @@ interface IXCrssTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "getOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "safeCakeTransfer",
+    functionFragment: "safeCrssTransfer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -181,7 +181,7 @@ export class IXCrssToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    safeCakeTransfer(
+    safeCrssTransfer(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -231,7 +231,7 @@ export class IXCrssToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  safeCakeTransfer(
+  safeCrssTransfer(
     _to: string,
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -281,7 +281,7 @@ export class IXCrssToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    safeCakeTransfer(
+    safeCrssTransfer(
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
@@ -370,7 +370,7 @@ export class IXCrssToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    safeCakeTransfer(
+    safeCrssTransfer(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -424,7 +424,7 @@ export class IXCrssToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    safeCakeTransfer(
+    safeCrssTransfer(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
