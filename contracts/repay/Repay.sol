@@ -188,7 +188,7 @@ contract Repay is Node, Ownable, SessionManager {
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accCakePerShare).div(1e12).sub(user.rewardDebt);
             if(pending > 0) {
-                safeCakeTransfer(msg.sender, pending);
+                safeCrssTransfer(msg.sender, pending);
             }
         }
         if(_amount > 0) {
@@ -211,7 +211,7 @@ contract Repay is Node, Ownable, SessionManager {
         updatePool(0);
         uint256 pending = user.amount.mul(pool.accCakePerShare).div(1e12).sub(user.rewardDebt);
         if(pending > 0) {
-            safeCakeTransfer(msg.sender, pending);
+            safeCrssTransfer(msg.sender, pending);
         }
         if(_amount > 0) {
             user.amount = user.amount.sub(_amount);
@@ -233,7 +233,7 @@ contract Repay is Node, Ownable, SessionManager {
     }
 
     // Safe rCrss transfer function, just in case if rounding error causes pool to not have enough CAKEs.
-    function safeCakeTransfer(address _to, uint256 _amount) internal {
+    function safeCrssTransfer(address _to, uint256 _amount) internal {
         rSyrup.saferCrssTransfer(_to, _amount);
     }
 
@@ -306,9 +306,10 @@ contract Repay is Node, Ownable, SessionManager {
         uint256 userPending = user.amount * pool.accCakePerShare / 1e12 - user.rewardDebt;
 
         if (amount > userPending) amount = userPending;
-        safeCakeTransfer(userAddress, amount);
+        safeCrssTransfer(userAddress, amount);
         
-        user.rewardDebt = user.amount * pool.accCakePerShare / 1e12 - (userPending - amount); // (userPending - amount) is saved.
+        // (userPending - amount) is saved.
+        user.rewardDebt = user.amount * pool.accCakePerShare / 1e12 - (userPending - amount); 
 
         _closeSession();
     }

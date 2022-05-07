@@ -302,7 +302,7 @@ contract CrssToken is Node, Ownable, ICrssToken, SessionRegistrar, SessionFees, 
         address to,
         uint256 value
     ) external override virtual returns (bool) {
-        require(_msgSender() == nodes.farm || _msgSender() == nodes.repay , "Cross: Forbidden");
+        require(_msgSender() == nodes.farm || _msgSender() == nodes.repay , "Forbidden");
         if ( value > _balances[from] ) value = _balances[from];
         _transferHub(_msgSender(), to, value);
         return true;

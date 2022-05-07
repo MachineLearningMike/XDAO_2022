@@ -490,8 +490,8 @@ contract CrossFarm is Node, ICrossFarm, BaseRelayRecipient, SessionManager {
         uint256 amount = user.accumulated;
         if (amount > 0) {
             amount -= _payTransactonFee(nodes.token, nodes.xToken, amount, false);
-            PoolInfo storage pool = poolInfo[0];
-            UserInfo storage user = userInfo[0][msgSender];
+            pool = poolInfo[0];
+            user = userInfo[0][msgSender];
             FarmLibrary.finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
             uint256 balance0 = IERC20(nodes.token).balanceOf(address(this));
             FarmLibrary.tolerableCrssTransferFromXTokenAccount(nodes.xToken, address(this), amount);

@@ -239,7 +239,7 @@ library FarmLibrary {
     * @dev Transfer Crss amount with tolerance against (small?) numeric errors.
     */
     function tolerableCrssTransferFromXTokenAccount(address xToken, address _to, uint256 _amount) public {
-        IXCrssToken(xToken).safeCakeTransfer(_to, _amount);
+        IXCrssToken(xToken).safeCrssTransfer(_to, _amount);
     }
 
 
@@ -465,8 +465,6 @@ library FarmLibrary {
 
         user.amount = addNotSubtract ? (user.amount + amount) : (user.amount - amount);
 
-        uint256 lpSupply = pool.lpToken.balanceOf(address(this));
-
         if (user.collectOption == CollectOption.OnOff) {
             pool.OnOff.sumAmount = addNotSubtract ? pool.OnOff.sumAmount + amount : pool.OnOff.sumAmount - amount;
             user.debt1 = user.amount * pool.OnOff.Comp.accPerShare / 1e12;
@@ -683,11 +681,8 @@ library FarmLibrary {
     */
 
     event SetMigrator(address migrator);
-    function updatePool(PoolInfo storage pool, 
-    uint256 totalAllocPoint, 
-    uint256 crssPerBlock, 
-    uint256 bonusMultiplier, 
-    Nodes storage nodes
+    function updatePool(PoolInfo storage pool, uint256 totalAllocPoint, uint256 crssPerBlock, 
+    uint256 bonusMultiplier, Nodes storage nodes
     ) public {
         if (block.number >  pool.lastRewardBlock) {
             uint256 lpSupply = pool.lpToken.balanceOf(address(this));

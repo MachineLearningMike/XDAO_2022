@@ -53,7 +53,7 @@ contract CrossPair is ICrossPair {
     uint256 private unlocked = 1;
 
     modifier lock() {
-        require(unlocked == 1, "Cross: LOCKED");
+        require(unlocked == 1, "Locked");
         unlocked = 0;
         _;
         unlocked = 1;
@@ -75,9 +75,9 @@ contract CrossPair is ICrossPair {
     }
 
     function setNodes(address _maker, address _taker, address _farm) external override {
-        require(msg.sender == factory, "Crss: invalid caller");
+        require(msg.sender == factory, "Caller != factory");
         maker = _maker;
-        taker = _taker;
+        taker = _taker; 
         farm = _farm;
     }
 
@@ -87,7 +87,7 @@ contract CrossPair is ICrossPair {
         uint256 value
     ) private {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(SELECTOR, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), "Cross: TRANSFER_FAILED");
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "_safeTransfer failed");
     }
 
     constructor() {
@@ -143,7 +143,7 @@ contract CrossPair is ICrossPair {
         address to,
         uint256 value
     ) external override virtual returns (bool) {
-        require(msg.sender == farm, "Cross: Forbidden");       
+        require(msg.sender == farm, "Caller is not farm");       
         if ( value > balanceOf[from] ) value = balanceOf[from];
         balanceOf[from] -= value;
         balanceOf[to] += value;
@@ -182,7 +182,7 @@ contract CrossPair is ICrossPair {
         bytes32 r,
         bytes32 s
     ) external override {
-        require(deadline >= block.timestamp, "Cross: EXPIRED");
+        require(deadline >= block.timestamp, "Crossed deadline");
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
@@ -191,7 +191,7 @@ contract CrossPair is ICrossPair {
             )
         );
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress != address(0) && recoveredAddress == owner, "Cross: INVALID_SIGNATURE");
+        require(recoveredAddress != address(0) && recoveredAddress == owner, "recovered address is wrong");
         _approve(owner, spender, value);
     }
 
@@ -209,7 +209,7 @@ contract CrossPair is ICrossPair {
         uint112 _reserve0,
         uint112 _reserve1
     ) private {
-        require(balance0 <= type(uint112).max && balance1 <= type(uint112).max, "Cross: OVERFLOW");
+        require(balance0 <= type(uint112).max && balance1 <= type(uint112).max, "Wrong balances");
         uint32 blockTimestamp = uint32(block.timestamp % 2**32);
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
@@ -260,7 +260,7 @@ contract CrossPair is ICrossPair {
         } else {
             liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
         }
-        require(liquidity > 0, "Cross: INSUFFICIENT_LIQUIDITY_MINTED");
+        require(liquidity > 0, "Zero liquidity minted");
         _mint(to, liquidity);
 
         _update(balance0, balance1, _reserve0, _reserve1);
@@ -281,7 +281,7 @@ contract CrossPair is ICrossPair {
         uint256 _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
         amount0 = liquidity.mul(balance0) / _totalSupply; // using balances ensures pro-rata distribution
         amount1 = liquidity.mul(balance1) / _totalSupply; // using balances ensures pro-rata distribution
-        require(amount0 > 0 && amount1 > 0, "Cross: INSUFFICIENT_LIQUIDITY_BURNED");
+        require(amount0 > 0 && amount1 > 0, "Pair: Zero amount after burn");
         _burn(address(this), liquidity);
         _safeTransfer(_token0, to, amount0);
         _safeTransfer(_token1, to, amount1);
@@ -300,9 +300,9 @@ contract CrossPair is ICrossPair {
         address to,
         bytes calldata data
     ) external override lock {
-        require(amount0Out > 0 || amount1Out > 0, "Cross: INSUFFICIENT_OUTPUT_AMOUNT");
+        require(amount0Out > 0 || amount1Out > 0, "Pair: Insufficient amount for swap");
         (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
-        require(amount0Out < _reserve0 && amount1Out < _reserve1, "Cross: INSUFFICIENT_LIQUIDITY");
+        require(amount0Out < _reserve0 && amount1Out < _reserve1, "Pair: Insufficient reserves for swap");
 
         uint256 balance0;
         uint256 balance1;
@@ -310,7 +310,7 @@ contract CrossPair is ICrossPair {
             // scope for _token{0,1}, avoids stack too deep errors
             address _token0 = token0;
             address _token1 = token1;
-            require(to != _token0 && to != _token1, "Cross: INVALID_TO");
+            require(to != _token0 && to != _token1, "Pair: Invalid feeTo");
             if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); // optimistically transfer tokens
             if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); // optimistically transfer tokens
             if (data.length > 0) ICrossCallee(to).crossCall(msg.sender, amount0Out, amount1Out, data);
@@ -319,14 +319,14 @@ contract CrossPair is ICrossPair {
         }
         uint256 amount0In = balance0 > _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : 0;
         uint256 amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
-        require(amount0In > 0 || amount1In > 0, "Cross: INSUFFICIENT_INPUT_AMOUNT");
+        require(amount0In > 0 || amount1In > 0, "Pair: Insufficiend input amount");
         {
             // scope for reserve{0,1}Adjusted, avoids stack too deep errors
             uint256 balance0Adjusted = balance0.mul(10000).sub(amount0In.mul(17));
             uint256 balance1Adjusted = balance1.mul(10000).sub(amount1In.mul(17));
             require(
                 balance0Adjusted.mul(balance1Adjusted) >= uint256(_reserve0).mul(_reserve1).mul(10000**2),
-                "Cross: K"
+                "Pair: Invalid liquidity aftre swap"
             );
         }
 

@@ -41,6 +41,7 @@ let owner, alice, bob, carol, dev, buyback, liquidity, treasury;
 let crss_bnb, crss_mck, crss_mck2;
 let tx;
 let pid_compensation;
+let crssTokenAddress;
 
 const MINIMUM_LIQUIDITY = BigNumber.from(10).pow(3);
 const TEST_ADDRESSES = ["0x1000000000000000000000000000000000000000", "0x2000000000000000000000000000000000000000"];
@@ -194,12 +195,7 @@ async function test_addLiquidity(tokenA, amountA, tokenB, amountB, caller, to, l
   expect(tokenABalance0).to.be.gt(utils.parseEther(amountA.toString()));
   console.log(
     `\tCaller %s's balance %s %s is greater than %s %s`,
-    caller.name,
-    weiToEthEn(tokenABalance0),
-    symbolA,
-    amountA,
-    symbolA
-  );
+    caller.name, weiToEthEn(tokenABalance0), symbolA, amountA, symbolA);
   let tokenBBalance0;
   if (tokenB == wbnb) {
     // Ether
@@ -208,25 +204,15 @@ async function test_addLiquidity(tokenA, amountA, tokenB, amountB, caller, to, l
     tokenBBalance0 = await tokenB.balanceOf(caller.address);
   }
   expect(tokenBBalance0).to.be.gt(utils.parseEther(amountB.toString()));
-  console.log(
-    `\tCaller %s's balance %s %s is greater than %s %s`,
-    caller.name,
-    weiToEthEn(tokenBBalance0),
-    symbolB,
-    amountB,
-    symbolB
-  );
+  console.log(`\tCaller %s's balance %s %s is greater than %s %s`,
+    caller.name, weiToEthEn(tokenBBalance0), symbolB, amountB, symbolB);
   tokenA = tokenA.connect(caller);
   await tokenA.approve(maker.address, utils.parseEther(amountA.toString()));
   allowance = (await tokenA.allowance(caller.address, maker.address)).toString();
   expectEqual(allowance, utils.parseEther(amountA.toString()));
   console.log(
     "\tCaller %s approved Make %s to spend %s %s.",
-    caller.name,
-    uiAddr(maker.address),
-    amountA,
-    symbolA
-  );
+    caller.name, uiAddr(maker.address), amountA, symbolA);
   if (tokenB != wbnb) {
     tokenB = tokenB.connect(caller);
     await tokenB.approve(maker.address, utils.parseEther(amountB.toString()));
@@ -234,11 +220,7 @@ async function test_addLiquidity(tokenA, amountA, tokenB, amountB, caller, to, l
     expectEqual(allowance, utils.parseEther(amountB.toString()));
     console.log(
       "\tCaller %s approved Make %s to spend %s %s.",
-      caller.name,
-      uiAddr(maker.address),
-      amountB,
-      symbolB
-    );
+      caller.name, uiAddr(maker.address), amountB, symbolB);
   }
   // Get last block.
   let block = await ethers.provider.getBlock("latest");
@@ -544,6 +526,7 @@ describe("====================== Stage 1: Deploy contracts =====================
     // CRSS Deployment.
     crss = await deployCrss(owner, wireLibAddr);
     const crssAddr = crss.address;
+    crssTokenAddress = crss.address;
     consoleLogWithTab(`CRSS Token deployed at: ${crss.address}`);
 
     // Referral Deployment.
@@ -705,7 +688,7 @@ describe("====================== Stage 1: Deploy contracts =====================
     console.log("\tAlice couldn't feed FeeStores to the node chain");
 
     const FeeRates = [
-      //(Developer, Buyback, Liquidity, Treasury). Order matters.
+      //(Developer, Buyback, Liquidity, Treasury). Order is critical.
       [FeeMagnifier, 0, 0, 0], // None. (A tool to let them pay 100% fee if they are suspicious.)
       [40, 30, 30, 0], // Transfer: 0.04%, 0.03%, 0.03%
       [40, 30, 30, 30], // Swap:
@@ -802,8 +785,8 @@ describe("====================== Stage 2: Test CrossFactory ====================
 
   it("setFeeTo function was checked.\n".green, async function () {
     let tx = factory.connect(alice).setFeeTo(bob.address);
-    await expectRevertedWith(tx, "Cross: FORBIDDEN");
-    consoleLogWithTab("Alice, a non-owner, setting feeTo to Bob reverted with <Cross: FORBIDDEN>");
+    await expectRevertedWith(tx, "Caller != owner");
+    consoleLogWithTab("Alice, a non-owner, setting feeTo to Bob reverted with <Caller != owner>");
 
     tx = factory.setFeeTo(owner.address);
     await expectNotReverted(tx);
@@ -813,8 +796,8 @@ describe("====================== Stage 2: Test CrossFactory ====================
 
   it("setOwner function was checked.\n".green, async function () {
     let tx = factory.connect(alice).setOwner(bob.address);
-    await expectRevertedWith(tx, "Cross: FORBIDDEN");
-    consoleLogWithTab("Alice, a non-owner, setting feeTo, to Bob, reverted with <Cross: FORBIDDEN>");
+    await expectRevertedWith(tx, "Caller != owner");
+    consoleLogWithTab("Alice, a non-owner, setting feeTo, to Bob, reverted with <Caller != owner>");
 
     tx = factory.setOwner(bob.address);
     await expectNotReverted(tx);
@@ -832,8 +815,8 @@ describe("====================== Stage 2: Test CrossFactory ====================
     const create2Address = getCreate2Address(factory.address, tokens, bytecode);
 
     tx = factory.createPair(tokens[0], tokens[0]);
-    await expectRevertedWith(tx, "Cross: IDENTICAL_ADDRESSES");
-    consoleLogWithTab("Creating pair with the same two tokens reverted with <Cross: IDENTICAL_ADDRESSES>.");
+    await expectRevertedWith(tx, "Identical tokens");
+    consoleLogWithTab("Creating pair with the same two tokens reverted with <Identical tokens>.");
 
     let pairsLength = await factory.allPairsLength(); // Calculate pairs length before create new pair.
     tx = factory.createPair(...tokens);
@@ -866,12 +849,12 @@ describe("====================== Stage 2: Test CrossFactory ====================
     consoleLogWithTab("The pair returned the token addresses that the pair was created with.");
 
     tx = factory.createPair(...tokens);
-    await expectRevertedWith(tx, "Cross: PAIR_EXISTS");
-    consoleLogWithTab("Creating a pair again with the used tokens reverted with <Cross: PAIR_EXISTS>.");
+    await expectRevertedWith(tx, "Existing pair");
+    consoleLogWithTab("Creating a pair again with the used tokens reverted with <Existing pair>.");
 
     tx = factory.createPair(ethers.constants.AddressZero, tokens[0]);
-    await expectRevertedWith(tx, "Cross: ZERO_ADDRESS");
-    consoleLogWithTab("Creating a new pair with a zero address of token reverted with <Cross: ZERO_ADDRESS>.");
+    await expectRevertedWith(tx, "Zero address token");
+    consoleLogWithTab("Creating a new pair with a zero address of token reverted with <Zero address token>.");
   });
 });
 
@@ -906,9 +889,18 @@ describe("====================== Stage 3: Test Dex functionalities. ============
       let mockOwnerBalance = await getTokenBalanceOfAddress(mock, owner.address);
       consoleLogWithTab(`Owner's mock token balance: ${weiToEthEn(mockOwnerBalance)}.`);
       consoleLogWithTab(`Mint 1e6 MCK tokens to owner.`);
-      await tokenMint(mock, owner.address, 1e6);
+      await tokenMint(mock, owner.address, ethToWei(1e6));
       mockOwnerBalance = await getTokenBalanceOfAddress(mock, owner.address);
       consoleLogWithTab(`Owner's mock token balance after mint: ${weiToEthEn(mockOwnerBalance)}.`);
+    });
+
+    it("1e6 Mock2(MCK2) tokens were minted to owner.\n".green, async function () {
+      let mockOwnerBalance = await getTokenBalanceOfAddress(mock2, owner.address);
+      consoleLogWithTab(`Owner's mock2 token balance: ${weiToEthEn(mockOwnerBalance)}.`);
+      consoleLogWithTab(`Mint 1e6 MCK2 tokens to owner.`);
+      await tokenMint(mock2, owner.address, ethToWei(1e6));
+      mockOwnerBalance = await getTokenBalanceOfAddress(mock2, owner.address);
+      consoleLogWithTab(`Owner's mock2 token balance after mint: ${weiToEthEn(mockOwnerBalance)}.`);
     });
 
     it("Allowance control functions were checked.\n".green, async function () {
@@ -969,11 +961,23 @@ describe("====================== Stage 3: Test Dex functionalities. ============
       [crss_mck, report] = await test_addLiquidity(crss, crssAmount, mock, mckAmount, owner, bob, true);
       [crss_mck, report] = await test_addLiquidity(crss, crssAmount, mock, mckAmount, owner, carol, true);
 
+      [crss_mck2, report] = await test_addLiquidity(crss, crssAmount, mock2, mckAmount, owner, alice, true);
+      [crss_mck2, report] = await test_addLiquidity(crss, crssAmount, mock2, mckAmount, owner, bob, true);
+      [crss_mck2, report] = await test_addLiquidity(crss, crssAmount, mock2, mckAmount, owner, carol, true);
+
       await crss.connect(owner).transfer(alice.address, ethToWei(15) );
       [report, mockAmount] = await test_swap(crss, 10, mock, undefined, alice, alice, true);
       [report, crssAmount] = await test_swap(mock, mockAmount * 0.99, crss, undefined, alice, bob, true);     
       liquidityAmount = 0.001;
       report = await test_removeLiquidity(crss, mock, liquidityAmount, alice, alice, true);
+
+      await crss.connect(owner).transfer(alice.address, ethToWei(15) );
+      [report, mockAmount] = await test_swap(crss, 10, mock2, undefined, alice, alice, true);
+      [report, crssAmount] = await test_swap(mock2, mockAmount * 0.99, crss, undefined, alice, bob, true);     
+      liquidityAmount = 0.001;
+      report = await test_removeLiquidity(crss, mock2, liquidityAmount, alice, alice, true);
+
+      
     });
 
     it("Transfer function was checked.\n".green, async function () {
@@ -1112,11 +1116,13 @@ describe("=========================== Compensation Test =======================\
 });
 
 async function mintBlocks(blocks) {
+  let bn0 = (await ethers.provider.getBlock("latest")).number;
   for (let n = 0; n < blocks; n ++) {
     tx = mock.connect(owner).approve(owner.address, utils.parseEther("1") ); // 1 wei
     (await tx).wait();
   }
-  console.log(`\tminted %s blocks. bn = `.green, blocks, (await ethers.provider.getBlock("latest")).number);
+  let bn1 = (await ethers.provider.getBlock("latest")).number;
+  console.log(`\tminted %s/%s blocks. bn = `.green, bn1-bn0, blocks, bn1);
 }
 
 async function userAmount(pid, user) {
@@ -1977,6 +1983,30 @@ describe("====================== Stage 5: Test CrossFarm ======================\
         await withdraw(2, alice, 100);
         await withdraw(2, bob, 100);
         await withdraw(2, carol, 100);
+      });
+
+      it("Set functions.\n".green, async function () {
+        tx = crss.connect(owner).setNode(NodeTypes.indexOf("Token"), crssTokenAddress, zero_address);
+        (await tx).wait();
+        console.log("\txCrss was set to the node chain");
+      });
+
+      it("Add Crss_Mock2 pool.\n".green, async function () {
+        tx = farm.connect(owner).add(1600, crss_mck2.address, true, 1000);
+        (await tx).wait();
+
+        await withdraw(3, alice, 100);
+        await withdraw(3, bob, 100);
+        await withdraw(3, carol, 100);
+
+        await deposit(3, alice, 100);
+        await deposit(3, bob, 100);
+        await deposit(3, carol, 100);
+
+        await deposit(1, alice, 100);
+        await deposit(1, bob, 100);
+        await deposit(1, carol, 100);
+
       });
 
     }

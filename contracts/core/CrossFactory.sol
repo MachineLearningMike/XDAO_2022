@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "../session/Node.sol";
-import "./interfaces/ICrossFactory.sol";
 import "../periphery/interfaces/ICrossRouter.sol";
 import "./CrossPair.sol";
+import "./interfaces/ICrossFactory.sol";
 
 contract CrossFactory is Node, ICrossFactory {
     bytes32 public constant INIT_CODE_PAIR_HASH = keccak256(abi.encodePacked(type(CrossPair).creationCode));
@@ -37,13 +37,13 @@ contract CrossFactory is Node, ICrossFactory {
     }
 
     function createPair(address tokenA, address tokenB) external override returns (address pair) {
-        require(nodes.maker != address(0), "Cross: NO_MAKER");
-        require(nodes.taker != address(0), "Cross: NO_TAKER");
-        require(nodes.farm != address(0), "Cross: NO_FARM");
-        require(tokenA != tokenB, "Cross: IDENTICAL_ADDRESSES");
+        require(nodes.maker != address(0), "No CrossMaker");
+        require(nodes.taker != address(0), "No CrossTake");
+        require(nodes.farm != address(0), "No CrossFarm");
+        require(tokenA != tokenB, "Identical tokens");
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-        require(token0 != address(0), "Cross: ZERO_ADDRESS");
-        require(getPair[token0][token1] == address(0), "Cross: PAIR_EXISTS"); // single check is sufficient
+        require(token0 != address(0), "Zero address token");
+        require(getPair[token0][token1] == address(0), "Existing pair"); // single check is sufficient
         bytes memory bytecode = type(CrossPair).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(token0, token1));
         assembly {
@@ -62,12 +62,12 @@ contract CrossFactory is Node, ICrossFactory {
     }
 
     function setFeeTo(address _feeTo) external override {
-        require(msg.sender == owner, "Cross: FORBIDDEN");
+        require(msg.sender == owner, "Caller != owner");
         feeTo = _feeTo;
     }
 
     function setOwner(address _owner) external override {
-        require(msg.sender == owner, "Cross: FORBIDDEN");
+        require(msg.sender == owner, "Caller != owner");
         owner = _owner;
     }
 }

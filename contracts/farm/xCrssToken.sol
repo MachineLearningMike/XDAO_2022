@@ -15,20 +15,20 @@ contract xCrssToken is Node, Ownable, IXCrssToken, ERC20 {
 
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) external override {
-        require(msg.sender == nodes.farm, "Cross: Forbidden");
+        require(msg.sender == nodes.farm, "Forbidden");
         _mint(_to, _amount);
         _moveDelegates(address(0), _delegates[_to], _amount);
     }
 
     function burn(address _from, uint256 _amount) external override {
-        require(msg.sender == nodes.farm, "Cross: Forbidden");
+        require(msg.sender == nodes.farm, "Forbidden");
         _burn(_from, _amount);
         _moveDelegates(_delegates[_from], address(0), _amount);
     }
 
     // Safe cake transfer function, just in case if rounding error causes pool to not have enough CAKEs.
-    function safeCakeTransfer(address _to, uint256 _amount) public override {
-        require(msg.sender == nodes.farm, "Cross: Forbidden");
+    function safeCrssTransfer(address _to, uint256 _amount) public override {
+        require(msg.sender == nodes.farm, "Forbidden");
 
         uint256 cakeBal = ICrssToken(nodes.token).balanceOf(address(this));
         if (_amount > cakeBal) {
