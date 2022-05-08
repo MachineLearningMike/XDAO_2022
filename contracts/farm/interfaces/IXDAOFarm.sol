@@ -15,8 +15,10 @@ interface IXDAOFarm {
 
     function updateMultiplier(uint256 multiplierNumber) external;
     function poolLength() external view returns (uint256);
-    function add(uint256 _allocPoint, address _lpToken, bool _withUpdate, uint256 _depositFeeRate) external;
-    function set(uint256 _pid, uint256 _allocPoint, bool _withUpdate, uint256 _depositFeeRate) external;
+    function add(uint256 _allocPoint, address _lpToken, bool _withUpdate, uint256 _depositFeeRate) 
+    external returns (uint256 totalAllocPoint);
+    function set(uint256 _pid, uint256 _allocPoint, bool _withUpdate, uint256 _depositFeeRate)
+    external returns (uint256 totalAllocPoint);
 
     event SetcrssReferral(address indexed crssReferral);
     event SetReferralCommissionRate(uint256 referralCommissionRate);

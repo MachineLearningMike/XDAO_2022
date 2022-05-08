@@ -428,7 +428,13 @@ const _abi = [
       },
     ],
     name: "add",
-    outputs: [],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "totalAllocPoint",
+        type: "uint256",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -682,7 +688,13 @@ const _abi = [
       },
     ],
     name: "set",
-    outputs: [],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "totalAllocPoint",
+        type: "uint256",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },

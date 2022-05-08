@@ -424,7 +424,13 @@
         }
       ],
       "name": "add",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "totalAllocPoint",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -678,7 +684,13 @@
         }
       ],
       "name": "set",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "totalAllocPoint",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },

@@ -666,7 +666,7 @@ export class IXDAOFarm extends BaseContract {
       _withUpdate: boolean,
       _depositFeeRate: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     changeReferrer(
       user: string,
@@ -723,7 +723,7 @@ export class IXDAOFarm extends BaseContract {
       _withUpdate: boolean,
       _depositFeeRate: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     setReferralCommissionRate(
       _referralCommissionRate: BigNumberish,

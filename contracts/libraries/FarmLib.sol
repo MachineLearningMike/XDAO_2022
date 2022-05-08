@@ -547,15 +547,13 @@ library FarmLib {
         CollectOption newOption,
         address msgSender, 
         FarmFeeParams storage feeParams, 
-        Nodes storage nodes, 
-        uint256 totalAllocPoint, 
-        uint256 crssPerBlock, 
-        uint256 bonusMultiplier
+        Nodes storage nodes,
+        FarmParams storage farmParams
         ) external returns (bool switched) {
         CollectOption orgOption = user.collectOption;
 
         if (orgOption != newOption) {
-            finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+            finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
 
             uint256 userAmount =  user.amount;
             startRewardCycle(pool, user, userAmount, feeParams, false); // false: addNotSubract
@@ -574,9 +572,7 @@ library FarmLib {
             mapping(uint256 => mapping(address => UserInfo)) storage userInfo,
             FarmFeeParams storage feeParams,
             Nodes storage nodes,
-            uint256 totalAllocPoint,
-            uint256 crssPerBlock,
-            uint256 bonusMultiplier
+            FarmParams storage farmParams
         ) external returns (uint256 rewards) {
 
         uint256 length = poolInfo.length;
@@ -584,7 +580,7 @@ library FarmLib {
             PoolInfo storage pool = poolInfo[pid];
             UserInfo storage user = userInfo[pid][msgSender];
 
-            finishRewardCycle(pool, user, msgSender, feeParams, nodes, totalAllocPoint, crssPerBlock, bonusMultiplier);
+            finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
             rewards += user.accumulated;
             user.accumulated = 0;
         }
@@ -595,12 +591,14 @@ library FarmLib {
         PoolInfo[] storage poolInfo, 
         mapping(uint256 => mapping(address => UserInfo)) storage userInfo, 
         Nodes storage nodes,
-        FarmFeeParams storage feeParams
+        FarmFeeParams storage feeParams,
+        FarmParams storage farmParams
     ) external returns (uint256 totalCompounded, uint256 crssToPay) {
         uint256 len = poolInfo.length;
         for (uint256 pid = 0; pid < len; pid ++) {
             PoolInfo storage pool = poolInfo[pid];
             UserInfo storage user = userInfo[pid][msgSender];
+            finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
             uint256 accumTGR = user.accumulated;
             if (feeParams.compoundFeeRate > 0) {
                 uint256 fee = accumTGR * feeParams.compoundFeeRate / FeeMagnifier;
@@ -681,15 +679,14 @@ library FarmLib {
     */
 
     event SetMigrator(address migrator);
-    function updatePool(PoolInfo storage pool, uint256 totalAllocPoint, uint256 crssPerBlock, 
-    uint256 bonusMultiplier, Nodes storage nodes
+    function updatePool(PoolInfo storage pool, FarmParams storage farmParams, Nodes storage nodes
     ) public {
         if (block.number >  pool.lastRewardBlock) {
             uint256 lpSupply = pool.lpToken.balanceOf(address(this));
 
             if (lpSupply > 0) {
-                uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number, bonusMultiplier);
-                uint256 crssReward = multiplier * crssPerBlock * pool.allocPoint / totalAllocPoint;
+                uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number, farmParams.bonusMultiplier);
+                uint256 crssReward = multiplier * farmParams.crssPerBlock * pool.allocPoint / farmParams.totalAllocPoint;
                 ITGRToken(nodes.token).mint(nodes.xToken, crssReward);
                 pool.reward = crssReward; // used as a checksum
                 pool.accTGRPerShare += (crssReward * 1e12 / lpSupply);
@@ -703,16 +700,14 @@ library FarmLib {
     function pendingTGR(
     PoolInfo storage pool, 
     UserInfo storage user, 
-    uint256 bonusMultiplier,
-    uint256 crssPerBlock, 
-    uint256 totalAllocPoint
+    FarmParams storage farmParams
     ) public view returns (uint256) {
         uint256 accTGRPerShare = pool.accTGRPerShare;
         uint256  lpSupply = pool.lpToken.balanceOf(address(this));
 
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
-            uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number, bonusMultiplier);
-            uint256 crssReward = multiplier.mul(crssPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+            uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number, farmParams.bonusMultiplier);
+            uint256 crssReward = multiplier.mul(farmParams.crssPerBlock).mul(pool.allocPoint).div(farmParams.totalAllocPoint);
             accTGRPerShare += (crssReward * 1e12 / lpSupply);
         }       
         return getRewardPayroll(pool, user) * accTGRPerShare / 1e12 - user.rewardDebt;
@@ -723,12 +718,10 @@ library FarmLib {
         UserInfo storage user, 
         address msgSender, 
         FarmFeeParams storage feeParams, 
-        Nodes storage nodes, 
-        uint256 totalAllocPoint, 
-        uint256 crssPerBlock, 
-        uint256 bonusMultiplier
+        Nodes storage nodes,
+        FarmParams storage farmParams
     ) public {
-        updatePool(pool, totalAllocPoint, crssPerBlock, bonusMultiplier, nodes);
+        updatePool(pool, farmParams, nodes);
         if (pool.reward > 0) {
             pyaReferralComission(pool, user, msgSender, feeParams, nodes);
             takePendingCollectively(pool, feeParams, nodes); // subPools' bulk and accPerShare.
@@ -743,9 +736,7 @@ library FarmLib {
         PoolInfo[] storage poolInfo,
         mapping(uint256 => mapping(address => UserInfo)) storage userInfo,
         Nodes storage nodes,
-        uint256 totalAllocPoint,
-        uint256 crssPerBlock,
-        uint256 bonusMultiplier,
+        FarmParams storage farmParams,
         uint256 vestMonths
     ) external view returns (UserState memory userState) {
         PoolInfo storage pool = poolInfo[pid];
@@ -755,7 +746,7 @@ library FarmLib {
         userState.accRewards = user.accumulated;
         userState.totalVest = getTotalVestPrincipals(user.vestList);
         userState.totalMatureVest = getTotalMatureVestPieces(user.vestList, vestMonths);
-        userState.pendingTGR = pendingTGR(pool, user, bonusMultiplier, crssPerBlock, totalAllocPoint);
+        userState.pendingTGR = pendingTGR(pool, user, farmParams);
         userState.rewardPayroll = getRewardPayroll(pool, user);
         userState.lpBalance = pool.lpToken.balanceOf(msgSender);
         userState.crssBalance = ITGRToken(nodes.token).balanceOf(msgSender);
@@ -808,10 +799,8 @@ library FarmLib {
     }
 
     function dailyPatrol(
-        PoolInfo[] storage poolInfo, 
-        uint256 totalAllocPoint, 
-        uint256 crssPerBlock, 
-        uint256 bonusMultiplier,
+        PoolInfo[] storage poolInfo,
+        FarmParams storage farmParams,
         FarmFeeParams storage feeParams,
         Nodes storage nodes,
         uint256 lastPatrolDay
@@ -822,7 +811,7 @@ library FarmLib {
             // do dailyPatrol
             for (uint256 pid; pid < poolInfo.length; pid ++) {
                 PoolInfo storage pool = poolInfo[pid];
-                updatePool(pool, totalAllocPoint, crssPerBlock, bonusMultiplier, nodes);
+                updatePool(pool, farmParams, nodes);
                 takePendingCollectively(pool, feeParams, nodes);
             }
             console.log("\t*************");

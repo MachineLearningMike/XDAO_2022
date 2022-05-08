@@ -22,12 +22,11 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface XDAOFarmInterface extends ethers.utils.Interface {
   functions: {
     "add(uint256,address,bool,uint256)": FunctionFragment;
-    "bonusMultiplier()": FunctionFragment;
     "changeReferrer(address,address)": FunctionFragment;
-    "crssPerBlock()": FunctionFragment;
     "dailyPatrol()": FunctionFragment;
     "deposit(uint256,uint256)": FunctionFragment;
     "emergencyWithdraw(uint256)": FunctionFragment;
+    "farmParams()": FunctionFragment;
     "feeRates(uint8)": FunctionFragment;
     "feeStores()": FunctionFragment;
     "getMultiplier(uint256,uint256)": FunctionFragment;
@@ -65,7 +64,6 @@ interface XDAOFarmInterface extends ethers.utils.Interface {
     "stakeAccumulated(uint256)": FunctionFragment;
     "startBlock()": FunctionFragment;
     "switchCollectOption(uint256,uint8)": FunctionFragment;
-    "totalAllocPoint()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "trustedForwarder()": FunctionFragment;
     "updateMultiplier(uint256)": FunctionFragment;
@@ -82,16 +80,8 @@ interface XDAOFarmInterface extends ethers.utils.Interface {
     values: [BigNumberish, string, boolean, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "bonusMultiplier",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "changeReferrer",
     values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "crssPerBlock",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "dailyPatrol",
@@ -104,6 +94,10 @@ interface XDAOFarmInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "emergencyWithdraw",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "farmParams",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "feeRates",
@@ -242,10 +236,6 @@ interface XDAOFarmInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "totalAllocPoint",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
@@ -284,15 +274,7 @@ interface XDAOFarmInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "add", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "bonusMultiplier",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "changeReferrer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "crssPerBlock",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -304,6 +286,7 @@ interface XDAOFarmInterface extends ethers.utils.Interface {
     functionFragment: "emergencyWithdraw",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "farmParams", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feeRates", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "feeStores", data: BytesLike): Result;
   decodeFunctionResult(
@@ -408,10 +391,6 @@ interface XDAOFarmInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "startBlock", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "switchCollectOption",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalAllocPoint",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -697,15 +676,11 @@ export class XDAOFarm extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    bonusMultiplier(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     changeReferrer(
       user: string,
       referrer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    crssPerBlock(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     dailyPatrol(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -721,6 +696,16 @@ export class XDAOFarm extends BaseContract {
       _pid: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    farmParams(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        crssPerBlock: BigNumber;
+        bonusMultiplier: BigNumber;
+        totalAllocPoint: BigNumber;
+      }
+    >;
 
     feeRates(
       arg0: BigNumberish,
@@ -1073,8 +1058,6 @@ export class XDAOFarm extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    totalAllocPoint(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1139,15 +1122,11 @@ export class XDAOFarm extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  bonusMultiplier(overrides?: CallOverrides): Promise<BigNumber>;
-
   changeReferrer(
     user: string,
     referrer: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  crssPerBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
   dailyPatrol(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1163,6 +1142,16 @@ export class XDAOFarm extends BaseContract {
     _pid: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  farmParams(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber] & {
+      crssPerBlock: BigNumber;
+      bonusMultiplier: BigNumber;
+      totalAllocPoint: BigNumber;
+    }
+  >;
 
   feeRates(
     arg0: BigNumberish,
@@ -1511,8 +1500,6 @@ export class XDAOFarm extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
-
   transferOwnership(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1575,17 +1562,13 @@ export class XDAOFarm extends BaseContract {
       _withUpdate: boolean,
       _depositFeeRate: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
-
-    bonusMultiplier(overrides?: CallOverrides): Promise<BigNumber>;
+    ): Promise<BigNumber>;
 
     changeReferrer(
       user: string,
       referrer: string,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    crssPerBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
     dailyPatrol(overrides?: CallOverrides): Promise<boolean>;
 
@@ -1599,6 +1582,16 @@ export class XDAOFarm extends BaseContract {
       _pid: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    farmParams(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        crssPerBlock: BigNumber;
+        bonusMultiplier: BigNumber;
+        totalAllocPoint: BigNumber;
+      }
+    >;
 
     feeRates(
       arg0: BigNumberish,
@@ -1861,7 +1854,7 @@ export class XDAOFarm extends BaseContract {
       _withUpdate: boolean,
       _depositFeeRate: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     setFeeParams(
       _referralCommissionRate: BigNumberish,
@@ -1930,8 +1923,6 @@ export class XDAOFarm extends BaseContract {
       newOption: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferOwnership(
       newOwner: string,
@@ -2401,15 +2392,11 @@ export class XDAOFarm extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    bonusMultiplier(overrides?: CallOverrides): Promise<BigNumber>;
-
     changeReferrer(
       user: string,
       referrer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    crssPerBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
     dailyPatrol(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -2425,6 +2412,8 @@ export class XDAOFarm extends BaseContract {
       _pid: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    farmParams(overrides?: CallOverrides): Promise<BigNumber>;
 
     feeRates(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -2600,8 +2589,6 @@ export class XDAOFarm extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
-
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -2658,15 +2645,11 @@ export class XDAOFarm extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    bonusMultiplier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     changeReferrer(
       user: string,
       referrer: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    crssPerBlock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     dailyPatrol(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -2682,6 +2665,8 @@ export class XDAOFarm extends BaseContract {
       _pid: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    farmParams(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     feeRates(
       arg0: BigNumberish,
@@ -2865,8 +2850,6 @@ export class XDAOFarm extends BaseContract {
       newOption: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    totalAllocPoint(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferOwnership(
       newOwner: string,

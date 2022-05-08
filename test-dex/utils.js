@@ -88,7 +88,7 @@ exports.verifyContract = async function (contract, params) {
 };
 
 exports.deployMaker = async function (deployer, wbnb, wireLib) {
-  const Router = await ethers.getContractFactory("XDAOMaker", {
+  const Router = await ethers.getContractFactory("Maker", {
     signer: deployer,
     libraries: {
       WireLib: wireLib,
@@ -102,7 +102,7 @@ exports.deployMaker = async function (deployer, wbnb, wireLib) {
 };
 
 exports.deployTaker = async function (deployer, wbnb, wireLib) {
-  const Router = await ethers.getContractFactory("XDAOTaker", {
+  const Router = await ethers.getContractFactory("Taker", {
     signer: deployer,
     libraries: {
       WireLib: wireLib,

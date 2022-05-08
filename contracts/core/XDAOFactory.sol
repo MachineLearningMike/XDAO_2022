@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import "../session/Node.sol";
-import "../periphery/interfaces/IXDAORouter.sol";
 import "./XDAOPair.sol";
 import "./interfaces/IXDAOFactory.sol";
 
@@ -37,7 +36,7 @@ contract XDAOFactory is Node, IXDAOFactory {
     }
 
     function createPair(address tokenA, address tokenB) external override returns (address pair) {
-        require(nodes.maker != address(0), "No XDAOMaker");
+        require(nodes.maker != address(0), "No Maker");
         require(nodes.taker != address(0), "No XDAOTake");
         require(nodes.farm != address(0), "No XDAOFarm");
         require(tokenA != tokenB, "Identical tokens");

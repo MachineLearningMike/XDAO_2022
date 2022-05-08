@@ -96,3 +96,9 @@ struct SubPooledTGR {
     uint256 toVest;
     uint256 toAccumulate;
 }
+
+struct FarmParams {
+    uint256 crssPerBlock;
+    uint256 bonusMultiplier;
+    uint256 totalAllocPoint;
+}

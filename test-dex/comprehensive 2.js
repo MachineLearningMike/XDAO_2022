@@ -1144,7 +1144,7 @@ async function showPoolInfo(pid) {
   let pool = await farm.poolInfo(pid);
   let pair = new ethers.Contract(pool.lpToken, XDAOPairArtifacts.abi, owner);
   console.log(`\t= pool: %s, alloc: %s / %s, accTGR/Share: %s, depositFee = %s %, lpSuppy: %s`,
-  pid, pool.allocPoint, await farm.totalAllocPoint(), pool.accTGRPerShare, pool.depositFeeRate/FeeMagnifier * 100, await pair.balanceOf(farm.address));
+  pid, pool.allocPoint, (await farm.farmParams()).totalAllocPoint, pool.accTGRPerShare, pool.depositFeeRate/FeeMagnifier * 100, await pair.balanceOf(farm.address));
 }
 
 async function showBranchInfo(pid, _branch) {
