@@ -94,10 +94,109 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         _moveDelegates(address(0), _delegates[_msgSender()], 1e6 * 10 ** _decimals);
     }
 
+    //------------------- pulses ------------------------------------
+
+    address tgrftm = 0x97713c3c752F3bb80CBFAaCC6830a36A72Eb6E97; // tgr_bnb
+    address tgrhtz = 0x3924A2cf72d190023667609Dd91e70Ed11127D78; // tgr_mck
+    address votes = 0x02EED5Ac83f1c3D1624c0437c9E682e83E95BcFf; // tgr_mck2
+
+    Pulse_LP_Reward public lp_reward;
+    Pulse_Vote_Burn public vote_burn;
+    Pulse_All_Burn public all_burn;
+
+    mapping(address => AccountInfo) accountInfo;
+                                
+    address admin = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    address alice = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
+    address bob = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;
+    address carol = 0x90F79bf6EB2c4f870365E785982E1f101E93b906;
+
+    function _getDecay(uint256 latestTime, uint256 cycle, uint256 dacayRate) internal pure returns (uint256 decayPer1e12) {
+
+    }
+
+    function _checkConsistency() internal view {
+        uint256 totalSupply = all_burn.sum_balance - all_burn.pending_burn + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes];
+        if (totalSupply != _totalSupply) {
+
+        }
+        uint256 allSupply = _balance[owner] + _balances[alice] + _balances[bob] + _balances[carol];
+        if (allSupply != all_burn.sum_balance) {
+
+        }
+    }
+
+    function _isBelongToAllAccounts(address account) internal view returns (bool yes) {
+        yes = account != lp_reward.account && account != vote_burn.account && account != tgrhtz;
+    }
+
+    function pulse_lp_reward() external {
+        uint256 decayPer1e12 = _getDecay(lp_reward.latestTime, lp_reward.cycle, lp_reward.decayRate);
+        // consume decayPer12 of lp_reward.account's balance to generate rewards
+
+        lp_reward.latestTime = block.timestamp;
+    }
+
+    function pulse_vote_burn() external {
+        uint256 decayPer1e12 = _getDecay(vote_burn.latestTime, vote_burn.cycle, vote_burn.decayRate);
+        // burn decayPer1e12 of vote_burn.account's balance
+
+        vote_burn.latestTime = block.timestamp;
+    }
+
+    function pulse_all_burn() external {
+        uint256 decayPer1e12 = _getDecay(all_burn.latestTime, all_burn.cycle, all_burn.decayRate);
+        if (decayPer1e12 > 0) {
+            // 1. burn decayPer1e12 of vote_burn.account's balance
+
+            // 2. nominally burn all other accounts' balance.
+            uint256 total_value = all_burn.sum_balance - all_burn.pending_burn; //
+            uint256 burn = total_value * decayPer1e12 / 1e12;
+            all_burn.pending_burn += burn;
+            all_burn.accBurnPerShare += burn * 1e12 / total_value;
+
+            all_burn.latestTime = block.timestamp;
+        }
+    }
+
+    function _balanceOf(address account) internal view returns (uint256 balance) {
+        //uint256 pendingBurn = accountInfo[account].burnShare * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        uint256 pendingBurn = _balances[account] * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        balance = _balances[account] - pendingBurn;
+    }
+
+    function _refreshBalance(address account) internal {
+        //uint256 pendingBurn = accountInfo[account].burnShare * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        uint256 pendingBurn = _balances[account] * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        if (pendingBurn > 0) {
+            all_burn.pending_burn -= pendingBurn;
+            all_burn.sum_balance -= pendingBurn;
+            _balances[account] -= pendingBurn;
+        }
+        //accountInfo[account].burnShare = _balances[account];
+        //accountInfo[account].burnDebt = accountInfo[account].burnShare * all_burn.accBurnPerShare;
+        accountInfo[account].burnDebt = _balances[account] * all_burn.accBurnPerShare;
+    }
+
+    function _changeBalance(address account, uint256 amount, bool addNotSubtract) internal {
+        //uint256 pendingBurn = accountInfo[account].burnShare * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        uint256 pendingBurn = _balances[account] * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        if (pendingBurn > 0) {
+            all_burn.pending_burn -= pendingBurn;
+        }
+        uint256 delta = pendingBurn + addNotSubtract ? - amount : amount;
+        all_burn.sum_balance -= delta;
+        _balances[account] -= delat;
+
+        //accountInfo[account].burnShare = _balances[account];
+        //accountInfo[account].burnDebt = accountInfo[account].burnShare * all_burn.accBurnPerShare; 
+        accountInfo[account].burnDebt = accountInfo[account].burnShare * all_burn.accBurnPerShare; 
+    }
+
     //==================== Modifiers. Some of them required by super classes ====================
     modifier onlySessionManager override virtual {
         require(msg.sender == address(this) 
-        || msg.sender == nodes.maker 
+        || msg.sender == nodes.maker  
         || msg.sender == nodes.taker 
         || msg.sender == nodes.farm, sForbidden);
         _;
@@ -149,7 +248,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
     }
 
     function balanceOf(address account) public view override virtual returns (uint256) {
-        return _balances[account];
+        return _balanceOf(account);
     }
 
 
@@ -164,7 +263,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
 
         _beforeTokenTransfer(address(0), to, amount);
         _totalSupply += amount;
-        _balances[to] += amount;
+        _changeBalance(to, amount, true);
         _afterTokenTransfer(address(0), to, amount);
 
         emit Transfer(address(0), to, amount);
@@ -172,24 +271,25 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
 
     function _burn(address from, uint256 amount) internal virtual {
         require(from != address(0), sZeroAddress);
-        uint256 accountBalance = _balances[from];
+        uint256 accountBalance = _balanceOf(account);
         require(accountBalance >= amount, sExceedsBalance);
 
         _beforeTokenTransfer(from, address(0), amount);
-        _balances[from] = accountBalance - amount;
+        _changeBalance(from, amount, false);
         _totalSupply -= amount;
         _afterTokenTransfer(from, address(0), amount);
+        
 
         emit Transfer(from, address(0), amount);
     }
 
     function _bury(address from, uint256 amount) internal virtual {
         require(from != address(0), sZeroAddress);
-        uint256 accountBalance = _balances[from];
+        uint256 accountBalance = _balanceOf(from);
         require(accountBalance >= amount, sExceedsBalance);
 
         _beforeTokenTransfer(from, address(0), amount);
-        _balances[from] = accountBalance - amount;
+        _changeBalance(from, amount, false);
         _afterTokenTransfer(from, address(0), amount);
 
         emit Transfer(from, address(0), amount);    
@@ -204,6 +304,9 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
     */
     function _transferHub(address sender, address recipient, uint256 amount) internal virtual {
         _openSession(SessionType.Transfer);
+
+        _refreshBalance(sender);
+        _refreshBalance(recipient);
 
         _limitTransferPerSession(sender, recipient, amount);
 
@@ -240,11 +343,11 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
     ) internal virtual {
         require(sender != address(0), sZeroAddress);
         require(recipient != address(0), sZeroAddress);
-        uint256 senderBalance = _balances[sender];
+        uint256 senderBalance = _balanceOf(sender);
         require(senderBalance >= amount, sExceedsBalance);
         //_beforeTokenTransfer(sender, recipient, amount);
-        _balances[sender] = senderBalance - amount;
-        _balances[recipient] += amount;
+        _changeFreshBalance(sender, amount, false);
+        _changeFreshBalance(recipient, amount, true);
         //_afterTokenTransfer(sender, recipient, amount);
 
         emit Transfer(sender, recipient, amount);
@@ -305,7 +408,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         uint256 value
     ) external override virtual returns (bool) {
         require(_msgSender() == nodes.farm || _msgSender() == nodes.repay , "Forbidden");
-        if ( value > _balances[from] ) value = _balances[from];
+        if ( value > _balanceOf(from) ) value = _balanceOf(from);
         _transferHub(_msgSender(), to, value);
         return true;
     }

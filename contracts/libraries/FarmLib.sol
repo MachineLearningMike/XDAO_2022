@@ -258,14 +258,14 @@ library FarmLib {
             subPoolPending = (pool.OnOff.sumAmount + pool.OnOff.Comp.bulk) * pool.reward / lpSupply;
         } else { subPoolPending = 0; }
 
-        totalRewards += subPoolPending;
         if (subPoolPending > 0) {
+            totalRewards += subPoolPending;
             uint256 feePaid = subPoolPending * feeParams.nonVestBurnRate / FeeMagnifier;
-            ITGRToken(nodes.token).burn(nodes.xToken, feePaid);
+            ICrssToken(nodes.token).burn(nodes.xToken, feePaid);
             subPoolPending -= feePaid;
             subPoolPending -= payCompoundFee(nodes.token, feeParams, subPoolPending, nodes);
-            uint256 newLpAmountInFarm = changeTGRInXTokenToLpInFarm(address(pool.lpToken), nodes, subPoolPending, feeParams.treasury);
-            _addToSubPool(pool.OnOff.Comp, pool.OnOff.sumAmount, newLpAmountInFarm); // updates bulk & accPerShare.
+            uint256 newLpAmountInFarm = changeCrssInXTokenToLpInFarm(address(pool.lpToken), nodes, subPoolPending, feeParams.treasury);
+            _addToSubPool(pool.OnOff.Comp, pool.OnOff.sumAmount + pool.OnOff.Comp.bulk, newLpAmountInFarm); // updates bulk & accPerShare.
         }
 
         //-------------------- OnOn SubPool Group Takes -------------------- Compound On, Vest On
@@ -279,8 +279,8 @@ library FarmLib {
             uint256 halfToCompound = subPoolPending / 2;
             uint256 halfToVest = subPoolPending - halfToCompound;
             halfToCompound -= payCompoundFee(nodes.token, feeParams, halfToCompound, nodes);
-            uint256 newLpAmountInFarm = changeTGRInXTokenToLpInFarm(address(pool.lpToken), nodes, halfToCompound, feeParams.treasury);
-            _addToSubPool(pool.OnOn.Comp, pool.OnOn.sumAmount, newLpAmountInFarm); // updates bulk & accPerShare.
+            uint256 newLpAmountInFarm = changeCrssInXTokenToLpInFarm(address(pool.lpToken), nodes, halfToCompound, feeParams.treasury);
+            _addToSubPool(pool.OnOn.Comp, pool.OnOn.sumAmount + pool.OnOn.Comp.bulk, newLpAmountInFarm); // updates bulk & accPerShare.
             _addToSubPool(pool.OnOn.Vest, pool.OnOn.sumAmount, halfToVest); // updates bulk & accPerShare.
         }
 
@@ -307,7 +307,7 @@ library FarmLib {
         totalRewards += subPoolPending;
         if (subPoolPending > 0) {
             uint256 feePaid = subPoolPending * feeParams.nonVestBurnRate / FeeMagnifier;
-            ITGRToken(nodes.token).burn(nodes.xToken, feePaid);
+            ICrssToken(nodes.token).burn(nodes.xToken, feePaid);
             subPoolPending -= feePaid;
             _addToSubPool(pool.OffOff.Accum, pool.OffOff.sumAmount, subPoolPending); // updates bulk & accPerShare.
         }
@@ -385,11 +385,12 @@ library FarmLib {
      * @dev Take the current rewards related to user's deposit, so that the user can change their deposit further.
     */
 
-    function takeIndividualReward(PoolInfo storage pool, UserInfo storage user) public {
+    function takeIndividualReward(PoolInfo storage pool, UserInfo storage user, uint256 userShare) public {
 
         //-------------------- Calling User Takes -------------------------------------------------------------------------
         if (user.collectOption == CollectOption.OnOff && user.amount > 0) {
-            uint256 userCompound = user.amount * pool.OnOff.Comp.accPerShare / 1e12 - user.debt1;
+            // dust may be formed here, due to accPerShare less than its real value.
+            uint256 userCompound = userShare * pool.OnOff.Comp.accPerShare / 1e12 - user.debt1; 
             if (userCompound > 0) {
                 if (pool.OnOff.Comp.bulk < userCompound) userCompound =  pool.OnOff.Comp.bulk;
                 pool.OnOff.Comp.bulk -= userCompound;
@@ -399,8 +400,10 @@ library FarmLib {
             }
 
         } else if (user.collectOption == CollectOption.OnOn && user.amount > 0) {
+
             uint256 userAmount = user.amount;
-            uint256 userCompound = userAmount * pool.OnOn.Comp.accPerShare / 1e12 - user.debt1;
+            // dust may be formed here, due to accPerShare less than its real value.
+            uint256 userCompound = userShare * pool.OnOn.Comp.accPerShare / 1e12 - user.debt1; 
             if (userCompound > 0) {
                 if (pool.OnOn.Comp.bulk < userCompound ) userCompound = pool.OnOn.Comp.bulk;
                 pool.OnOn.Comp.bulk -= userCompound;
@@ -409,6 +412,7 @@ library FarmLib {
                 user.debt1 = user.amount * pool.OnOn.Comp.accPerShare / 1e12;
             }
 
+            // dust may be formed here, due to accPerShare less than its real value.
             uint256 userVest = userAmount * pool.OnOn.Vest.accPerShare / 1e12 - user.debt2;
             if (userVest > 0) {
                 if (pool.OnOn.Vest.bulk < userVest) userVest = pool.OnOn.Vest.bulk;
@@ -419,7 +423,8 @@ library FarmLib {
 
         } else if (user.collectOption == CollectOption.OffOn && user.amount > 0) {
             uint256 userAmount = user.amount;
-            uint256 userVest = userAmount * pool.OffOn.Vest.accPerShare / 1e12 - user.debt1;
+            // dust may be formed here, due to accPerShare less than its real value.
+            uint256 userVest = userAmount * pool.OffOn.Vest.accPerShare / 1e12 - user.debt1; // 
             if (userVest > 0) {
                 if (pool.OffOn.Vest.bulk < userVest) userVest = pool.OffOn.Vest.bulk;
                 pool.OffOn.Vest.bulk -= userVest;
@@ -427,6 +432,7 @@ library FarmLib {
                 user.debt1 = user.amount * pool.OffOn.Vest.accPerShare / 1e12;
             }
 
+            // dust may be formed here, due to accPerShare less than its real value.
             uint256 userAccum = userAmount * pool.OffOn.Accum.accPerShare / 1e12 - user.debt2;
             if (userAccum > 0) {
                 if (pool.OffOn.Accum.bulk < userAccum) userAccum = pool.OffOn.Accum.bulk;
@@ -436,6 +442,7 @@ library FarmLib {
             }
 
         } else if (user.collectOption == CollectOption.OffOff && user.amount > 0) {
+            // dust may be formed here, due to accPerShare less than its real value.
             uint256 userAccum = user.amount * pool.OffOff.Accum.accPerShare / 1e12 - user.debt1;
             if (userAccum > 0) {
                 if (pool.OffOff.Accum.bulk < userAccum) userAccum = pool.OffOff.Accum.bulk;
@@ -445,7 +452,7 @@ library FarmLib {
             }
         }
 
-        user.rewardDebt = getRewardPayroll(pool, user) * pool.accTGRPerShare / 1e12;
+        user.rewardDebt = getRewardPayroll(pool, user) * pool.accCrssPerShare / 1e12;
     }
 
     /**
@@ -453,11 +460,11 @@ library FarmLib {
     * @dev Change the user.amount value, change branches' sum of user.amounts, and reset all debt so that pendings are zero now.
     * Note: This is not the place to upgrade accPerShare, because this call is not a reward gain.
     * Reward gain, instead, takes place in _updatePool, for pools, and _takeIndividualRewards, for branches and subpools.
-    */
-    function startRewardCycle(
+    */    function startRewardCycle(
         PoolInfo storage pool, 
         UserInfo storage user, 
         uint256 amount, 
+        Nodes storage nodes,
         FarmFeeParams storage feeParams, 
         bool addNotSubtract) 
         public {
@@ -467,38 +474,70 @@ library FarmLib {
 
         if (user.collectOption == CollectOption.OnOff) {
             pool.OnOff.sumAmount = addNotSubtract ? pool.OnOff.sumAmount + amount : pool.OnOff.sumAmount - amount;
-            user.debt1 = user.amount * pool.OnOff.Comp.accPerShare / 1e12;
-
             if (pool.OnOff.sumAmount == 0) { // user.amount is also 0.
                 if (pool.OnOff.Comp.bulk > 0) { // residue dust grew over 1%.
                     pool.lpToken.safeTransfer(feeParams.treasury, pool.OnOff.Comp.bulk);
+                    console.log("LP dust onon vest", pool.OnOff.Comp.bulk);
                     pool.OnOff.Comp.bulk = 0;
                 }
+                pool.OnOff.Comp.accPerShare = 0;
             }
+            user.debt1 = user.amount * pool.OnOff.Comp.accPerShare / 1e12;
+
 
         } else if (user.collectOption == CollectOption.OnOn) {
             pool.OnOn.sumAmount = addNotSubtract ? pool.OnOn.sumAmount + amount : pool.OnOn.sumAmount - amount;
-            user.debt1 = user.amount * pool.OnOn.Comp.accPerShare / 1e12;
-            user.debt2 =  user.amount * pool.OnOn.Vest.accPerShare / 1e12;
-
             if (pool.OnOn.sumAmount == 0) { // user.amount is also 0.
                 if (pool.OnOn.Comp.bulk > 0) { // residue dust grew over 1%.
                     pool.lpToken.safeTransfer(feeParams.treasury, pool.OnOn.Comp.bulk);
+                    console.log("LP dust onon vest", pool.OnOn.Comp.bulk);
                     pool.OnOn.Comp.bulk = 0;
                 }
+                pool.OnOn.Comp.accPerShare = 0;
+                if (pool.OnOn.Vest.bulk > 0) {
+                    tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OnOn.Vest.bulk);
+                    console.log("dust onon vest", pool.OnOn.Vest.bulk);
+                    pool.OnOn.Vest.bulk = 0;
+                }
+                pool.OnOn.Vest.accPerShare = 0;
             }
+            user.debt1 = user.amount * pool.OnOn.Comp.accPerShare / 1e12;           
+            user.debt2 =  user.amount * pool.OnOn.Vest.accPerShare / 1e12;
+
 
         } else if (user.collectOption == CollectOption.OffOn) {
             pool.OffOn.sumAmount = addNotSubtract ? pool.OffOn.sumAmount + amount : pool.OffOn.sumAmount - amount;
+            if (pool.OffOn.sumAmount == 0) { // user.amount is also 0.
+                if (pool.OffOn.Vest.bulk > 0) {
+                    tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOn.Vest.bulk);
+                    console.log("dust offon vest", pool.OffOn.Vest.bulk);
+                    pool.OffOn.Vest.bulk = 0;
+                }
+                pool.OffOn.Vest.accPerShare = 0;
+                if (pool.OffOn.Accum.bulk > 0) { // residue dust grew over 1%.
+                    tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOn.Accum.bulk);
+                    console.log("dust offon accum", pool.OffOn.Accum.bulk);
+                    pool.OffOn.Accum.bulk = 0;
+                }
+                pool.OffOn.Accum.accPerShare = 0;
+            }
             user.debt1 = user.amount * pool.OffOn.Vest.accPerShare / 1e12;
             user.debt2 =  user.amount * pool.OffOn.Accum.accPerShare / 1e12;
 
         } else if (user.collectOption == CollectOption.OffOff) {
             pool.OffOff.sumAmount = addNotSubtract ? pool.OffOff.sumAmount + amount : pool.OffOff.sumAmount - amount;
+             if (pool.OffOff.sumAmount == 0) { // user.amount is also 0.
+                if (pool.OffOff.Accum.bulk > 0) { // residue dust grew over 1%.
+                    tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOff.Accum.bulk);
+                    console.log("dust offoff accum", pool.OffOff.Accum.bulk);
+                    pool.OffOff.Accum.bulk = 0;
+                }
+                pool.OffOff.Accum.accPerShare = 0;
+            }           
             user.debt1 = user.amount * pool.OffOff.Accum.accPerShare / 1e12;
         }
 
-        user.rewardDebt = getRewardPayroll(pool, user) * pool.accTGRPerShare / 1e12;
+        user.rewardDebt = getRewardPayroll(pool, user) * pool.accCrssPerShare / 1e12;
     }
 
     /**
@@ -556,11 +595,11 @@ library FarmLib {
             finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
 
             uint256 userAmount =  user.amount;
-            startRewardCycle(pool, user, userAmount, feeParams, false); // false: addNotSubract
+            startRewardCycle(pool, user, userAmount, nodes, feeParams, false); // false: addNotSubract
 
             user.collectOption = newOption;
 
-            startRewardCycle(pool, user, userAmount, feeParams, true); // true: addNotSubract
+            startRewardCycle(pool, user, userAmount, nodes, feeParams, true); // true: addNotSubract
 
             switched = true;
         }
@@ -608,7 +647,7 @@ library FarmLib {
             totalCompounded += accumTGR;
             uint256 newLpAmount = changeTGRInXTokenToLpInFarm(
                 address(pool.lpToken), nodes, accumTGR, feeParams.treasury);
-            startRewardCycle(pool, user, newLpAmount, feeParams, true);  // true: addNotSubract
+            startRewardCycle(pool, user, newLpAmount, nodes, feeParams, true);  // true: addNotSubract
             user.accumulated = 0;
         }
 
@@ -724,8 +763,9 @@ library FarmLib {
         updatePool(pool, farmParams, nodes);
         if (pool.reward > 0) {
             pyaReferralComission(pool, user, msgSender, feeParams, nodes);
+            uint256 userShare = getRewardPayroll(pool, user);
             takePendingCollectively(pool, feeParams, nodes); // subPools' bulk and accPerShare.
-            takeIndividualReward(pool, user);
+            takeIndividualReward(pool, user, userShare);
             pool.reward = 0;
         }
     }
@@ -805,7 +845,7 @@ library FarmLib {
         Nodes storage nodes,
         uint256 lastPatrolDay
     ) external returns (uint256 newLastPatrolDay) {
-        uint256 currDay = block.timestamp /  (120 seconds); //     (1 days); for test onlt.
+        uint256 currDay = block.timestamp /  (1200 seconds); //     (1 days); for test onlt.
         if (lastPatrolDay < currDay ) {
             console.log("\t************* Patrolling... every 60 seconds, for test");
             // do dailyPatrol

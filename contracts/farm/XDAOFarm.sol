@@ -325,13 +325,11 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     */
     function deposit(uint256 _pid, uint256 _amount) public override validPid(_pid) returns (uint256 deposited) {
         _openSession(SessionType.Deposit);
-        bool patroled = dailyPatrol();
 
         address msgSender = _msgSender();
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msgSender];
 
-        if (! patroled)
         FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
 
         if (_amount > 0) {
@@ -339,7 +337,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
             _amount -= _payTransactonFee(address(pool.lpToken), address(this), _amount, false);
             _amount -= FarmLib.payDepositFeeLPFromFarm(pool, _amount, feeStores);
             deposited = _amount;
-            FarmLib.startRewardCycle(pool, user, deposited, feeParams, true); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, deposited, nodes, feeParams, true); // false: addNotSubract
             emit Deposit(_msgSender(), _pid, deposited);
         }
 
@@ -351,13 +349,11 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     */
     function withdraw(uint256 _pid, uint256 _amount) public override validPid(_pid) returns (uint256 withdrawn){
         _openSession(SessionType.Withdraw);
-        bool patroled = dailyPatrol();
 
         address msgSender = _msgSender();
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msgSender];
 
-        if (! patroled)
         FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
         if (user.amount < _amount) _amount = user.amount;
 
@@ -365,7 +361,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
             withdrawn = _amount;
             _amount -= _payTransactonFee(address(pool.lpToken), address(this), _amount, false);
             pool.lpToken.safeTransfer(msgSender, _amount);  // withdraw
-            FarmLib.startRewardCycle(pool, user, withdrawn, feeParams, false); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, withdrawn, nodes, feeParams, false); // false: addNotSubract
             emit Withdraw(msgSender, _pid, withdrawn);
         }
 
@@ -378,13 +374,11 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
     function withdrawVest(uint256 _pid, uint256 _amount) public override validPid(_pid)  returns (uint256 withdrawn) {
         _openSession(SessionType.WithdrawVest); 
-        bool patroled = dailyPatrol();
 
         address msgSender = _msgSender();
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msgSender];
 
-        if (! patroled)
         FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
 
         if (_amount > 0) {
@@ -404,13 +398,11 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
     function vestAccumulated(uint256 _pid) public override virtual validPid(_pid) returns (uint256 vested) {
         _openSession(SessionType.VestAccumulated);
-        bool patroled = dailyPatrol();
 
         address msgSender = _msgSender();
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msgSender];
       
-        if (! patroled)
         FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
 
         uint256 amount = user.accumulated;
@@ -427,13 +419,11 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
     // function compoundAccumulated(uint256 _pid) public override virtual validPid(_pid) returns (uint256 compounded) {
     //     _openSession(SessionType.CompoundAccumulated);
-    //     bool patroled = dailyPatrol();
 
     //     address msgSender = _msgSender();
     //     PoolInfo storage pool = poolInfo[_pid];
     //     UserInfo storage user = userInfo[_pid][msgSender];
 
-    //     if (! patroled)
     //     FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
 
     //     uint256 amount = user.accumulated;
@@ -443,7 +433,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     //         amount -= FarmLib.payCompoundFee(nodes.token, feeParams, amount, nodes);
     //         compounded = amount;
     //         newLpAmount = FarmLib.changeTGRInXTokenToLpInFarm(address(pool.lpToken), nodes, amount, feeParams.treasury);
-    //         FarmLib.startRewardCycle(pool, user, newLpAmount, true);  // true: addNotSubract
+    //         FarmLib.startRewardCycle(pool, user, newLpAmount, nodes, true);  // true: addNotSubract
     //         user.accumulated = 0;
     //         emit CompoundAccumulated(msgSender, _pid, compounded, newLpAmount);
     //     }    
@@ -452,13 +442,11 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
     function harvestAccumulated(uint256 _pid) public override virtual validPid(_pid) returns (uint256 harvested) {
         _openSession(SessionType.HarvestAccumulated);
-        bool patroled = dailyPatrol();
 
         address msgSender = _msgSender();
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msgSender];
 
-        if (! patroled)
         FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
 
         uint256 amount = user.accumulated;
@@ -475,13 +463,11 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
     function stakeAccumulated(uint256 _pid) public override virtual validPid(_pid) returns (uint256 staked) {
         _openSession(SessionType.StakeAccumulated);
-        bool patroled = dailyPatrol();
 
         address msgSender = _msgSender();
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msgSender];
 
-        if (! patroled)
         FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
 
         uint256 amount = user.accumulated;
@@ -495,7 +481,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
             amount = IERC20(nodes.token).balanceOf(address(this)) - balance0;           
             amount -= FarmLib.payDepositFeeLPFromFarm(pool, amount, feeStores);
             staked = amount;
-            FarmLib.startRewardCycle(pool, user, staked, feeParams, true); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, staked, nodes, feeParams, true); // false: addNotSubract
             user.accumulated = 0;
             emit StakeAccumulated(msgSender, _pid, amount);
         }
@@ -516,7 +502,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
         if (amount > 0) {
             uint256 withdrawn = amount;
             pool.lpToken.safeTransfer(msgSender, amount);  // withdraw
-            FarmLib.startRewardCycle(pool, user, withdrawn, feeParams, false); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, withdrawn, nodes, feeParams, false); // false: addNotSubract
             emit EmergencyWithdraw(msgSender, _pid, withdrawn);
         }
 
@@ -528,7 +514,6 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     */
     function massHarvestRewards() public override virtual returns (uint256 rewards) {
         _openSession(SessionType.MassHarvestRewards);
-        dailyPatrol();
 
         address msgSender = _msgSender();
 
@@ -548,7 +533,6 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
     */
     function massStakeRewards() external override virtual returns (uint256 rewards) {
         _openSession(SessionType.MassStakeRewards);
-        dailyPatrol();
 
         address msgSender = _msgSender();
         uint256 amount = FarmLib.collectAccumulated(msgSender, poolInfo, userInfo, feeParams, nodes, farmParams);
@@ -562,7 +546,7 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
             rewards = amount;
             UserInfo storage user = userInfo[0][msgSender];
             FarmLib.finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
-            FarmLib.startRewardCycle(pool, user, rewards, feeParams, true); // false: addNotSubract
+            FarmLib.startRewardCycle(pool, user, rewards, nodes, feeParams, true); // false: addNotSubract
             emit MassStakeRewards(msgSender, rewards);
         }
 
@@ -571,7 +555,6 @@ contract XDAOFarm is Node, IXDAOFarm, BaseRelayRecipient, SessionManager {
 
     function massCompoundRewards() external override virtual {
         _openSession(SessionType.MassCompoundRewards);
-        dailyPatrol();
 
         address msgSender = _msgSender();
         (uint256 totalCompounded, )

@@ -1124,11 +1124,14 @@ describe("=========================== Compensation Test =======================\
 async function mintBlocks(blocks) {
   let bn0 = (await ethers.provider.getBlock("latest")).number;
   for (let n = 0; n < blocks; n ++) {
-    tx = mock.connect(owner).approve(owner.address, utils.parseEther("1") ); // 1 wei
-    (await tx).wait();
+      await network.provider.send("evm_mine");
   }
   let bn1 = (await ethers.provider.getBlock("latest")).number;
   console.log(`\tminted %s/%s blocks. bn = `.green, bn1-bn0, blocks, bn1);
+}
+
+async function mintTime(seconds) {
+    await network.provider.send("evm_increaseTime", [seconds]);
 }
 
 async function userAmount(pid, user) {
