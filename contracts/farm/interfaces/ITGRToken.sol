@@ -5,38 +5,22 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface ITGRToken is IERC20 {
 
+    struct Pulse {
+        uint256 lastestTime;
+        uint256 cycle;
+        uint256 decayRate;
+        address account;
+        uint256 accDecayPerShare;
+        uint256 sum_balances;
+        uint256 pending_burn;
+    }
+    struct User {
+        uint256 debtToPendingBurn;        
+    }
+
     function maxSupply() external view returns (uint256);
     function mint(address to, uint256 amount) external;
     function burn(address from, uint256 amount) external;
     function bury(address from, uint256 amount) external;
-    function maxTransferAmountRate() external view returns (uint256);
-    function changeMaxTransferAmountRate(uint _maxTransferAmountRate) external;
-    function tolerableTransfer(address from, address to, uint256 value) external returns (bool);
 }
 
-struct Pulse_LP_Reward {
-    uint256 cycle;
-    uint256 decayRate;
-    address account;
-    uint256 latestTime;
-}
-
-struct Pulse_Vote_Burn {
-    uint256 cycle;
-    uint256 decayRate;
-    address account;
-    uint256 latestTime;
-}
-
-struct Pulse_User_Burn {
-    uint256 cycle;
-    uint256 decayRate;
-    uint256 latestTime;
-    uint256 sum_balance;
-    uint256 pending_burn;
-    uint256 accBurnPerShare;
-}
-
-struct AccountInfo {
-    uint256 burnDebt;
-}
