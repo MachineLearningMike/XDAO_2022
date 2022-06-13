@@ -22,25 +22,25 @@ import "./math/SafeMath.sol";
 
 import "hardhat/console.sol";
 
-library FarmLib {
+library FarmLibrary {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    function changeLpTokensToTGRInFarm(
+    function changeLpTokensToTgrInFarm(
         address sourceLpToken, 
         IMaker maker, 
         ITaker taker, 
         address token, 
         uint256 lpAmount
-        ) external returns(uint256 newTGR) {
+        ) external returns(uint256 newTgr) {
         if (address(sourceLpToken) != address(0) && lpAmount > 0) {
 
             if (sourceLpToken == token) {
-                newTGR = lpAmount;
+                newTgr = lpAmount;
 
             } else {
-                address token0 = IXDAOPair(sourceLpToken).token0();
-                address token1 = IXDAOPair(sourceLpToken).token1();
+                address token0 = IPancakePair(sourceLpToken).token0();
+                address token1 = IPancakePair(sourceLpToken).token1();
                 bool foundDirectSwapPath;
                 {
                     address pair0 = maker.getPair(token, token0);
@@ -56,26 +56,26 @@ library FarmLib {
                 uint256 amount1 = IERC20(token1).balanceOf(address(this)) - balance1_old;
 
                 require( amount0 > 0 && amount1 > 0, "RemoveLiqudity failed");
-                newTGR += _swapExactNonTGRToTGR(taker, token, token0, token, amount0);
-                newTGR += _swapExactNonTGRToTGR(taker, token, token1, token, amount1);
+                newTgr += _swapExactNonTgrToTgr(taker, token, token0, token, amount0);
+                newTgr += _swapExactNonTgrToTgr(taker, token, token1, token, amount1);
             }
         }
     }
 
-    function changeTGRInXTokenToLpInFarm(address targetLpToken, Nodes storage nodes, uint256 amountTGRInXToken, address dustBin) 
+    function changeTgrInXTokenToLpInFarm(address targetLpToken, Nodes storage nodes, uint256 amountTgrInXToken, address dustBin) 
     public returns (uint256 newLpAmountInFarm) {
-        if (targetLpToken != address(0) && amountTGRInXToken > 0) {
-            uint256 balance0 = ITGRToken(nodes.token).balanceOf(address(this));
-            tolerableTGRTransferFromXTokenAccount(nodes.xToken, address(this), amountTGRInXToken);
-            uint256 balance1 = ITGRToken(nodes.token).balanceOf(address(this));
-            uint256 amountTGRInFarm = balance1 - balance0;
+        if (targetLpToken != address(0) && amountTgrInXToken > 0) {
+            uint256 balance0 = ITgrToken(nodes.token).balanceOf(address(this));
+            tolerableTgrTransferFromXTokenAccount(nodes.xToken, address(this), amountTgrInXToken);
+            uint256 balance1 = ITgrToken(nodes.token).balanceOf(address(this));
+            uint256 amountTgrInFarm = balance1 - balance0;
 
             if (targetLpToken == nodes.token) {
-                newLpAmountInFarm = amountTGRInFarm;  // pending rewards, by definition, reside in token.balanceOf[address(this)].
+                newLpAmountInFarm = amountTgrInFarm;  // pending rewards, by definition, reside in token.balanceOf[address(this)].
 
             } else {
-                address token0 = IXDAOPair(targetLpToken).token0();
-                address token1 = IXDAOPair(targetLpToken).token1();
+                address token0 = IPancakePair(targetLpToken).token0();
+                address token1 = IPancakePair(targetLpToken).token1();
                 bool foundDirectSwapPath;
                 {
                     address pair0 = IMaker(nodes.maker).getPair(nodes.token, token0);
@@ -84,17 +84,17 @@ library FarmLib {
                 }
                 require(foundDirectSwapPath, "Swap path not found");
 
-                uint256 amount0 = amountTGRInFarm / 2;
-                uint256 amount1 = amountTGRInFarm - amount0;
-                amount0 = _swapExactTGRToNonTGR(ITaker(nodes.taker), nodes.token, nodes.token, token0, amount0);
-                amount1 = _swapExactTGRToNonTGR(ITaker(nodes.taker), nodes.token, nodes.token, token1, amount1);
+                uint256 amount0 = amountTgrInFarm / 2;
+                uint256 amount1 = amountTgrInFarm - amount0;
+                amount0 = _swapExactTgrToNonTgr(ITaker(nodes.taker), nodes.token, nodes.token, token0, amount0);
+                amount1 = _swapExactTgrToNonTgr(ITaker(nodes.taker), nodes.token, nodes.token, token1, amount1);
                 
                 require( amount0 > 0 && amount1 > 0, "Swap failed");
-                balance0 = IXDAOPair(targetLpToken).balanceOf(address(this));
+                balance0 = IERC20(targetLpToken).balanceOf(address(this));
                 IERC20(token0).safeIncreaseAllowance(nodes.maker, amount0);
                 IERC20(token1).safeIncreaseAllowance(nodes.maker, amount1);
                 (uint256 _amount0, uint256 _amount1, ) =IMaker(nodes.maker).addLiquidity(token0, token1, amount0, amount1, 0, 0, address(this), block.timestamp);
-                balance1 = IXDAOPair(targetLpToken).balanceOf(address(this));
+                balance1 = IERC20(targetLpToken).balanceOf(address(this));
 
                 if (_amount0 < amount0) TransferHelper.safeTransfer(token0, dustBin, amount0 - _amount0); // remove dust
                 if (_amount1 < amount1) TransferHelper.safeTransfer(token1, dustBin, amount1 - _amount1); // remove dust
@@ -105,7 +105,7 @@ library FarmLib {
     }
 
 
-    function _swapExactTGRToNonTGR(
+    function _swapExactTgrToNonTgr(
         ITaker taker,
         address token,
         address tokenFr,
@@ -119,7 +119,7 @@ library FarmLib {
         } else if (tokenFr != tokenTo) {
             uint256 balance0 = IERC20(tokenTo).balanceOf(address(this));
 
-            ITGRToken(tokenFr).approve(address(taker), amount);
+            ITgrToken(tokenFr).approve(address(taker), amount);
             address[] memory path = new address[](2);
             path[0] = tokenFr;
             path[1] = tokenTo;
@@ -136,7 +136,7 @@ library FarmLib {
         }
     }
 
-    function _swapExactNonTGRToTGR(
+    function _swapExactNonTgrToTgr(
         ITaker taker,
         address token,
         address tokenFr,
@@ -150,7 +150,7 @@ library FarmLib {
         } else if (tokenFr != tokenTo) {
             uint256 balance0 = IERC20(tokenTo).balanceOf(address(this));
 
-            ITGRToken(tokenFr).approve(address(taker), amount);
+            ITgrToken(tokenFr).approve(address(taker), amount);
             address[] memory path = new address[](2);
             path[0] = tokenFr;
             path[1] = tokenTo;
@@ -177,7 +177,7 @@ library FarmLib {
         if (tokenFr != tokenTo) {
             uint256 _tokenToAmt = IERC20(tokenTo).balanceOf(address(this));
 
-            ITGRToken(token).approve(address(taker), amount);
+            ITgrToken(token).approve(address(taker), amount);
             address[] memory path = new address[](2);
             path[0] = tokenFr;
             path[1] = tokenTo;
@@ -203,7 +203,7 @@ library FarmLib {
     function getTotalMatureVestPieces(VestChunk[] storage vestList, uint256 vestMonths) public view returns (uint amount) {
         for (uint256 i = 0; i < vestList.length; i++) {
             // Time simulation for test: 600 * 24 * 30. A hardhat block pushes 2 seconds of timestamp. 3 blocks will be equivalent to a month.
-            uint256 elapsed = (block.timestamp - vestList[i].startTime) * 600 * 24 * 30; 
+            uint256 elapsed = (block.timestamp - vestList[i].startTime); // * 600 * 24 * 30; 
             uint256 monthsElapsed = elapsed / month >= vestMonths ? vestMonths : elapsed / month;
             uint256 unlockAmount = vestList[i].principal * monthsElapsed / vestMonths - vestList[i].withdrawn;
             amount += unlockAmount;
@@ -216,7 +216,7 @@ library FarmLib {
         uint256 i;
         while( _amount > 0 && i < vestList.length ) {
             // Time simulation for test: 600 * 24 * 30. A hardhat block pushes 2 seconds of timestamp. 3 blocks will be equivalent to a month.
-            uint256 elapsed = (block.timestamp - vestList[i].startTime) * 600 * 24 * 30;
+            uint256 elapsed = (block.timestamp - vestList[i].startTime); // * 600 * 24 * 30;
             uint256 monthsElapsed = elapsed / month >= vestMonths ? vestMonths : elapsed / month;
             uint256 unlockAmount = vestList[i].principal * monthsElapsed / vestMonths - vestList[i].withdrawn;
             if (unlockAmount > _amount) {
@@ -236,10 +236,10 @@ library FarmLib {
     }
     
     /**
-    * @dev Transfer TGR amount with tolerance against (small?) numeric errors.
+    * @dev Transfer Tgr amount with tolerance against (small?) numeric errors.
     */
-    function tolerableTGRTransferFromXTokenAccount(address xToken, address _to, uint256 _amount) public {
-        IXTGRToken(xToken).safeTGRTransfer(_to, _amount);
+    function tolerableTgrTransferFromXTokenAccount(address xToken, address _to, uint256 _amount) public {
+        IXTgrToken(xToken).safeTgrTransfer(_to, _amount);
     }
 
 
@@ -247,7 +247,87 @@ library FarmLib {
     //============================================= Rewardds ===================================================
     //==========================================================================================================
 
-    function takePendingCollectively(PoolInfo storage pool, FarmFeeParams storage feeParams, Nodes storage nodes) public {
+    // function takePendingCollectively(PoolInfo storage pool, FarmFeeParams storage feeParams, Nodes storage nodes) public {
+    //     uint256 subPoolPending;
+    //     uint256 totalRewards;
+
+    //     uint256 lpSupply = pool.lpToken.balanceOf(address(this));
+
+    //     //-------------------- OnOff SubPool Group Takes -------------------- Compound On, Vest Off
+    //     if (lpSupply > 0) {
+    //         subPoolPending = (pool.OnOff.sumAmount + pool.OnOff.Comp.bulk) * pool.reward / lpSupply;
+    //     } else { subPoolPending = 0; }
+
+    //     if (subPoolPending > 0) {
+    //         totalRewards += subPoolPending;
+    //         uint256 feePaid = subPoolPending * feeParams.nonVestBurnRate / FeeMagnifier;
+    //         ITgrToken(nodes.token).burn(nodes.xToken, feePaid);
+    //         subPoolPending -= feePaid;
+    //         subPoolPending -= payCompoundFee(nodes.token, feeParams, subPoolPending, nodes);
+    //         //uint256 newLpAmountInFarm = changeTgrInXTokenToLpInFarm(address(pool.lpToken), nodes, subPoolPending, feeParams.treasury);
+    //         //_addToSubPool(pool.OnOff.Comp, pool.OnOff.sumAmount + pool.OnOff.Comp.bulk, newLpAmountInFarm); // updates bulk & accPerShare.
+    //         _addToSubPool(pool.OnOff.PreComp, pool.OnOff.sumAmount + pool.OnOff.Comp.bulk, subPoolPending); // updates bulk & accPerShare.
+    //     }
+
+    //     //-------------------- OnOn SubPool Group Takes -------------------- Compound On, Vest On
+
+    //     if (lpSupply > 0) {
+    //         subPoolPending = (pool.OnOn.sumAmount + pool.OnOn.Comp.bulk) * pool.reward / lpSupply;
+    //     } else { subPoolPending = 0; }
+
+    //     totalRewards += subPoolPending;
+    //     if (subPoolPending > 0 ) {
+    //         uint256 halfToCompound = subPoolPending / 2;
+    //         uint256 halfToVest = subPoolPending - halfToCompound;
+    //         halfToCompound -= payCompoundFee(nodes.token, feeParams, halfToCompound, nodes);
+    //         //uint256 newLpAmountInFarm = changeTgrInXTokenToLpInFarm(address(pool.lpToken), nodes, halfToCompound, feeParams.treasury);
+    //         //_addToSubPool(pool.OnOn.Comp, pool.OnOn.sumAmount + pool.OnOn.Comp.bulk, newLpAmountInFarm); // updates bulk & accPerShare.
+    //         _addToSubPool(pool.OnOn.PreComp, pool.OnOn.sumAmount + pool.OnOn.Comp.bulk, halfToCompound); // updates bulk & accPerShare.
+    //         _addToSubPool(pool.OnOn.Vest, pool.OnOn.sumAmount, halfToVest); // updates bulk & accPerShare.
+    //     }
+
+    //     //-------------------- OffOn SubPool Group Takes -------------------- Compound Off, Vest On
+
+    //     if (lpSupply > 0) {
+    //         subPoolPending = (pool.OffOn.sumAmount) * pool.reward / lpSupply;
+    //     } else { subPoolPending = 0; }
+
+    //     totalRewards += subPoolPending;
+    //     if (subPoolPending > 0) {
+    //         uint256 halfToVest = subPoolPending / 2;
+    //         uint256 halfToSend = subPoolPending - halfToVest;
+    //         _addToSubPool(pool.OffOn.Vest, pool.OffOn.sumAmount, halfToVest); // updates bulk & accPerShare.
+    //         _addToSubPool(pool.OffOn.Accum, pool.OffOn.sumAmount, halfToSend); // updates bulk & accPerShare.
+    //     }
+
+    //     //-------------------- OffOff SubPool Group Takes -------------------- Compound Off, Vest Off
+
+    //     if (lpSupply > 0) {
+    //         subPoolPending = (pool.OffOff.sumAmount) * pool.reward / lpSupply;
+    //     } else { subPoolPending = 0; }
+
+    //     totalRewards += subPoolPending;
+    //     if (subPoolPending > 0) {
+    //         uint256 feePaid = subPoolPending * feeParams.nonVestBurnRate / FeeMagnifier;
+    //         ITgrToken(nodes.token).burn(nodes.xToken, feePaid);
+    //         subPoolPending -= feePaid;
+    //         _addToSubPool(pool.OffOff.Accum, pool.OffOff.sumAmount, subPoolPending); // updates bulk & accPerShare.
+    //     }
+
+    //     //assert( pool.lpToken.balanceOf(address(this)) == checkSum );
+
+    //     checkConsistency(pool, "after collective");
+    //     if (pool.reward < totalRewards) {
+    //         console.log("---", totalRewards - pool.reward, "pool.reward < totalRewards");
+    //         console.log("pool.OnOff.sumAmount, Comp.bulk", pool.OnOff.sumAmount, pool.OnOff.Comp.bulk);
+    //         console.log("pool.OnOn.sumAmount, Comp.bulk", pool.OnOn.sumAmount, pool.OnOn.Comp.bulk);
+    //         console.log("pool.OffOn.sumAmount", pool.OffOn.sumAmount);
+    //         console.log("pool.OffOff.sumAmount", pool.OffOff.sumAmount);
+
+    //     }
+    // }
+
+    function takePendingCollectively(PoolInfo storage pool, FarmFeeParams storage feeParams, Nodes storage nodes, bool periodic) public {
         uint256 subPoolPending;
         uint256 totalRewards;
 
@@ -261,11 +341,16 @@ library FarmLib {
         if (subPoolPending > 0) {
             totalRewards += subPoolPending;
             uint256 feePaid = subPoolPending * feeParams.nonVestBurnRate / FeeMagnifier;
-            ICrssToken(nodes.token).burn(nodes.xToken, feePaid);
+            ITgrToken(nodes.token).burn(nodes.xToken, feePaid);
             subPoolPending -= feePaid;
             subPoolPending -= payCompoundFee(nodes.token, feeParams, subPoolPending, nodes);
-            uint256 newLpAmountInFarm = changeCrssInXTokenToLpInFarm(address(pool.lpToken), nodes, subPoolPending, feeParams.treasury);
-            _addToSubPool(pool.OnOff.Comp, pool.OnOff.sumAmount + pool.OnOff.Comp.bulk, newLpAmountInFarm); // updates bulk & accPerShare.
+            if (periodic ) {
+                subPoolPending += _emptySubPool(pool.OnOff.PreComp, pool.OnOff.sumAmount + pool.OnOff.Comp.bulk);
+                uint256 newLpAmountInFarm = changeTgrInXTokenToLpInFarm(address(pool.lpToken), nodes, subPoolPending, feeParams.treasury);
+                _addToSubPool(pool.OnOff.Comp, pool.OnOff.sumAmount + pool.OnOff.Comp.bulk, newLpAmountInFarm); // updates bulk & accPerShare.
+            } else {
+                _addToSubPool(pool.OnOff.PreComp, pool.OnOff.sumAmount + pool.OnOff.Comp.bulk, subPoolPending); // updates bulk & accPerShare.
+            }
         }
 
         //-------------------- OnOn SubPool Group Takes -------------------- Compound On, Vest On
@@ -279,8 +364,13 @@ library FarmLib {
             uint256 halfToCompound = subPoolPending / 2;
             uint256 halfToVest = subPoolPending - halfToCompound;
             halfToCompound -= payCompoundFee(nodes.token, feeParams, halfToCompound, nodes);
-            uint256 newLpAmountInFarm = changeCrssInXTokenToLpInFarm(address(pool.lpToken), nodes, halfToCompound, feeParams.treasury);
-            _addToSubPool(pool.OnOn.Comp, pool.OnOn.sumAmount + pool.OnOn.Comp.bulk, newLpAmountInFarm); // updates bulk & accPerShare.
+            if (periodic ) {
+                halfToCompound += _emptySubPool(pool.OnOff.PreComp, pool.OnOn.sumAmount + pool.OnOn.Comp.bulk);
+                uint256 newLpAmountInFarm = changeTgrInXTokenToLpInFarm(address(pool.lpToken), nodes, halfToCompound, feeParams.treasury);
+                _addToSubPool(pool.OnOn.Comp, pool.OnOn.sumAmount + pool.OnOn.Comp.bulk, newLpAmountInFarm); // updates bulk & accPerShare.
+            } else {
+                _addToSubPool(pool.OnOn.PreComp, pool.OnOn.sumAmount + pool.OnOn.Comp.bulk, halfToCompound); // updates bulk & accPerShare.
+            }
             _addToSubPool(pool.OnOn.Vest, pool.OnOn.sumAmount, halfToVest); // updates bulk & accPerShare.
         }
 
@@ -307,7 +397,7 @@ library FarmLib {
         totalRewards += subPoolPending;
         if (subPoolPending > 0) {
             uint256 feePaid = subPoolPending * feeParams.nonVestBurnRate / FeeMagnifier;
-            ICrssToken(nodes.token).burn(nodes.xToken, feePaid);
+            ITgrToken(nodes.token).burn(nodes.xToken, feePaid);
             subPoolPending -= feePaid;
             _addToSubPool(pool.OffOff.Accum, pool.OffOff.sumAmount, subPoolPending); // updates bulk & accPerShare.
         }
@@ -318,7 +408,9 @@ library FarmLib {
         if (pool.reward < totalRewards) {
             console.log("---", totalRewards - pool.reward, "pool.reward < totalRewards");
             console.log("pool.OnOff.sumAmount, Comp.bulk", pool.OnOff.sumAmount, pool.OnOff.Comp.bulk);
+            console.log("pool.OnOff.sumAmount, PreComp.bulk", pool.OnOff.sumAmount, pool.OnOff.PreComp.bulk);
             console.log("pool.OnOn.sumAmount, Comp.bulk", pool.OnOn.sumAmount, pool.OnOn.Comp.bulk);
+            console.log("pool.OnOn.sumAmount, PreComp.bulk", pool.OnOn.sumAmount, pool.OnOn.PreComp.bulk);
             console.log("pool.OffOn.sumAmount", pool.OffOn.sumAmount);
             console.log("pool.OffOff.sumAmount", pool.OffOff.sumAmount);
 
@@ -329,8 +421,8 @@ library FarmLib {
         // ------------------------------ Check ----------------------------
 
         uint256 balance = pool.lpToken.balanceOf(address(this));
-        uint256 checkSum = pool.OnOff.sumAmount + pool.OnOff.Comp.bulk + pool.OnOn.sumAmount + pool.OnOn.Comp.bulk
-        + pool.OffOn.sumAmount + pool.OffOff.sumAmount;
+        uint256 checkSum = pool.OnOff.sumAmount + pool.OnOff.Comp.bulk + pool.OnOn.sumAmount 
+        + pool.OnOn.Comp.bulk + pool.OnOn.PreComp.bulk + pool.OffOn.sumAmount + pool.OffOff.sumAmount;
 
         if (balance != checkSum) {
             if (balance < checkSum) {
@@ -340,7 +432,9 @@ library FarmLib {
             }
             console.log("lp Balanace, checkSum", balance, checkSum);
             console.log("pool.OnOff.sumAmount, Comp.bulk", pool.OnOff.sumAmount, pool.OnOff.Comp.bulk);
+            console.log("pool.OnOff.sumAmount, PreComp.bulk", pool.OnOff.sumAmount, pool.OnOff.PreComp.bulk);
             console.log("pool.OnOn.sumAmount, Comp.bulk", pool.OnOn.sumAmount, pool.OnOn.Comp.bulk);
+            console.log("pool.OnOn.sumAmount, PreComp.bulk", pool.OnOn.sumAmount, pool.OnOn.PreComp.bulk);
             console.log("pool.OffOn.sumAmount", pool.OffOn.sumAmount);
             console.log("pool.OffOff.sumAmount", pool.OffOff.sumAmount);
         }
@@ -349,11 +443,19 @@ library FarmLib {
     function _addToSubPool(SubPool storage subPool, uint256 totalShare, uint256 newAmount) internal {
         subPool.bulk += newAmount;
         if (totalShare > 0) {
-            subPool.accPerShare += ( newAmount * 1e12 / totalShare); // Note that inteter devision is not greater than real division. So it's safe.
+            // Note: that inteter devision is not greater than real division. So it's safe.
+            // Note: if it's less than real division, then a seed of dust is formed here.
+            subPool.accPerShare += ( newAmount * 1e12 / totalShare); 
         } else { 
             console.log("\t --------------- totalShare = 0, compound dust, acc", newAmount, subPool.accPerShare); // newAmount should be compound dust. Ignore it.
             //subPool.accPerShare = 1e12; 
         }
+    }
+
+    function _emptySubPool(SubPool storage subPool, uint256 totalShare) internal returns (uint256 amount) {
+        amount = subPool.bulk;
+        subPool.bulk = 0;
+        subPool.accPerShare = 0;
     }
 
     function payCompoundFee(address payerToken, FarmFeeParams storage feeParams, uint256 amount, Nodes storage nodes) public returns (uint256 feesPaid) {
@@ -361,8 +463,8 @@ library FarmLib {
         if (feesPaid > 0) {
             uint256 half = feesPaid / 2;
             if (payerToken == nodes.token) {
-                tolerableTGRTransferFromXTokenAccount(nodes.xToken, feeParams.stakeholders, half);
-                tolerableTGRTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, feesPaid - half);
+                tolerableTgrTransferFromXTokenAccount(nodes.xToken, feeParams.stakeholders, half);
+                tolerableTgrTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, feesPaid - half);
             } else {
                 TransferHelper.safeTransfer(payerToken, feeParams.stakeholders, half);
                 TransferHelper.safeTransfer(payerToken, feeParams.treasury, feesPaid - half);
@@ -374,10 +476,10 @@ library FarmLib {
     address msgSender, FarmFeeParams storage feeParams, Nodes storage nodes)
     public {
         //-------------------- Pay referral fee outside of user's pending reward --------------------
-        uint256 userPending = getRewardPayroll(pool, user) * pool.accTGRPerShare / 1e12 - user.rewardDebt; // This is the only place user.rewardDebt works explicitly.
+        uint256 userPending = getRewardPayroll(pool, user) * pool.accTgrPerShare / 1e12 - user.rewardDebt; // This is the only place user.rewardDebt works explicitly.
         if (userPending > 0) {
             _mintReferralCommission(msgSender, userPending, feeParams, nodes);
-            //user.rewardDebt = getRewardPayroll(pool, user) * pool.accTGRPerShare / 1e12;
+            //user.rewardDebt = getRewardPayroll(pool, user) * pool.accTgrPerShare / 1e12;
         }
     }
 
@@ -452,7 +554,7 @@ library FarmLib {
             }
         }
 
-        user.rewardDebt = getRewardPayroll(pool, user) * pool.accCrssPerShare / 1e12;
+        user.rewardDebt = getRewardPayroll(pool, user) * pool.accTgrPerShare / 1e12;
     }
 
     /**
@@ -460,12 +562,13 @@ library FarmLib {
     * @dev Change the user.amount value, change branches' sum of user.amounts, and reset all debt so that pendings are zero now.
     * Note: This is not the place to upgrade accPerShare, because this call is not a reward gain.
     * Reward gain, instead, takes place in _updatePool, for pools, and _takeIndividualRewards, for branches and subpools.
-    */    function startRewardCycle(
+    */
+    function startRewardCycle(
         PoolInfo storage pool, 
         UserInfo storage user, 
-        uint256 amount, 
         Nodes storage nodes,
         FarmFeeParams storage feeParams, 
+        uint256 amount, 
         bool addNotSubtract) 
         public {
         // Open it for 0 amount, as it re-bases user debts.
@@ -495,7 +598,7 @@ library FarmLib {
                 }
                 pool.OnOn.Comp.accPerShare = 0;
                 if (pool.OnOn.Vest.bulk > 0) {
-                    tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OnOn.Vest.bulk);
+                    tolerableTgrTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OnOn.Vest.bulk);
                     console.log("dust onon vest", pool.OnOn.Vest.bulk);
                     pool.OnOn.Vest.bulk = 0;
                 }
@@ -509,13 +612,13 @@ library FarmLib {
             pool.OffOn.sumAmount = addNotSubtract ? pool.OffOn.sumAmount + amount : pool.OffOn.sumAmount - amount;
             if (pool.OffOn.sumAmount == 0) { // user.amount is also 0.
                 if (pool.OffOn.Vest.bulk > 0) {
-                    tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOn.Vest.bulk);
+                    tolerableTgrTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOn.Vest.bulk);
                     console.log("dust offon vest", pool.OffOn.Vest.bulk);
                     pool.OffOn.Vest.bulk = 0;
                 }
                 pool.OffOn.Vest.accPerShare = 0;
                 if (pool.OffOn.Accum.bulk > 0) { // residue dust grew over 1%.
-                    tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOn.Accum.bulk);
+                    tolerableTgrTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOn.Accum.bulk);
                     console.log("dust offon accum", pool.OffOn.Accum.bulk);
                     pool.OffOn.Accum.bulk = 0;
                 }
@@ -528,7 +631,7 @@ library FarmLib {
             pool.OffOff.sumAmount = addNotSubtract ? pool.OffOff.sumAmount + amount : pool.OffOff.sumAmount - amount;
              if (pool.OffOff.sumAmount == 0) { // user.amount is also 0.
                 if (pool.OffOff.Accum.bulk > 0) { // residue dust grew over 1%.
-                    tolerableCrssTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOff.Accum.bulk);
+                    tolerableTgrTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, pool.OffOff.Accum.bulk);
                     console.log("dust offoff accum", pool.OffOff.Accum.bulk);
                     pool.OffOff.Accum.bulk = 0;
                 }
@@ -537,7 +640,7 @@ library FarmLib {
             user.debt1 = user.amount * pool.OffOff.Accum.accPerShare / 1e12;
         }
 
-        user.rewardDebt = getRewardPayroll(pool, user) * pool.accCrssPerShare / 1e12;
+        user.rewardDebt = getRewardPayroll(pool, user) * pool.accTgrPerShare / 1e12;
     }
 
     /**
@@ -563,11 +666,11 @@ library FarmLib {
     */
     function _mintReferralCommission(address _user, uint256 principal, FarmFeeParams storage feeParams, Nodes storage nodes) internal {
         uint256 commission = principal.mul(feeParams.referralCommissionRate).div(FeeMagnifier);
-        if (feeParams.crssReferral != address(0) && commission > 0) {
-            address referrer = ITGRReferral(feeParams.crssReferral).getReferrer(_user);
+        if (feeParams.trgReferral != address(0) && commission > 0) {
+            address referrer = ITgrReferral(feeParams.trgReferral).getReferrer(_user);
             if (referrer != address(0)) {
-                ITGRToken(nodes.token).mint(referrer, commission);
-                ITGRReferral(feeParams.crssReferral).recordReferralCommission(referrer, commission);
+                ITgrToken(nodes.token).mint(referrer, commission);
+                ITgrReferral(feeParams.trgReferral).recordReferralCommission(referrer, commission);
             }
         }
     }
@@ -586,20 +689,19 @@ library FarmLib {
         CollectOption newOption,
         address msgSender, 
         FarmFeeParams storage feeParams, 
-        Nodes storage nodes,
+        Nodes storage nodes, 
         FarmParams storage farmParams
         ) external returns (bool switched) {
         CollectOption orgOption = user.collectOption;
 
         if (orgOption != newOption) {
             finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
-
             uint256 userAmount =  user.amount;
-            startRewardCycle(pool, user, userAmount, nodes, feeParams, false); // false: addNotSubract
+            startRewardCycle(pool, user, nodes, feeParams, userAmount, false); // false: addNotSubract
 
             user.collectOption = newOption;
 
-            startRewardCycle(pool, user, userAmount, nodes, feeParams, true); // true: addNotSubract
+            startRewardCycle(pool, user, nodes, feeParams, userAmount, true); // true: addNotSubract
 
             switched = true;
         }
@@ -632,29 +734,29 @@ library FarmLib {
         Nodes storage nodes,
         FarmFeeParams storage feeParams,
         FarmParams storage farmParams
-    ) external returns (uint256 totalCompounded, uint256 crssToPay) {
+    ) external returns (uint256 totalCompounded, uint256 trgToPay) {
         uint256 len = poolInfo.length;
         for (uint256 pid = 0; pid < len; pid ++) {
             PoolInfo storage pool = poolInfo[pid];
             UserInfo storage user = userInfo[pid][msgSender];
             finishRewardCycle(pool, user, msgSender, feeParams, nodes, farmParams);
-            uint256 accumTGR = user.accumulated;
+            uint256 accumTgr = user.accumulated;
             if (feeParams.compoundFeeRate > 0) {
-                uint256 fee = accumTGR * feeParams.compoundFeeRate / FeeMagnifier;
-                accumTGR -= fee;
-                crssToPay += fee;
+                uint256 fee = accumTgr * feeParams.compoundFeeRate / FeeMagnifier;
+                accumTgr -= fee;
+                trgToPay += fee;
             }
-            totalCompounded += accumTGR;
-            uint256 newLpAmount = changeTGRInXTokenToLpInFarm(
-                address(pool.lpToken), nodes, accumTGR, feeParams.treasury);
-            startRewardCycle(pool, user, newLpAmount, nodes, feeParams, true);  // true: addNotSubract
+            totalCompounded += accumTgr;
+            uint256 newLpAmount = changeTgrInXTokenToLpInFarm(
+                address(pool.lpToken), nodes, accumTgr, feeParams.treasury);
+            startRewardCycle(pool, user, nodes, feeParams, newLpAmount, true);  // true: addNotSubract
             user.accumulated = 0;
         }
 
-        if (crssToPay > 0) {
-            uint256 half = crssToPay / 2;
-            tolerableTGRTransferFromXTokenAccount(nodes.xToken, feeParams.stakeholders, half);
-            tolerableTGRTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, crssToPay - half);
+        if (trgToPay > 0) {
+            uint256 half = trgToPay / 2;
+            tolerableTgrTransferFromXTokenAccount(nodes.xToken, feeParams.stakeholders, half);
+            tolerableTgrTransferFromXTokenAccount(nodes.xToken, feeParams.treasury, trgToPay - half);
         }
     }
 
@@ -669,8 +771,8 @@ library FarmLib {
         uint256 pointsForStakingPool;
 
         if (points != 0) {
-            pointsPerPercent = points * 1e5 / ( 100 - TGRPoolAllocPercent ); // 25% for TGR staking pool.
-            pointsForStakingPool = pointsPerPercent * TGRPoolAllocPercent / 1e5;
+            pointsPerPercent = points * 1e5 / ( 100 - TgrPoolAllocPercent ); // 25% for Tgr staking pool.
+            pointsForStakingPool = pointsPerPercent * TgrPoolAllocPercent / 1e5;
             totalAllocPoint = points + pointsForStakingPool;
             poolInfo[0].allocPoint = pointsForStakingPool;
         } else {
@@ -690,7 +792,7 @@ library FarmLib {
         pool.depositFeeRate = _depositFeeRate;
 
         totalAllocPoint = updateSpecialPools(poolInfo);
-        require(poolInfo.length <= 1 || _allocPoint * 99 <= totalAllocPoint * (100 - TGRPoolAllocPercent), "Invalid allocPoint");
+        require(poolInfo.length <= 1 || _allocPoint * 99 <= totalAllocPoint * (100 - TgrPoolAllocPercent), "Invalid allocPoint");
     }
 
     function addPool(
@@ -703,7 +805,7 @@ library FarmLib {
         poolInfo.push( buildStandardPool(_lpToken, _allocPoint, startBlock, _depositFeeRate) );
 
         totalAllocPoint = updateSpecialPools(poolInfo);
-        require(poolInfo.length <= 1 || _allocPoint * 99 <= totalAllocPoint * (100 - TGRPoolAllocPercent), "Invalid allocPoint");
+        require(poolInfo.length <= 1 || _allocPoint * 99 <= totalAllocPoint * (100 - TgrPoolAllocPercent), "Invalid allocPoint");
     }
 
 
@@ -712,23 +814,23 @@ library FarmLib {
     }
 
     /**
-    * @dev Mint rewards, and increase the pool's accTGRPerShare, accordingly.
-    * accTGRPerShare: the amount of rewards that a user would have gaind NOW 
+    * @dev Mint rewards, and increase the pool's accTgrPerShare, accordingly.
+    * accTgrPerShare: the amount of rewards that a user would have gaind NOW 
     * if they had maintained 1e12 LP tokens as user.amount since the very beginning.
     */
 
     event SetMigrator(address migrator);
-    function updatePool(PoolInfo storage pool, FarmParams storage farmParams, Nodes storage nodes
+    function updatePool(PoolInfo storage pool, FarmParams storage farmParams,Nodes storage nodes
     ) public {
         if (block.number >  pool.lastRewardBlock) {
             uint256 lpSupply = pool.lpToken.balanceOf(address(this));
 
             if (lpSupply > 0) {
                 uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number, farmParams.bonusMultiplier);
-                uint256 crssReward = multiplier * farmParams.crssPerBlock * pool.allocPoint / farmParams.totalAllocPoint;
-                ITGRToken(nodes.token).mint(nodes.xToken, crssReward);
-                pool.reward = crssReward; // used as a checksum
-                pool.accTGRPerShare += (crssReward * 1e12 / lpSupply);
+                uint256 trgReward = multiplier * farmParams.trgPerBlock * pool.allocPoint / farmParams.totalAllocPoint;
+                ITgrToken(nodes.token).mint(nodes.xToken, trgReward);
+                pool.reward = trgReward; // used as a checksum
+                pool.accTgrPerShare += (trgReward * 1e12 / lpSupply);
                 pool.lastRewardBlock = block.number;
             }
 
@@ -736,20 +838,20 @@ library FarmLib {
         }
     }
 
-    function pendingTGR(
+    function pendingTgr(
     PoolInfo storage pool, 
     UserInfo storage user, 
     FarmParams storage farmParams
     ) public view returns (uint256) {
-        uint256 accTGRPerShare = pool.accTGRPerShare;
+        uint256 accTgrPerShare = pool.accTgrPerShare;
         uint256  lpSupply = pool.lpToken.balanceOf(address(this));
 
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number, farmParams.bonusMultiplier);
-            uint256 crssReward = multiplier.mul(farmParams.crssPerBlock).mul(pool.allocPoint).div(farmParams.totalAllocPoint);
-            accTGRPerShare += (crssReward * 1e12 / lpSupply);
+            uint256 trgReward = multiplier.mul(farmParams.trgPerBlock).mul(pool.allocPoint).div(farmParams.totalAllocPoint);
+            accTgrPerShare += (trgReward * 1e12 / lpSupply);
         }       
-        return getRewardPayroll(pool, user) * accTGRPerShare / 1e12 - user.rewardDebt;
+        return getRewardPayroll(pool, user) * accTgrPerShare / 1e12 - user.rewardDebt;
     }
 
     function finishRewardCycle(
@@ -757,14 +859,14 @@ library FarmLib {
         UserInfo storage user, 
         address msgSender, 
         FarmFeeParams storage feeParams, 
-        Nodes storage nodes,
+        Nodes storage nodes, 
         FarmParams storage farmParams
     ) public {
         updatePool(pool, farmParams, nodes);
         if (pool.reward > 0) {
             pyaReferralComission(pool, user, msgSender, feeParams, nodes);
             uint256 userShare = getRewardPayroll(pool, user);
-            takePendingCollectively(pool, feeParams, nodes); // subPools' bulk and accPerShare.
+            takePendingCollectively(pool, feeParams, nodes, false); // subPools' bulk and accPerShare.. periodic: false
             takeIndividualReward(pool, user, userShare);
             pool.reward = 0;
         }
@@ -786,16 +888,16 @@ library FarmLib {
         userState.accRewards = user.accumulated;
         userState.totalVest = getTotalVestPrincipals(user.vestList);
         userState.totalMatureVest = getTotalMatureVestPieces(user.vestList, vestMonths);
-        userState.pendingTGR = pendingTGR(pool, user, farmParams);
+        userState.pendingTgr = pendingTgr(pool, user, farmParams);
         userState.rewardPayroll = getRewardPayroll(pool, user);
         userState.lpBalance = pool.lpToken.balanceOf(msgSender);
-        userState.crssBalance = ITGRToken(nodes.token).balanceOf(msgSender);
+        userState.trgBalance = ITgrToken(nodes.token).balanceOf(msgSender);
         for(pid = 0; pid < poolInfo.length; pid++) {
             userState.totalAccRewards += userInfo[pid][msgSender].accumulated;
         }
     }
 
-    function getSubPooledTGR(PoolInfo storage pool, UserInfo storage user) external view returns (SubPooledTGR memory spc) {
+    function getSubPooledTgr(PoolInfo storage pool, UserInfo storage user) external view returns (SubPooledTgr memory spc) {
 
         if (user.collectOption == CollectOption.OnOff && user.amount > 0) {
 
@@ -824,7 +926,7 @@ library FarmLib {
         }
     }
 
-    function payDepositFeeTGRFromXTGR(
+    function payDepositFeeTgrFromXTgr(
         PoolInfo storage pool,
         address xToken,
         uint256 amount,
@@ -833,26 +935,26 @@ library FarmLib {
         if (pool.depositFeeRate > 0) {
             feePaid = amount * pool.depositFeeRate / FeeMagnifier;
             uint256 treasury = feePaid / 2;
-            tolerableTGRTransferFromXTokenAccount(xToken, feeStores.treasury, treasury);
-            tolerableTGRTransferFromXTokenAccount(xToken, feeStores.develop, feePaid - treasury);
+            tolerableTgrTransferFromXTokenAccount(xToken, feeStores.treasury, treasury);
+            tolerableTgrTransferFromXTokenAccount(xToken, feeStores.develop, feePaid - treasury);
         }
     }
 
-    function dailyPatrol(
-        PoolInfo[] storage poolInfo,
+    function periodicPatrol(
+        PoolInfo[] storage poolInfo, 
         FarmParams storage farmParams,
         FarmFeeParams storage feeParams,
         Nodes storage nodes,
         uint256 lastPatrolDay
     ) external returns (uint256 newLastPatrolDay) {
-        uint256 currDay = block.timestamp /  (1200 seconds); //     (1 days); for test onlt.
+        uint256 currDay = block.timestamp /  (600 seconds); //     (1 days); for test onlt.
         if (lastPatrolDay < currDay ) {
-            console.log("\t************* Patrolling... every 60 seconds, for test");
-            // do dailyPatrol
+            console.log("\t************* Patrolling... every 600 seconds");
+            // do periodicPatrol
             for (uint256 pid; pid < poolInfo.length; pid ++) {
                 PoolInfo storage pool = poolInfo[pid];
                 updatePool(pool, farmParams, nodes);
-                takePendingCollectively(pool, feeParams, nodes);
+                takePendingCollectively(pool, feeParams, nodes, true); // periodic: true
             }
             console.log("\t*************");
             newLastPatrolDay = currDay;
@@ -872,12 +974,12 @@ library FarmLib {
             lpToken: IERC20(lp),
             allocPoint: allocPoint,
             lastRewardBlock: (block.number > startBlock ? block.number : startBlock),
-            accTGRPerShare: 0,
+            accTgrPerShare: 0,
             depositFeeRate: depositFeeRate,
             reward: 0,
 
-            OnOff: Struct_OnOff(0, SubPool(0, 0)),
-            OnOn: Struct_OnOn(0, SubPool(0, 0), SubPool(0, 0)),
+            OnOff: Struct_OnOff(0, SubPool(0, 0), SubPool(0,0)),
+            OnOn: Struct_OnOn(0, SubPool(0, 0), SubPool(0, 0), SubPool(0,0)),
             OffOn: Struct_OffOn(0, SubPool(0, 0), SubPool(0, 0)),
             OffOff: Struct_OffOff(0, SubPool(0, 0))
         });

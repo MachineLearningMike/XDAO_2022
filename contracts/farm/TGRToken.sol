@@ -102,7 +102,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
 
     Pulse_LP_Reward public lp_reward;
     Pulse_Vote_Burn public vote_burn;
-    Pulse_All_Burn public all_burn;
+    Pulse_User_Burn public user_burn;
 
     mapping(address => AccountInfo) accountInfo;
                                 
@@ -116,81 +116,92 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
     }
 
     function _checkConsistency() internal view {
-        uint256 totalSupply = all_burn.sum_balance - all_burn.pending_burn + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes];
-        if (totalSupply != _totalSupply) {
-
-        }
-        uint256 allSupply = _balance[owner] + _balances[alice] + _balances[bob] + _balances[carol];
-        if (allSupply != all_burn.sum_balance) {
-
-        }
+        uint256 totalSupply = user_burn.sum_balance - user_burn.pending_burn + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes];
+        assert (user_burn.sum_balance + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply);
+        assert (_balance[owner] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balance);
     }
 
-    function _isBelongToAllAccounts(address account) internal view returns (bool yes) {
-        yes = account != lp_reward.account && account != vote_burn.account && account != tgrhtz;
+    function _isUserAccount(address account) internal view returns (bool yes) {
+        yes = account != tgrftm && account != tgrhtz && account != votes;
+
+        // Assumes the following are the only non-user TGR accounts.
+        // lp_reward.account = tgrftm
+        // vote_burn.account = votes: the share-based staking account used to keep all voting tgr tokens.
+        // tgrhtz
     }
 
     function pulse_lp_reward() external {
+        // 0.69% of XDAO/FTM LP has the XDAO side sold for FTM, 
+        // then the FTM is used to buy HTZ which is added to XDAO lps airdrop rewards every 12 hours.
+
         uint256 decayPer1e12 = _getDecay(lp_reward.latestTime, lp_reward.cycle, lp_reward.decayRate);
-        // consume decayPer12 of lp_reward.account's balance to generate rewards
+        // Use decayPer12 portion of tgrftm pool to obtain FTM to buy HTZ tokens at the htzftm pool, then add them to airdrop rewards.
+        // TGR/FTM price falls and HTZ/FTM price rises, at their respective pools.
 
         lp_reward.latestTime = block.timestamp;
     }
 
     function pulse_vote_burn() external {
+        // 0.07% of tokens in the Agency dapp actively being used for voting burned every 12 hours.
+
         uint256 decayPer1e12 = _getDecay(vote_burn.latestTime, vote_burn.cycle, vote_burn.decayRate);
-        // burn decayPer1e12 of vote_burn.account's balance
+        // burn decayPer1e12 portion of vote_burn.account's balance. vote_burn.account should be share-based staking account.
 
         vote_burn.latestTime = block.timestamp;
     }
 
-    function pulse_all_burn() external {
-        uint256 decayPer1e12 = _getDecay(all_burn.latestTime, all_burn.cycle, all_burn.decayRate);
+    function pulse_user_burn() external {
+        // 0.777% of tokens(not in Cyberswap/Agency dapp) burned each 24 hours from users wallets.
+
+        // Interpretation: TGR tokens not in Cyberswap accounts, which are tgrftm and tgrhtz, and not in Agency account, 
+        // which is the votes account, will be burned at the above rate and interval.
+
+        uint256 decayPer1e12 = _getDecay(user_burn.latestTime, user_burn.cycle, user_burn.decayRate);
         if (decayPer1e12 > 0) {
             // 1. burn decayPer1e12 of vote_burn.account's balance
 
             // 2. nominally burn all other accounts' balance.
-            uint256 total_value = all_burn.sum_balance - all_burn.pending_burn; //
+            uint256 total_value = user_burn.sum_balance - user_burn.pending_burn; //
             uint256 burn = total_value * decayPer1e12 / 1e12;
-            all_burn.pending_burn += burn;
-            all_burn.accBurnPerShare += burn * 1e12 / total_value;
+            user_burn.pending_burn += burn;
+            user_burn.accBurnPerShare += burn * 1e12 / total_value;
 
-            all_burn.latestTime = block.timestamp;
+            user_burn.latestTime = block.timestamp;
         }
     }
 
     function _balanceOf(address account) internal view returns (uint256 balance) {
-        //uint256 pendingBurn = accountInfo[account].burnShare * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
-        uint256 pendingBurn = _balances[account] * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        //uint256 pendingBurn = accountInfo[account].burnShare * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
         balance = _balances[account] - pendingBurn;
     }
 
     function _refreshBalance(address account) internal {
-        //uint256 pendingBurn = accountInfo[account].burnShare * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
-        uint256 pendingBurn = _balances[account] * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        //uint256 pendingBurn = accountInfo[account].burnShare * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
         if (pendingBurn > 0) {
-            all_burn.pending_burn -= pendingBurn;
-            all_burn.sum_balance -= pendingBurn;
+            user_burn.pending_burn -= pendingBurn;
+            user_burn.sum_balance -= pendingBurn;
             _balances[account] -= pendingBurn;
         }
         //accountInfo[account].burnShare = _balances[account];
-        //accountInfo[account].burnDebt = accountInfo[account].burnShare * all_burn.accBurnPerShare;
-        accountInfo[account].burnDebt = _balances[account] * all_burn.accBurnPerShare;
+        //accountInfo[account].burnDebt = accountInfo[account].burnShare * user_burn.accBurnPerShare;
+        accountInfo[account].burnDebt = _balances[account] * user_burn.accBurnPerShare;
     }
 
     function _changeBalance(address account, uint256 amount, bool addNotSubtract) internal {
-        //uint256 pendingBurn = accountInfo[account].burnShare * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
-        uint256 pendingBurn = _balances[account] * all_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        //uint256 pendingBurn = accountInfo[account].burnShare * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
         if (pendingBurn > 0) {
-            all_burn.pending_burn -= pendingBurn;
+            user_burn.pending_burn -= pendingBurn;
         }
         uint256 delta = pendingBurn + addNotSubtract ? - amount : amount;
-        all_burn.sum_balance -= delta;
+        user_burn.sum_balance -= delta;
         _balances[account] -= delat;
 
         //accountInfo[account].burnShare = _balances[account];
-        //accountInfo[account].burnDebt = accountInfo[account].burnShare * all_burn.accBurnPerShare; 
-        accountInfo[account].burnDebt = accountInfo[account].burnShare * all_burn.accBurnPerShare; 
+        //accountInfo[account].burnDebt = accountInfo[account].burnShare * user_burn.accBurnPerShare; 
+        accountInfo[account].burnDebt = accountInfo[account].burnShare * user_burn.accBurnPerShare; 
     }
 
     //==================== Modifiers. Some of them required by super classes ====================

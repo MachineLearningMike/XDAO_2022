@@ -29,29 +29,26 @@ struct SubPool {
 }
 struct Struct_OnOff {
     uint256 sumAmount;
-    //uint256 rewardDebt;
     SubPool Comp;
+    SubPool PreComp;
 }
 struct Struct_OnOn {
     uint256 sumAmount;
-    //uint256 rewardDebt;
     SubPool Comp;
+    SubPool PreComp;
     SubPool Vest;
 }
 struct Struct_OffOn {
     uint256 sumAmount;
-    //uint256 rewardDebt;
     SubPool Vest;
     SubPool Accum;
 }
 struct Struct_OffOff {
     uint256 sumAmount;
-    //uint256 rewardDebt;
     SubPool Accum;
 }
 struct Struct_Accum {
     uint256 sumAmount;
-    //uint256 rewardDebt;
     SubPool Pass;
 }
 
@@ -59,7 +56,7 @@ struct PoolInfo {
     IERC20 lpToken;
     uint256 allocPoint;
     uint256 lastRewardBlock;
-    uint256 accTGRPerShare;
+    uint256 accCrssPerShare;
     uint256 depositFeeRate;
     uint256 reward;
 
@@ -85,20 +82,20 @@ struct UserState {
     uint256 accRewards;
     uint256 totalVest;
     uint256 totalMatureVest;
-    uint256 pendingTGR;
+    uint256 pendingCrss;
     uint256 rewardPayroll;
     uint256 lpBalance;
     uint256 crssBalance;
     uint256 totalAccRewards;
 }
 
-struct SubPooledTGR {
+struct SubPooledCrss {
     uint256 toVest;
     uint256 toAccumulate;
 }
 
 struct FarmParams {
+    uint256 totalAllocPoint;
     uint256 crssPerBlock;
     uint256 bonusMultiplier;
-    uint256 totalAllocPoint;
 }

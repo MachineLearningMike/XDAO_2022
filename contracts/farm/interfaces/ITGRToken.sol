@@ -28,7 +28,7 @@ struct Pulse_Vote_Burn {
     uint256 latestTime;
 }
 
-struct Pulse_All_Burn {
+struct Pulse_User_Burn {
     uint256 cycle;
     uint256 decayRate;
     uint256 latestTime;
