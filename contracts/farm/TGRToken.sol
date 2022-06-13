@@ -149,16 +149,17 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         // pulse.lastTime, pulse.cycle, pulse.decayRate
     }
 
-    function _checkConsistency() internal view {
+    function _checkForConsistency() internal view {
         assert (user_burn.sum_balances + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply);
         assert (_balance[owner] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balances);
         // totalSupply = _totalSupply - user_burn.pending_burn
         // balanceOf(account) = _isUserAccount(account) ? _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn : _balances[account]
         // user_burn.accDecayPerShare += new_pending_burn * 1e12 / user_burn.sum_balances;
         // transfer(sender, recipient, amount)
-        // if _isUserAccount(sender) 
-            // burn out pending_burn NOW
-            //...
+        // if _isUserAccount(sender, recipient) 
+            // settlw with pending_burn, by using Users[account].debtToPendingBurn
+            // transfer ...
+            // 
     }
 
     function _isUserAccount(address account) internal view returns (bool yes) {
@@ -199,10 +200,10 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         uint256 decayPer1e12 = _getDecay(user_burn);
         if (decayPer1e12 > 0) {
             // nominally burn all user accounts' balance.
-            uint256 total_value = user_burn.sum_balance - user_burn.pending_burn; //
-            uint256 burn = total_value * decayPer1e12 / 1e12;
-            user_burn.pending_burn += burn;
-            user_burn.accBurnPerShare += burn * 1e12 / total_value;
+            uint256 true_value = user_burn.sum_balance - user_burn.pending_burn;
+            uint256 new_burn = true_value * decayPer1e12 / 1e12;
+            user_burn.pending_burn += new_burn;
+            user_burn.accBurnPerShare += new_burn * 1e12 / user_burn.sum_balances;
 
             user_burn.latestTime = block.timestamp;
         }
@@ -214,35 +215,24 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         balance = _balances[account] - pendingBurn;
     }
 
-    function _refreshBalance(address account) internal {
-        //uint256 pendingBurn = accountInfo[account].burnShare * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
-        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
+    function _settleWithPendingBurn(address account) internal { // user account only
+        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - Users[account].debtToPendingBurn;
         if (pendingBurn > 0) {
             user_burn.pending_burn -= pendingBurn;
-            user_burn.sum_balance -= pendingBurn;
             _balances[account] -= pendingBurn;
+            user_burn.sum_balances -= pendingBurn;
+            Users[account].debtToPendingBurn =  _balances[account] * user_burn.accBurnPerShare
         }
-        //accountInfo[account].burnShare = _balances[account];
-        //accountInfo[account].burnDebt = accountInfo[account].burnShare * user_burn.accBurnPerShare;
-        accountInfo[account].burnDebt = _balances[account] * user_burn.accBurnPerShare;
     }
 
-    function _changeBalance(address account, uint256 amount, bool addNotSubtract) internal {
-        //uint256 pendingBurn = accountInfo[account].burnShare * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
-        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
-        if (pendingBurn > 0) {
-            user_burn.pending_burn -= pendingBurn;
-        }
-        uint256 delta = pendingBurn + addNotSubtract ? - amount : amount;
-        user_burn.sum_balance -= delta;
-        _balances[account] -= delta;
+    function _changeBalance(address account, uint256 amount, bool addNotSubtract) internal { // user account only
+        _settleWithPendingBurn(account);
+        _balances[account] += addNotSubtract ? amount : - amount;
+        Users[account].debtToPendingBurn =  _balances[account] * user_burn.accBurnPerShare;
 
-        //accountInfo[account].burnShare = _balances[account];
-        //accountInfo[account].burnDebt = accountInfo[account].burnShare * user_burn.accBurnPerShare; 
-        accountInfo[account].burnDebt = accountInfo[account].burnShare * user_burn.accBurnPerShare; 
-    }
+    } 
 
-    //==================== Modifiers. Some of them required by super classes ====================
+    //========== Modifiers. Some of them required by super classes ====================
     modifier onlySessionManager override virtual {
         require(msg.sender == address(this) 
         || msg.sender == nodes.maker  
