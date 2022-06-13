@@ -72,6 +72,14 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
     event DelegateVotesChanged(address indexed delegate, uint256 previousBalance, uint256 newBalance);
     event SwapAndLiquify(uint256 crssPart, uint256 crssForEthPart, uint256 ethPart, uint256 liquidity);
 
+    //=================== TGR =========================
+    
+    struct User {
+        uint256 debtToPendingBurn;        
+    }
+    mapping(address => User) Users;
+
+    //=================================================
     receive() external payable {}
 
     function informOfPair(address pair, address token0, address token1, address caller) public override virtual {
@@ -80,6 +88,31 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         getPairQuick[token0][token1] = pair;
         getPairQuick[token1][token0] = pair;
     }
+
+    address constant zero_address = 0x0000000000000000000000000000000000000000;
+
+    address admin;
+    address alice;
+    address bob;
+    address carol;
+
+    address tgrftm; // tgr_bnb
+    address tgrhtz; // tgr_mck
+    address votes; // tgr_mck2
+
+    struct Pulse {
+        uint256 lastestTime;
+        uint256 cycle;
+        uint256 decayRate;
+        address account;
+        uint256 accDecayPerShare;
+        uint256 sum_balances;
+        uint256 pending_burn;
+    }
+
+    Pulse public lp_reward;
+    Pulse public vote_burn;
+    Pulse public user_burn;
 
     constructor() Ownable() {
         GovLib.test();
@@ -92,33 +125,40 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         // Mint 1e6 TGR to the caller for testing - MUST BE REMOVED WHEN DEPLOY
         _mint(_msgSender(), 1e6 * 10 ** _decimals);
         _moveDelegates(address(0), _delegates[_msgSender()], 1e6 * 10 ** _decimals);
+
+        //--------- test users ---------
+        admin = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+        alice = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
+        bob = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;
+        carol = 0x90F79bf6EB2c4f870365E785982E1f101E93b906;
+
+        tgrftm = 0x97713c3c752F3bb80CBFAaCC6830a36A72Eb6E97; // tgr_bnb
+        tgrhtz = 0x3924A2cf72d190023667609Dd91e70Ed11127D78; // tgr_mck
+        votes = 0x02EED5Ac83f1c3D1624c0437c9E682e83E95BcFf; // tgr_mck2
+
+        lp_reward = Pulse(tgrftm, 0, 2 seconds, 690, 0, 0, 0);
+        vote_burn = Pulse(votes, 0, 2 seconds, 70, 0, 0, 0);
+        user_burn = Pulse(zero_address, 0, 4 seconds, 777, 0, 0, 0);
+
     }
 
     //------------------- pulses ------------------------------------
 
-    address tgrftm = 0x97713c3c752F3bb80CBFAaCC6830a36A72Eb6E97; // tgr_bnb
-    address tgrhtz = 0x3924A2cf72d190023667609Dd91e70Ed11127D78; // tgr_mck
-    address votes = 0x02EED5Ac83f1c3D1624c0437c9E682e83E95BcFf; // tgr_mck2
 
-    Pulse_LP_Reward public lp_reward;
-    Pulse_Vote_Burn public vote_burn;
-    Pulse_User_Burn public user_burn;
-
-    mapping(address => AccountInfo) accountInfo;
-                                
-    address admin = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-    address alice = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
-    address bob = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;
-    address carol = 0x90F79bf6EB2c4f870365E785982E1f101E93b906;
-
-    function _getDecay(uint256 latestTime, uint256 cycle, uint256 dacayRate) internal pure returns (uint256 decayPer1e12) {
-
+    function _getDecay(Pulse pulse) internal pure returns (uint256 decayPer1e12) {
+        // pulse.lastTime, pulse.cycle, pulse.decayRate
     }
 
     function _checkConsistency() internal view {
-        uint256 totalSupply = user_burn.sum_balance - user_burn.pending_burn + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes];
-        assert (user_burn.sum_balance + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply);
-        assert (_balance[owner] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balance);
+        assert (user_burn.sum_balances + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply);
+        assert (_balance[owner] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balances);
+        // totalSupply = _totalSupply - user_burn.pending_burn
+        // balanceOf(account) = _isUserAccount(account) ? _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn : _balances[account]
+        // user_burn.accDecayPerShare += new_pending_burn * 1e12 / user_burn.sum_balances;
+        // transfer(sender, recipient, amount)
+        // if _isUserAccount(sender) 
+            // burn out pending_burn NOW
+            //...
     }
 
     function _isUserAccount(address account) internal view returns (bool yes) {
@@ -134,7 +174,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         // 0.69% of XDAO/FTM LP has the XDAO side sold for FTM, 
         // then the FTM is used to buy HTZ which is added to XDAO lps airdrop rewards every 12 hours.
 
-        uint256 decayPer1e12 = _getDecay(lp_reward.latestTime, lp_reward.cycle, lp_reward.decayRate);
+        uint256 decayPer1e12 = _getDecay(lp_reward);
         // Use decayPer12 portion of tgrftm pool to obtain FTM to buy HTZ tokens at the htzftm pool, then add them to airdrop rewards.
         // TGR/FTM price falls and HTZ/FTM price rises, at their respective pools.
 
@@ -144,7 +184,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
     function pulse_vote_burn() external {
         // 0.07% of tokens in the Agency dapp actively being used for voting burned every 12 hours.
 
-        uint256 decayPer1e12 = _getDecay(vote_burn.latestTime, vote_burn.cycle, vote_burn.decayRate);
+        uint256 decayPer1e12 = _getDecay(vote_burn);
         // burn decayPer1e12 portion of vote_burn.account's balance. vote_burn.account should be share-based staking account.
 
         vote_burn.latestTime = block.timestamp;
@@ -156,11 +196,9 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         // Interpretation: TGR tokens not in Cyberswap accounts, which are tgrftm and tgrhtz, and not in Agency account, 
         // which is the votes account, will be burned at the above rate and interval.
 
-        uint256 decayPer1e12 = _getDecay(user_burn.latestTime, user_burn.cycle, user_burn.decayRate);
+        uint256 decayPer1e12 = _getDecay(user_burn);
         if (decayPer1e12 > 0) {
-            // 1. burn decayPer1e12 of vote_burn.account's balance
-
-            // 2. nominally burn all other accounts' balance.
+            // nominally burn all user accounts' balance.
             uint256 total_value = user_burn.sum_balance - user_burn.pending_burn; //
             uint256 burn = total_value * decayPer1e12 / 1e12;
             user_burn.pending_burn += burn;
@@ -197,7 +235,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         }
         uint256 delta = pendingBurn + addNotSubtract ? - amount : amount;
         user_burn.sum_balance -= delta;
-        _balances[account] -= delat;
+        _balances[account] -= delta;
 
         //accountInfo[account].burnShare = _balances[account];
         //accountInfo[account].burnDebt = accountInfo[account].burnShare * user_burn.accBurnPerShare; 
