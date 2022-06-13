@@ -211,7 +211,7 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
 
     function _balanceOf(address account) internal view returns (uint256 balance) {
         //uint256 pendingBurn = accountInfo[account].burnShare * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
-        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - accountInfo[account].burnDebt;
+        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - Users[account].debtToPendingBurn;
         balance = _balances[account] - pendingBurn;
     }
 
