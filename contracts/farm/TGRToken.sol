@@ -392,7 +392,7 @@ contract TGRToken is Ownable, ITGRToken {
             abs_error = net_collective - sum_net_of_users;
         }
 
-        require( 100 * abs_error < net_collective, "error exceeds 1%");
+        require( 1000 * abs_error < net_collective, "error exceeds 0.1%");
     }
 
 }
