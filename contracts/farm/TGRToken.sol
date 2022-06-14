@@ -64,9 +64,10 @@ contract TGRToken is Ownable, ITGRToken {
 
     function _checkForConsistency() internal view {
         // Defines user_burn attributes, based on the ERC20 core data.
-
-        assert (user_burn.sum_balances + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply);
-        assert (_balances[admin] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balances);
+        require(user_burn.sum_balances + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply, 
+        "sum_balances + _bal[tgrftm] + _bal[tgrhtz + _bal[votes != _totalSupply");
+        require(_balances[admin] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balances,
+        "_bal[admin] + _bal[alice] + _bal[bob] + _bal[carol] != sum_balances");
     }
 
     function _isUserAccount(address account) internal view returns (bool) {
@@ -368,7 +369,8 @@ contract TGRToken is Ownable, ITGRToken {
 
     function checkForConsistency() external view {
         _checkForConsistency();
-        assert(user_burn.sum_balances - user_burn.pending_burn == balanceOf(admin) + balanceOf(alice) + balanceOf(bob) + balanceOf(carol));
+        // require(user_burn.sum_balances - user_burn.pending_burn == balanceOf(admin) + balanceOf(alice) + balanceOf(bob) + balanceOf(carol),
+        // "sum_balances - pending_burn != balOf(admin) + balOf(alice) + balOf(bob) + balOf(carol)");
     }
 
 }

@@ -134,6 +134,16 @@ describe("====================== Stage 1: ======================\n".yellow, asyn
         await tgr.pulse_user_burn();
         await showVirtualBurn();
 
+        await tgr.connect(owner).transfer(bob.address, ethToWei(1000));
+        await mintBlocks(5);
+        await tgr.pulse_user_burn();
+        await showVirtualBurn();
+
+        await tgr.connect(owner).transfer(carol.address, ethToWei(5000));
+        await mintBlocks(5);
+        await tgr.pulse_user_burn();
+        await showVirtualBurn();
+
 
     });
 
