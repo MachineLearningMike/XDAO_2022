@@ -99,6 +99,9 @@ async function showVirtualBurn() {
     
     console.log("\towner: %s, alice: %s, bob: %s, carol: %s",
     await tgr.balanceOf(owner.address), await tgr.balanceOf(alice.address), await tgr.balanceOf(bob.address), await tgr.balanceOf(carol.address) );
+
+    await tgr.checkForConsistency();
+    console.log("\tConsistency checked!");
 }
 
 describe("====================== Stage 1: ======================\n".yellow, async function () {

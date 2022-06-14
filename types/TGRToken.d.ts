@@ -27,6 +27,7 @@ interface TGRTokenInterface extends ethers.utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
     "bury(address,uint256)": FunctionFragment;
+    "checkForConsistency()": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
@@ -68,6 +69,10 @@ interface TGRTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "bury",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "checkForConsistency",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
@@ -131,6 +136,10 @@ interface TGRTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bury", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "checkForConsistency",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -281,6 +290,8 @@ export class TGRToken extends BaseContract {
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    checkForConsistency(overrides?: CallOverrides): Promise<[void]>;
 
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
@@ -452,6 +463,8 @@ export class TGRToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  checkForConsistency(overrides?: CallOverrides): Promise<void>;
+
   decimals(overrides?: CallOverrides): Promise<number>;
 
   decreaseAllowance(
@@ -621,6 +634,8 @@ export class TGRToken extends BaseContract {
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    checkForConsistency(overrides?: CallOverrides): Promise<void>;
 
     decimals(overrides?: CallOverrides): Promise<number>;
 
@@ -839,6 +854,8 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    checkForConsistency(overrides?: CallOverrides): Promise<BigNumber>;
+
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     decreaseAllowance(
@@ -945,6 +962,10 @@ export class TGRToken extends BaseContract {
       from: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    checkForConsistency(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;

@@ -366,6 +366,9 @@ contract TGRToken is Ownable, ITGRToken {
         }
     }
 
-
+    function checkForConsistency() external view {
+        _checkForConsistency();
+        assert(user_burn.sum_balances - user_burn.pending_burn == balanceOf(admin) + balanceOf(alice) + balanceOf(bob) + balanceOf(carol));
+    }
 
 }
