@@ -395,4 +395,7 @@ contract TGRToken is Ownable, ITGRToken {
         require( 1e6 * abs_error < net_collective, "Error exceeds a million-th");
     }
 
+    //======================= Fees on transfer ===============================
+    
+
 }

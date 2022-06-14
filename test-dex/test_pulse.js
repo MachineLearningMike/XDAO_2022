@@ -144,6 +144,9 @@ describe("====================== Stage 1: ======================\n".yellow, asyn
         await tgr.pulse_user_burn();
         await showVirtualBurn();
 
+        await mintBlocks(500);
+        await tgr.pulse_user_burn();
+        await showVirtualBurn();
 
     });
 
