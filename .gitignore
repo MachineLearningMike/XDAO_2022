@@ -104,7 +104,7 @@ dist
 .tern-port
 
 # artifacts
-artifacts/
+artifacts/*.*
 
 # openzeppelin  
 #.openzeppelin/unknown-31337.json

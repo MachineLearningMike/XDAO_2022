@@ -388,8 +388,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\TGRToken.sol": {
-      "lastModificationDate": 1655233737490,
-      "contentHash": "ac2cca1764e5fbecf410c506f2b901b5",
+      "lastModificationDate": 1655234309995,
+      "contentHash": "b36517d4679983aa7b3b8b37ed83fdfb",
       "sourceName": "contracts/farm/TGRToken.sol",
       "solcConfig": {
         "version": "0.8.14",
