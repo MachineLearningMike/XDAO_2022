@@ -76,12 +76,12 @@ contract TGRToken is Ownable, ITGRToken {
 
 
     function _settleWithPendingBurn(address account) internal { // user account only
-        uint256 pendingBurn = _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn;
+        uint256 pendingBurn = _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn; // smaller than its real value
         if (pendingBurn > 0) {
-            _balances[account] -= pendingBurn;
-            _totalSupply -= pendingBurn;
-            user_burn.sum_balances -= pendingBurn;
-            user_burn.pending_burn -= pendingBurn;
+            _balances[account] -= pendingBurn; // larger than its real value
+            _totalSupply -= pendingBurn; // larger than its real value
+            user_burn.sum_balances -= pendingBurn; // larger
+            user_burn.pending_burn -= pendingBurn; // larger
             Users[account].debtToPendingBurn =  _balances[account] * user_burn.accDecayPerShare / 1e12;
         }
     }
@@ -125,8 +125,10 @@ contract TGRToken is Ownable, ITGRToken {
 
     function _balanceOf(address account) internal view returns (uint256 balance) {
         if (_isUserAccount(account)) {
+            // This line of code produces dust, due to numerical error. pendingBurn becomes less than its real value.
             uint256 pendingBurn = _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn;
-            balance = _balances[account] - pendingBurn;
+            // so, balance becomes greater than its real value.
+            balance = _balances[account] - pendingBurn; // larger than its real value
         } else {
             balance = _balances[account];
         }
@@ -243,7 +245,7 @@ contract TGRToken is Ownable, ITGRToken {
     }
 
     function balanceOf(address account) public view override virtual returns (uint256) {
-        return _balanceOf(account);
+        return _balanceOf(account); // larger than its real value
     }
 
     function mint(address to, uint256 amount) public override onlyOwner {
@@ -319,7 +321,12 @@ contract TGRToken is Ownable, ITGRToken {
                 decayPer1e12 = 1e12 - 1e12 * numerator / denominator;
             } else {
                 (uint256 P, uint256 Q) = analyticMath.pow(FeeMagnifier - pulse.decayRate, FeeMagnifier, missingRounds, uint256(1));
+                // Function pow(a, b, c, d) approximates the power of a / b by c / d.
+                // When a >= b, the output of this function is guaranteed to be smaller than or equal to the actual value of (a / b) ^ (c / d).
+                // When a <= b, the output of this function is guaranteed to be larger than or equal to the actual value of (a / b) ^ (c / d).
+                // As a <= b, the output is larger than its real value.
                 decayPer1e12 = 1e12 - 1e12 * P / Q;
+                // Now, decayPer1e12 is smaller than its real value.
             }
         }
     }
@@ -333,7 +340,7 @@ contract TGRToken is Ownable, ITGRToken {
             uint256 missingRounds = lp_reward.latestRound - round;
             lp_reward.latestRound = round;
 
-            uint256 decayPer1e12 = _getDecayPer1e12(lp_reward);
+            uint256 decayPer1e12 = _getDecayPer1e12(lp_reward); // smaller than its real value.
             // Use decayPer12 portion of tgrftm pool to obtain FTM to buy HTZ tokens at the htzftm pool, then add them to airdrop rewards.
             // TGR/FTM price falls and HTZ/FTM price rises, at their respective pools.
 
@@ -344,7 +351,7 @@ contract TGRToken is Ownable, ITGRToken {
     function pulse_vote_burn() external {
         // 0.07% of tokens in the Agency dapp actively being used for voting burned every 12 hours.
 
-        uint256 decayPer1e12 = _getDecayPer1e12(vote_burn);
+        uint256 decayPer1e12 = _getDecayPer1e12(vote_burn); // smaller than its real value.
         // burn decayPer1e12 portion of votes account's TRG balance.
         _burn(vote_burn.account, _balances[vote_burn.account] * decayPer1e12 / 1e12);
 
@@ -356,12 +363,12 @@ contract TGRToken is Ownable, ITGRToken {
         // Interpretation: TGR tokens not in Cyberswap accounts (tgrftm and tgrhtz), and not in Agency account (votes account), 
         // will be burned at the above rate and interval.
 
-        uint256 decayPer1e12 = _getDecayPer1e12(user_burn);
+        uint256 decayPer1e12 = _getDecayPer1e12(user_burn); // smaller than its real value.
         if (decayPer1e12 > 0) {
             uint256 net_value = user_burn.sum_balances - user_burn.pending_burn;
-            uint256 new_burn = net_value * decayPer1e12 / 1e12;
+            uint256 new_burn = net_value * decayPer1e12 / 1e12;  // smaller than its real value
             user_burn.pending_burn += new_burn;
-            user_burn.accDecayPerShare += new_burn * 1e12 / user_burn.sum_balances;   // Note: user_burn.sum_balance vs. net_value
+            user_burn.accDecayPerShare += new_burn * 1e12 / user_burn.sum_balances;   // smaller than its real value
 
             user_burn.latestTime = block.timestamp;
         }
@@ -369,8 +376,23 @@ contract TGRToken is Ownable, ITGRToken {
 
     function checkForConsistency() external view {
         _checkForConsistency();
+
+        // This requirement cannot be met due to numerical errors.
         // require(user_burn.sum_balances - user_burn.pending_burn == balanceOf(admin) + balanceOf(alice) + balanceOf(bob) + balanceOf(carol),
         // "sum_balances - pending_burn != balOf(admin) + balOf(alice) + balOf(bob) + balOf(carol)");
+
+        // Instead, 
+        uint256 net_collective = user_burn.sum_balances - user_burn.pending_burn;
+        uint256 sum_net_of_users = balanceOf(admin) + balanceOf(alice) + balanceOf(bob) + balanceOf(carol);
+
+        uint256 abs_error;
+        if (net_collective < sum_net_of_users) {
+            abs_error = sum_net_of_users - net_collective;
+        } else {
+            abs_error = net_collective - sum_net_of_users;
+        }
+
+        require( 100 * abs_error < net_collective, "error exceeds 1%");
     }
 
 }
