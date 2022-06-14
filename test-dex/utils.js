@@ -47,16 +47,12 @@ exports.deployGovLib = async function (deployer) {
 };
 
 
-exports.deployTGR = async function (deployer, wireLib, governanceLib) {
+exports.deployTGR = async function (deployer, analyticMath) {
   const TGRToken = await ethers.getContractFactory("TGRToken", {
     signer: deployer,
-    libraries: {
-      WireLib: wireLib,
-      GovLib: governanceLib,
-    },
-  });
+});
 
-  const crssToken = await TGRToken.connect(deployer).deploy();
+  const crssToken = await TGRToken.connect(deployer).deploy(analyticMath);
   await crssToken.deployed();
 
   return crssToken;

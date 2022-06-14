@@ -26,11 +26,8 @@ interface ITGRTokenInterface extends ethers.utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
     "bury(address,uint256)": FunctionFragment;
-    "changeMaxTransferAmountRate(uint256)": FunctionFragment;
     "maxSupply()": FunctionFragment;
-    "maxTransferAmountRate()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
-    "tolerableTransfer(address,address,uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
@@ -53,22 +50,10 @@ interface ITGRTokenInterface extends ethers.utils.Interface {
     functionFragment: "bury",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "changeMaxTransferAmountRate",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "maxSupply", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "maxTransferAmountRate",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "mint",
     values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "tolerableTransfer",
-    values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -88,20 +73,8 @@ interface ITGRTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bury", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "changeMaxTransferAmountRate",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "maxSupply", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "maxTransferAmountRate",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "tolerableTransfer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
     data: BytesLike
@@ -203,25 +176,11 @@ export class ITGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    changeMaxTransferAmountRate(
-      _maxTransferAmountRate: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     maxSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    maxTransferAmountRate(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     mint(
       to: string,
       amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    tolerableTransfer(
-      from: string,
-      to: string,
-      value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -267,25 +226,11 @@ export class ITGRToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  changeMaxTransferAmountRate(
-    _maxTransferAmountRate: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-  maxTransferAmountRate(overrides?: CallOverrides): Promise<BigNumber>;
 
   mint(
     to: string,
     amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  tolerableTransfer(
-    from: string,
-    to: string,
-    value: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -331,27 +276,13 @@ export class ITGRToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    changeMaxTransferAmountRate(
-      _maxTransferAmountRate: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxTransferAmountRate(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       to: string,
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    tolerableTransfer(
-      from: string,
-      to: string,
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -434,25 +365,11 @@ export class ITGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    changeMaxTransferAmountRate(
-      _maxTransferAmountRate: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxTransferAmountRate(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       to: string,
       amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    tolerableTransfer(
-      from: string,
-      to: string,
-      value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -502,27 +419,11 @@ export class ITGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    changeMaxTransferAmountRate(
-      _maxTransferAmountRate: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     maxSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    maxTransferAmountRate(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     mint(
       to: string,
       amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    tolerableTransfer(
-      from: string,
-      to: string,
-      value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

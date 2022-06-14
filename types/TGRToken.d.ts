@@ -21,68 +21,33 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface TGRTokenInterface extends ethers.utils.Interface {
   functions: {
-    "DELEGATION_TYPEHASH()": FunctionFragment;
-    "DOMAIN_TYPEHASH()": FunctionFragment;
     "_decreaseAllowance(address,address,uint256)": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
     "bury(address,uint256)": FunctionFragment;
-    "changeMaxTransferAmountRate(uint256)": FunctionFragment;
-    "checkpoints(address,uint32)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
-    "delegate(address)": FunctionFragment;
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "delegates(address)": FunctionFragment;
-    "feeRates(uint8)": FunctionFragment;
-    "feeStores()": FunctionFragment;
-    "getCurrentVotes(address)": FunctionFragment;
-    "getInnermostSType()": FunctionFragment;
-    "getOutermostSType()": FunctionFragment;
-    "getOwner()": FunctionFragment;
-    "getPairQuick(address,address)": FunctionFragment;
-    "getPriorVotes(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "informOfPair(address,address,address,address)": FunctionFragment;
+    "lp_reward()": FunctionFragment;
     "maxSupply()": FunctionFragment;
-    "maxTransferAmount()": FunctionFragment;
-    "maxTransferAmountRate()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
-    "nextNode()": FunctionFragment;
-    "nonces(address)": FunctionFragment;
-    "numCheckpoints(address)": FunctionFragment;
     "owner()": FunctionFragment;
-    "pairs(address)": FunctionFragment;
-    "payFeeTGRLogic(address,uint256,(uint32,uint32,uint32,uint32),bool)": FunctionFragment;
-    "prevNode()": FunctionFragment;
-    "registerSession(uint8)": FunctionFragment;
+    "pulse_lp_reward()": FunctionFragment;
+    "pulse_user_burn()": FunctionFragment;
+    "pulse_vote_burn()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "session()": FunctionFragment;
-    "sessionsLastSeenBySType(uint8)": FunctionFragment;
-    "setFeeRates(uint8,(uint32,uint32,uint32,uint32),address)": FunctionFragment;
-    "setFeeStores((address,address,address,address),address)": FunctionFragment;
-    "setNode(uint8,address,address)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "tolerableTransfer(address,address,uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "unregisterSession()": FunctionFragment;
-    "wire(address,address)": FunctionFragment;
+    "user_burn()": FunctionFragment;
+    "vote_burn()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "DELEGATION_TYPEHASH",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "DOMAIN_TYPEHASH",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "_decreaseAllowance",
     values: [string, string, BigNumberish]
@@ -104,145 +69,40 @@ interface TGRTokenInterface extends ethers.utils.Interface {
     functionFragment: "bury",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "changeMaxTransferAmountRate",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "checkpoints",
-    values: [string, BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "decreaseAllowance",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "delegate", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "delegateBySig",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(functionFragment: "delegates", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "feeRates",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "feeStores", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "getCurrentVotes",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getInnermostSType",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getOutermostSType",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "getOwner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "getPairQuick",
-    values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getPriorVotes",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "increaseAllowance",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "informOfPair",
-    values: [string, string, string, string]
-  ): string;
+  encodeFunctionData(functionFragment: "lp_reward", values?: undefined): string;
   encodeFunctionData(functionFragment: "maxSupply", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "maxTransferAmount",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "maxTransferAmountRate",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "mint",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nextNode", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "numCheckpoints",
-    values: [string]
-  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "pairs", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "payFeeTGRLogic",
-    values: [
-      string,
-      BigNumberish,
-      {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      boolean
-    ]
+    functionFragment: "pulse_lp_reward",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "prevNode", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "registerSession",
-    values: [BigNumberish]
+    functionFragment: "pulse_user_burn",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "pulse_vote_burn",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "session", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "sessionsLastSeenBySType",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setFeeRates",
-    values: [
-      BigNumberish,
-      {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setFeeStores",
-    values: [
-      { develop: string; buyback: string; liquidity: string; treasury: string },
-      string
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setNode",
-    values: [BigNumberish, string, string]
-  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "tolerableTransfer",
-    values: [string, string, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
     values?: undefined
@@ -259,23 +119,9 @@ interface TGRTokenInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "unregisterSession",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "wire",
-    values: [string, string]
-  ): string;
+  encodeFunctionData(functionFragment: "user_burn", values?: undefined): string;
+  encodeFunctionData(functionFragment: "vote_burn", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "DELEGATION_TYPEHASH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "DOMAIN_TYPEHASH",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "_decreaseAllowance",
     data: BytesLike
@@ -285,107 +131,37 @@ interface TGRTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bury", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "changeMaxTransferAmountRate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "checkpoints",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "delegate", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "delegateBySig",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "delegates", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "feeRates", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "feeStores", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getCurrentVotes",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getInnermostSType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getOutermostSType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "getOwner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getPairQuick",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getPriorVotes",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "increaseAllowance",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "informOfPair",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "lp_reward", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "maxSupply", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "maxTransferAmount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "maxTransferAmountRate",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nextNode", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "numCheckpoints",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "pairs", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "payFeeTGRLogic",
+    functionFragment: "pulse_lp_reward",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "prevNode", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "registerSession",
+    functionFragment: "pulse_user_burn",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "pulse_vote_burn",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "session", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "sessionsLastSeenBySType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setFeeRates",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setFeeStores",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "setNode", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "tolerableTransfer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
     data: BytesLike
@@ -399,32 +175,17 @@ interface TGRTokenInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "unregisterSession",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "wire", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "user_burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "vote_burn", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
-    "DelegateChanged(address,address,address)": EventFragment;
-    "DelegateVotesChanged(address,uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
-    "SetFeeRates(uint8,tuple)": EventFragment;
-    "SetFeeStores(tuple)": EventFragment;
-    "SetNode(uint8,address,address)": EventFragment;
-    "SwapAndLiquify(uint256,uint256,uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DelegateChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DelegateVotesChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetFeeRates"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetFeeStores"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetNode"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SwapAndLiquify"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
@@ -436,79 +197,8 @@ export type ApprovalEvent = TypedEvent<
   }
 >;
 
-export type DelegateChangedEvent = TypedEvent<
-  [string, string, string] & {
-    delegator: string;
-    fromDelegate: string;
-    toDelegate: string;
-  }
->;
-
-export type DelegateVotesChangedEvent = TypedEvent<
-  [string, BigNumber, BigNumber] & {
-    delegate: string;
-    previousBalance: BigNumber;
-    newBalance: BigNumber;
-  }
->;
-
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
->;
-
-export type SetFeeRatesEvent = TypedEvent<
-  [
-    number,
-    [number, number, number, number] & {
-      develop: number;
-      buyback: number;
-      liquidity: number;
-      treasury: number;
-    }
-  ] & {
-    _sessionType: number;
-    _feeRates: [number, number, number, number] & {
-      develop: number;
-      buyback: number;
-      liquidity: number;
-      treasury: number;
-    };
-  }
->;
-
-export type SetFeeStoresEvent = TypedEvent<
-  [
-    [string, string, string, string] & {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    }
-  ] & {
-    _feeStores: [string, string, string, string] & {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    };
-  }
->;
-
-export type SetNodeEvent = TypedEvent<
-  [number, string, string] & {
-    nodeType: number;
-    node: string;
-    msgSender: string;
-  }
->;
-
-export type SwapAndLiquifyEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, BigNumber] & {
-    crssPart: BigNumber;
-    crssForEthPart: BigNumber;
-    ethPart: BigNumber;
-    liquidity: BigNumber;
-  }
 >;
 
 export type TransferEvent = TypedEvent<
@@ -559,10 +249,6 @@ export class TGRToken extends BaseContract {
   interface: TGRTokenInterface;
 
   functions: {
-    DELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
-
-    DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
-
     _decreaseAllowance(
       _owner: string,
       _spender: string,
@@ -596,17 +282,6 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    changeMaxTransferAmountRate(
-      _maxTransferAmountRate: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    checkpoints(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[number, BigNumber] & { fromBlock: number; votes: BigNumber }>;
-
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     decreaseAllowance(
@@ -615,88 +290,37 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    delegate(
-      delegatee: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    delegateBySig(
-      delegatee: string,
-      nonce: BigNumberish,
-      expiry: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    delegates(delegator: string, overrides?: CallOverrides): Promise<[string]>;
-
-    feeRates(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [number, number, number, number] & {
-        develop: number;
-        buyback: number;
-        liquidity: number;
-        treasury: number;
-      }
-    >;
-
-    feeStores(
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, string, string] & {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      }
-    >;
-
-    getCurrentVotes(
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    getInnermostSType(overrides?: CallOverrides): Promise<[number]>;
-
-    getOutermostSType(overrides?: CallOverrides): Promise<[number]>;
-
-    getOwner(overrides?: CallOverrides): Promise<[string]>;
-
-    getPairQuick(
-      arg0: string,
-      arg1: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    getPriorVotes(
-      account: string,
-      blockNumber: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    informOfPair(
-      pair: string,
-      token0: string,
-      token1: string,
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    lp_reward(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        string,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        latestTime: BigNumber;
+        cycle: BigNumber;
+        decayRate: BigNumber;
+        account: string;
+        accDecayPerShare: BigNumber;
+        sum_balances: BigNumber;
+        pending_burn: BigNumber;
+        latestRound: BigNumber;
+      }
+    >;
 
     maxSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    maxTransferAmount(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    maxTransferAmountRate(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     mint(
       to: string,
@@ -706,36 +330,17 @@ export class TGRToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    nextNode(overrides?: CallOverrides): Promise<[string]>;
-
-    nonces(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<[number]>;
-
     owner(overrides?: CallOverrides): Promise<[string]>;
 
-    pairs(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[string, string] & { token0: string; token1: string }>;
-
-    payFeeTGRLogic(
-      payer: string,
-      principal: BigNumberish,
-      rates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      fromAllowance: boolean,
+    pulse_lp_reward(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    prevNode(overrides?: CallOverrides): Promise<[string]>;
+    pulse_user_burn(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    registerSession(
-      sessionType: BigNumberish,
+    pulse_vote_burn(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -743,51 +348,7 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    session(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    sessionsLastSeenBySType(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    setFeeRates(
-      _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setNode(
-      nodeType: BigNumberish,
-      node: string,
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     symbol(overrides?: CallOverrides): Promise<[string]>;
-
-    tolerableTransfer(
-      from: string,
-      to: string,
-      value: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -809,20 +370,54 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    unregisterSession(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    user_burn(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        string,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        latestTime: BigNumber;
+        cycle: BigNumber;
+        decayRate: BigNumber;
+        account: string;
+        accDecayPerShare: BigNumber;
+        sum_balances: BigNumber;
+        pending_burn: BigNumber;
+        latestRound: BigNumber;
+      }
+    >;
 
-    wire(
-      _prevNode: string,
-      _nextNode: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    vote_burn(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        string,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        latestTime: BigNumber;
+        cycle: BigNumber;
+        decayRate: BigNumber;
+        account: string;
+        accDecayPerShare: BigNumber;
+        sum_balances: BigNumber;
+        pending_burn: BigNumber;
+        latestRound: BigNumber;
+      }
+    >;
   };
-
-  DELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<string>;
-
-  DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
   _decreaseAllowance(
     _owner: string,
@@ -857,17 +452,6 @@ export class TGRToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  changeMaxTransferAmountRate(
-    _maxTransferAmountRate: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  checkpoints(
-    arg0: string,
-    arg1: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<[number, BigNumber] & { fromBlock: number; votes: BigNumber }>;
-
   decimals(overrides?: CallOverrides): Promise<number>;
 
   decreaseAllowance(
@@ -876,88 +460,37 @@ export class TGRToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  delegate(
-    delegatee: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  delegateBySig(
-    delegatee: string,
-    nonce: BigNumberish,
-    expiry: BigNumberish,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  delegates(delegator: string, overrides?: CallOverrides): Promise<string>;
-
-  feeRates(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [number, number, number, number] & {
-      develop: number;
-      buyback: number;
-      liquidity: number;
-      treasury: number;
-    }
-  >;
-
-  feeStores(
-    overrides?: CallOverrides
-  ): Promise<
-    [string, string, string, string] & {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    }
-  >;
-
-  getCurrentVotes(
-    account: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getInnermostSType(overrides?: CallOverrides): Promise<number>;
-
-  getOutermostSType(overrides?: CallOverrides): Promise<number>;
-
-  getOwner(overrides?: CallOverrides): Promise<string>;
-
-  getPairQuick(
-    arg0: string,
-    arg1: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  getPriorVotes(
-    account: string,
-    blockNumber: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   increaseAllowance(
     spender: string,
     addedValue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  informOfPair(
-    pair: string,
-    token0: string,
-    token1: string,
-    caller: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  lp_reward(
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      string,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      latestTime: BigNumber;
+      cycle: BigNumber;
+      decayRate: BigNumber;
+      account: string;
+      accDecayPerShare: BigNumber;
+      sum_balances: BigNumber;
+      pending_burn: BigNumber;
+      latestRound: BigNumber;
+    }
+  >;
 
   maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-  maxTransferAmount(overrides?: CallOverrides): Promise<BigNumber>;
-
-  maxTransferAmountRate(overrides?: CallOverrides): Promise<BigNumber>;
 
   mint(
     to: string,
@@ -967,36 +500,17 @@ export class TGRToken extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  nextNode(overrides?: CallOverrides): Promise<string>;
-
-  nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<number>;
-
   owner(overrides?: CallOverrides): Promise<string>;
 
-  pairs(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<[string, string] & { token0: string; token1: string }>;
-
-  payFeeTGRLogic(
-    payer: string,
-    principal: BigNumberish,
-    rates: {
-      develop: BigNumberish;
-      buyback: BigNumberish;
-      liquidity: BigNumberish;
-      treasury: BigNumberish;
-    },
-    fromAllowance: boolean,
+  pulse_lp_reward(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  prevNode(overrides?: CallOverrides): Promise<string>;
+  pulse_user_burn(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  registerSession(
-    sessionType: BigNumberish,
+  pulse_vote_burn(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1004,51 +518,7 @@ export class TGRToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  session(overrides?: CallOverrides): Promise<BigNumber>;
-
-  sessionsLastSeenBySType(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  setFeeRates(
-    _sessionType: BigNumberish,
-    _feeRates: {
-      develop: BigNumberish;
-      buyback: BigNumberish;
-      liquidity: BigNumberish;
-      treasury: BigNumberish;
-    },
-    caller: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setFeeStores(
-    _feeStores: {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    },
-    caller: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setNode(
-    nodeType: BigNumberish,
-    node: string,
-    caller: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   symbol(overrides?: CallOverrides): Promise<string>;
-
-  tolerableTransfer(
-    from: string,
-    to: string,
-    value: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1070,21 +540,55 @@ export class TGRToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  unregisterSession(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  user_burn(
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      string,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      latestTime: BigNumber;
+      cycle: BigNumber;
+      decayRate: BigNumber;
+      account: string;
+      accDecayPerShare: BigNumber;
+      sum_balances: BigNumber;
+      pending_burn: BigNumber;
+      latestRound: BigNumber;
+    }
+  >;
 
-  wire(
-    _prevNode: string,
-    _nextNode: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  vote_burn(
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      string,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      latestTime: BigNumber;
+      cycle: BigNumber;
+      decayRate: BigNumber;
+      account: string;
+      accDecayPerShare: BigNumber;
+      sum_balances: BigNumber;
+      pending_burn: BigNumber;
+      latestRound: BigNumber;
+    }
+  >;
 
   callStatic: {
-    DELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<string>;
-
-    DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<string>;
-
     _decreaseAllowance(
       _owner: string,
       _spender: string,
@@ -1118,17 +622,6 @@ export class TGRToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    changeMaxTransferAmountRate(
-      _maxTransferAmountRate: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    checkpoints(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[number, BigNumber] & { fromBlock: number; votes: BigNumber }>;
-
     decimals(overrides?: CallOverrides): Promise<number>;
 
     decreaseAllowance(
@@ -1137,85 +630,37 @@ export class TGRToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    delegate(delegatee: string, overrides?: CallOverrides): Promise<void>;
-
-    delegateBySig(
-      delegatee: string,
-      nonce: BigNumberish,
-      expiry: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    delegates(delegator: string, overrides?: CallOverrides): Promise<string>;
-
-    feeRates(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [number, number, number, number] & {
-        develop: number;
-        buyback: number;
-        liquidity: number;
-        treasury: number;
-      }
-    >;
-
-    feeStores(
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, string, string] & {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      }
-    >;
-
-    getCurrentVotes(
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getInnermostSType(overrides?: CallOverrides): Promise<number>;
-
-    getOutermostSType(overrides?: CallOverrides): Promise<number>;
-
-    getOwner(overrides?: CallOverrides): Promise<string>;
-
-    getPairQuick(
-      arg0: string,
-      arg1: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getPriorVotes(
-      account: string,
-      blockNumber: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    informOfPair(
-      pair: string,
-      token0: string,
-      token1: string,
-      caller: string,
+    lp_reward(
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        string,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        latestTime: BigNumber;
+        cycle: BigNumber;
+        decayRate: BigNumber;
+        account: string;
+        accDecayPerShare: BigNumber;
+        sum_balances: BigNumber;
+        pending_burn: BigNumber;
+        latestRound: BigNumber;
+      }
+    >;
 
     maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxTransferAmount(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxTransferAmountRate(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       to: string,
@@ -1225,93 +670,17 @@ export class TGRToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    nextNode(overrides?: CallOverrides): Promise<string>;
-
-    nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<number>;
-
     owner(overrides?: CallOverrides): Promise<string>;
 
-    pairs(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[string, string] & { token0: string; token1: string }>;
+    pulse_lp_reward(overrides?: CallOverrides): Promise<void>;
 
-    payFeeTGRLogic(
-      payer: string,
-      principal: BigNumberish,
-      rates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      fromAllowance: boolean,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    pulse_user_burn(overrides?: CallOverrides): Promise<void>;
 
-    prevNode(overrides?: CallOverrides): Promise<string>;
-
-    registerSession(
-      sessionType: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [number, BigNumber, BigNumber, boolean] & {
-        sessionType: number;
-        session: BigNumber;
-        lastSession: BigNumber;
-        isOriginAction: boolean;
-      }
-    >;
+    pulse_vote_burn(overrides?: CallOverrides): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    session(overrides?: CallOverrides): Promise<BigNumber>;
-
-    sessionsLastSeenBySType(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    setFeeRates(
-      _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      caller: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
-      caller: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setNode(
-      nodeType: BigNumberish,
-      node: string,
-      caller: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     symbol(overrides?: CallOverrides): Promise<string>;
-
-    tolerableTransfer(
-      from: string,
-      to: string,
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1333,13 +702,53 @@ export class TGRToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    unregisterSession(overrides?: CallOverrides): Promise<void>;
-
-    wire(
-      _prevNode: string,
-      _nextNode: string,
+    user_burn(
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        string,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        latestTime: BigNumber;
+        cycle: BigNumber;
+        decayRate: BigNumber;
+        account: string;
+        accDecayPerShare: BigNumber;
+        sum_balances: BigNumber;
+        pending_burn: BigNumber;
+        latestRound: BigNumber;
+      }
+    >;
+
+    vote_burn(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        string,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        latestTime: BigNumber;
+        cycle: BigNumber;
+        decayRate: BigNumber;
+        account: string;
+        accDecayPerShare: BigNumber;
+        sum_balances: BigNumber;
+        pending_burn: BigNumber;
+        latestRound: BigNumber;
+      }
+    >;
   };
 
   filters: {
@@ -1361,42 +770,6 @@ export class TGRToken extends BaseContract {
       { owner: string; spender: string; value: BigNumber }
     >;
 
-    "DelegateChanged(address,address,address)"(
-      delegator?: string | null,
-      fromDelegate?: string | null,
-      toDelegate?: string | null
-    ): TypedEventFilter<
-      [string, string, string],
-      { delegator: string; fromDelegate: string; toDelegate: string }
-    >;
-
-    DelegateChanged(
-      delegator?: string | null,
-      fromDelegate?: string | null,
-      toDelegate?: string | null
-    ): TypedEventFilter<
-      [string, string, string],
-      { delegator: string; fromDelegate: string; toDelegate: string }
-    >;
-
-    "DelegateVotesChanged(address,uint256,uint256)"(
-      delegate?: string | null,
-      previousBalance?: null,
-      newBalance?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { delegate: string; previousBalance: BigNumber; newBalance: BigNumber }
-    >;
-
-    DelegateVotesChanged(
-      delegate?: string | null,
-      previousBalance?: null,
-      newBalance?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { delegate: string; previousBalance: BigNumber; newBalance: BigNumber }
-    >;
-
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -1411,144 +784,6 @@ export class TGRToken extends BaseContract {
     ): TypedEventFilter<
       [string, string],
       { previousOwner: string; newOwner: string }
-    >;
-
-    "SetFeeRates(uint8,tuple)"(
-      _sessionType?: null,
-      _feeRates?: null
-    ): TypedEventFilter<
-      [
-        number,
-        [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        }
-      ],
-      {
-        _sessionType: number;
-        _feeRates: [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        };
-      }
-    >;
-
-    SetFeeRates(
-      _sessionType?: null,
-      _feeRates?: null
-    ): TypedEventFilter<
-      [
-        number,
-        [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        }
-      ],
-      {
-        _sessionType: number;
-        _feeRates: [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        };
-      }
-    >;
-
-    "SetFeeStores(tuple)"(
-      _feeStores?: null
-    ): TypedEventFilter<
-      [
-        [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        }
-      ],
-      {
-        _feeStores: [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        };
-      }
-    >;
-
-    SetFeeStores(
-      _feeStores?: null
-    ): TypedEventFilter<
-      [
-        [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        }
-      ],
-      {
-        _feeStores: [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        };
-      }
-    >;
-
-    "SetNode(uint8,address,address)"(
-      nodeType?: null,
-      node?: null,
-      msgSender?: null
-    ): TypedEventFilter<
-      [number, string, string],
-      { nodeType: number; node: string; msgSender: string }
-    >;
-
-    SetNode(
-      nodeType?: null,
-      node?: null,
-      msgSender?: null
-    ): TypedEventFilter<
-      [number, string, string],
-      { nodeType: number; node: string; msgSender: string }
-    >;
-
-    "SwapAndLiquify(uint256,uint256,uint256,uint256)"(
-      crssPart?: null,
-      crssForEthPart?: null,
-      ethPart?: null,
-      liquidity?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber, BigNumber, BigNumber],
-      {
-        crssPart: BigNumber;
-        crssForEthPart: BigNumber;
-        ethPart: BigNumber;
-        liquidity: BigNumber;
-      }
-    >;
-
-    SwapAndLiquify(
-      crssPart?: null,
-      crssForEthPart?: null,
-      ethPart?: null,
-      liquidity?: null
-    ): TypedEventFilter<
-      [BigNumber, BigNumber, BigNumber, BigNumber],
-      {
-        crssPart: BigNumber;
-        crssForEthPart: BigNumber;
-        ethPart: BigNumber;
-        liquidity: BigNumber;
-      }
     >;
 
     "Transfer(address,address,uint256)"(
@@ -1571,10 +806,6 @@ export class TGRToken extends BaseContract {
   };
 
   estimateGas: {
-    DELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
-
-    DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
-
     _decreaseAllowance(
       _owner: string,
       _spender: string,
@@ -1608,17 +839,6 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    changeMaxTransferAmountRate(
-      _maxTransferAmountRate: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    checkpoints(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     decreaseAllowance(
@@ -1627,69 +847,15 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    delegate(
-      delegatee: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    delegateBySig(
-      delegatee: string,
-      nonce: BigNumberish,
-      expiry: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    delegates(delegator: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    feeRates(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
-    feeStores(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getCurrentVotes(
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getInnermostSType(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getOutermostSType(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getOwner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getPairQuick(
-      arg0: string,
-      arg1: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getPriorVotes(
-      account: string,
-      blockNumber: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    informOfPair(
-      pair: string,
-      token0: string,
-      token1: string,
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    lp_reward(overrides?: CallOverrides): Promise<BigNumber>;
 
     maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxTransferAmount(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxTransferAmountRate(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       to: string,
@@ -1699,33 +865,17 @@ export class TGRToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    nextNode(overrides?: CallOverrides): Promise<BigNumber>;
-
-    nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    pairs(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    payFeeTGRLogic(
-      payer: string,
-      principal: BigNumberish,
-      rates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      fromAllowance: boolean,
+    pulse_lp_reward(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    prevNode(overrides?: CallOverrides): Promise<BigNumber>;
+    pulse_user_burn(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    registerSession(
-      sessionType: BigNumberish,
+    pulse_vote_burn(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1733,51 +883,7 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    session(overrides?: CallOverrides): Promise<BigNumber>;
-
-    sessionsLastSeenBySType(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    setFeeRates(
-      _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setNode(
-      nodeType: BigNumberish,
-      node: string,
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
-
-    tolerableTransfer(
-      from: string,
-      to: string,
-      value: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1799,24 +905,12 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    unregisterSession(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    user_burn(overrides?: CallOverrides): Promise<BigNumber>;
 
-    wire(
-      _prevNode: string,
-      _nextNode: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    vote_burn(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    DELEGATION_TYPEHASH(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     _decreaseAllowance(
       _owner: string,
       _spender: string,
@@ -1853,17 +947,6 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    changeMaxTransferAmountRate(
-      _maxTransferAmountRate: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    checkpoints(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     decreaseAllowance(
@@ -1872,77 +955,15 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    delegate(
-      delegatee: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    delegateBySig(
-      delegatee: string,
-      nonce: BigNumberish,
-      expiry: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    delegates(
-      delegator: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    feeRates(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    feeStores(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getCurrentVotes(
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getInnermostSType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getOutermostSType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getPairQuick(
-      arg0: string,
-      arg1: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getPriorVotes(
-      account: string,
-      blockNumber: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    informOfPair(
-      pair: string,
-      token0: string,
-      token1: string,
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    lp_reward(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     maxSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    maxTransferAmount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    maxTransferAmountRate(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     mint(
       to: string,
@@ -1952,42 +973,17 @@ export class TGRToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    nextNode(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    nonces(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    numCheckpoints(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    pairs(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    payFeeTGRLogic(
-      payer: string,
-      principal: BigNumberish,
-      rates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      fromAllowance: boolean,
+    pulse_lp_reward(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    prevNode(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    pulse_user_burn(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
-    registerSession(
-      sessionType: BigNumberish,
+    pulse_vote_burn(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1995,51 +991,7 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    session(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    sessionsLastSeenBySType(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    setFeeRates(
-      _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setNode(
-      nodeType: BigNumberish,
-      node: string,
-      caller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    tolerableTransfer(
-      from: string,
-      to: string,
-      value: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -2061,14 +1013,8 @@ export class TGRToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    unregisterSession(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    user_burn(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    wire(
-      _prevNode: string,
-      _nextNode: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    vote_burn(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

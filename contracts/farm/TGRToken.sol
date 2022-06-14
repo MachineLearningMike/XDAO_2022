@@ -2,8 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "solidity-math-utils/project/contracts/AnalyticMath.sol";
 
 import "./interfaces/ITGRToken.sol";
+import "../session/interfaces/IConstants.sol";
 // import "../session/SessionRegistrar.sol";
 // import "../session/SessionManager.sol";
 // import "../session/SessionFees.sol";
@@ -42,7 +44,7 @@ contract TGRToken is Ownable, ITGRToken {
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
 
-    //====================== Pulses ============================
+    //====================== Pulse core data ============================
 
     // The non-user TGR accounts, not limited to the below items.
     address tgrftm; // The address of TGR_FTM pool, which has TGR and WFTM balances.
@@ -58,104 +60,50 @@ contract TGRToken is Ownable, ITGRToken {
     // test accounts
     address admin; address alice; address bob; address carol;
 
-    function _getDecay(Pulse pulse) internal pure returns (uint256 decayPer1e12) {
-        // pulse.lastTime, pulse.cycle, pulse.decayRate
-    }
+    //====================== Pulse internal functions ============================
 
     function _checkForConsistency() internal view {
         // Defines user_burn attributes, based on the ERC20 core data.
 
         assert (user_burn.sum_balances + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply);
-        assert (_balance[owner] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balances);
-        // totalSupply = _totalSupply - user_burn.pending_burn
-        // balanceOf(account) = _isUserAccount(account) ? _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn : _balances[account]
-        // user_burn.accDecayPerShare += new_pending_burn * 1e12 / user_burn.sum_balances;
-        // transfer(sender, recipient, amount)
-        // if _isUserAccount(sender, recipient) 
-            // settlw with pending_burn, by using Users[account].debtToPendingBurn
-            // transfer ...
-            // 
+        assert (_balances[admin] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balances);
     }
 
     function _isUserAccount(address account) internal view returns (bool) {
         return account != tgrftm && account != tgrhtz && account != votes;
     }
 
-    function pulse_lp_reward() external {
-        // 0.69% of XDAO/FTM LP has the XDAO side sold for FTM, 
-        // then the FTM is used to buy HTZ which is added to XDAO lps airdrop rewards every 12 hours.
-
-        uint256 decayPer1e12 = _getDecay(lp_reward);
-        // Use decayPer12 portion of tgrftm pool to obtain FTM to buy HTZ tokens at the htzftm pool, then add them to airdrop rewards.
-        // TGR/FTM price falls and HTZ/FTM price rises, at their respective pools.
-
-        lp_reward.latestTime = block.timestamp;
-    }
-
-    function pulse_vote_burn() external {
-        // 0.07% of tokens in the Agency dapp actively being used for voting burned every 12 hours.
-
-        uint256 decayPer1e12 = _getDecay(vote_burn);
-        // burn decayPer1e12 portion of votes account's TRG balance.
-
-        vote_burn.latestTime = block.timestamp;
-    }
-
-    function pulse_user_burn() external {
-        // 0.777% of tokens(not in Cyberswap/Agency dapp) burned each 24 hours from users wallets.
-        // Interpretation: TGR tokens not in Cyberswap accounts (tgrftm and tgrhtz), and not in Agency account (votes account), 
-        // will be burned at the above rate and interval.
-
-        uint256 decayPer1e12 = _getDecay(user_burn);
-        if (decayPer1e12 > 0) {
-            uint256 net_value = user_burn.sum_balance - user_burn.pending_burn;
-            uint256 new_burn = net_value * decayPer1e12 / 1e12;
-            user_burn.pending_burn += new_burn;
-            user_burn.accBurnPerShare += new_burn * 1e12 / user_burn.sum_balances;
-
-            user_burn.latestTime = block.timestamp;
-        }
-    }
-
-    function _balanceOf(address account) internal view returns (uint256 balance) { // user account only
-        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - Users[account].debtToPendingBurn;
-        balance = _balances[account] - pendingBurn;
-    }
 
     function _settleWithPendingBurn(address account) internal { // user account only
-        uint256 pendingBurn = _balances[account] * user_burn.accBurnPerShare - Users[account].debtToPendingBurn;
+        uint256 pendingBurn = _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn;
         if (pendingBurn > 0) {
             _balances[account] -= pendingBurn;
+            _totalSupply -= pendingBurn;
             user_burn.sum_balances -= pendingBurn;
             user_burn.pending_burn -= pendingBurn;
-            Users[account].debtToPendingBurn =  _balances[account] * user_burn.accBurnPerShare
+            Users[account].debtToPendingBurn =  _balances[account] * user_burn.accDecayPerShare / 1e12;
         }
     }
 
     function _changeBalance(address account, uint256 amount, bool addNotSubtract) internal {
         if (_isUserAccount(account)) {
             _settleWithPendingBurn(account);
-            _balances[account] += addNotSubtract ? amount : - amount;
-            user_burn.sum_balance += addNotSubtract ? amount : - amount;
-            Users[account].debtToPendingBurn =  _balances[account] * user_burn.accBurnPerShare;
+            _balances[account] = addNotSubtract ?  _balances[account] + amount : _balances[account] - amount;
+            user_burn.sum_balances = addNotSubtract ? user_burn.sum_balances + amount : user_burn.sum_balances - amount;
+
+            Users[account].debtToPendingBurn =  _balances[account] * user_burn.accDecayPerShare / 1e12;
         } else {
-            _balances[account] += addNotSubtract ? amount : - amount;
+            _balances[account] = addNotSubtract ? _balances[account] + amount : _balances[account] - amount;
         }
     }
 
-    function _totalSupply() internal return (uint256) {
-        return _totalSupply - user_burn.panding_burn;
-    }
+    AnalyticMath analyticMath;
 
-
-
-    constructor() Ownable() {
-
-        // Mint 1e6 TGR to the caller for testing - MUST BE REMOVED WHEN DEPLOY
-        _mint(_msgSender(), 1e6 * 10 ** _decimals);
+    constructor(address _analyticMath) Ownable() {
+        analyticMath = AnalyticMath(_analyticMath);
 
         //--------- test users ---------
-        admin = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+        admin = _msgSender();
         alice = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
         bob = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;
         carol = 0x90F79bf6EB2c4f870365E785982E1f101E93b906;
@@ -164,37 +112,28 @@ contract TGRToken is Ownable, ITGRToken {
         tgrhtz = 0x3924A2cf72d190023667609Dd91e70Ed11127D78; // tgr_mck
         votes = 0x02EED5Ac83f1c3D1624c0437c9E682e83E95BcFf; // tgr_mck2
 
-        lp_reward = Pulse(tgrftm, 0, 2 seconds, 690, 0, 0, 0);
-        vote_burn = Pulse(votes, 0, 2 seconds, 70, 0, 0, 0);
-        user_burn = Pulse(zero_address, 0, 4 seconds, 777, 0, 0, 0);
+        lp_reward = Pulse(0, 2 seconds, 690, tgrftm, 0, 0, 0, block.timestamp / (2 seconds));
+        vote_burn = Pulse(0, 2 seconds, 70, votes, 0, 0, 0, block.timestamp / (2 seconds));
+        user_burn = Pulse(0, 4 seconds, 777, zero_address, 0, 0, 0, block.timestamp / (4 seconds));
+
+        _mint(_msgSender(), 1e6 * 10 ** _decimals);
+
     }
 
+    //==================== ERC20 internal functions ====================
 
-
-    //========== Modifiers. Some of them required by super classes ====================
-    //==================== Basic ERC20 functions ====================
-    function name() public view virtual returns (string memory) {
-        return _name;
+    function _balanceOf(address account) internal view returns (uint256 balance) {
+        if (_isUserAccount(account)) {
+            uint256 pendingBurn = _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn;
+            balance = _balances[account] - pendingBurn;
+        } else {
+            balance = _balances[account];
+        }
     }
 
-    function symbol() public view virtual returns (string memory) {
-        return _symbol;
+    function _getTotalSupply() internal view returns (uint256) {
+        return _totalSupply - user_burn.pending_burn;
     }
-
-    function decimals() public view virtual returns (uint8) {
-        return _decimals;
-    }
-
-    function totalSupply() public view override virtual returns (uint256) {
-        return _totalSupply();
-    }
-
-    function balanceOf(address account) public view override virtual returns (uint256) {
-        return _balanceOf(account);
-    }
-
-
-    //==================== Intrinsic + business internal logic ====================
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual {}
 
@@ -213,7 +152,7 @@ contract TGRToken is Ownable, ITGRToken {
 
     function _burn(address from, uint256 amount) internal virtual {
         require(from != address(0), sZeroAddress);
-        uint256 accountBalance = _balanceOf(account);
+        uint256 accountBalance = _balanceOf(from);
         require(accountBalance >= amount, sExceedsBalance);
 
         _beforeTokenTransfer(from, address(0), amount);
@@ -237,19 +176,6 @@ contract TGRToken is Ownable, ITGRToken {
         emit Transfer(from, address(0), amount);
     }
 
-    /**
-    * @dev Implements the business logic of the tansfer and transferFrom funcitons.
-    * Collect transfer fee if the calling transfer functions are a top session, 
-    * or, equivalently, an external actor invoked the transfer.
-    * If the transfer is 100% of transfer amount if  external actor wants to transfer to a pool created by XDAOFactory.
-    */
-    function _transferHub(address sender, address recipient, uint256 amount) internal virtual {
-        if (amount > 0) {
-            _transfer(sender, recipient, amount);
-        }
-    }
-
-
     function _transfer(
         address sender,
         address recipient,
@@ -260,11 +186,17 @@ contract TGRToken is Ownable, ITGRToken {
         uint256 senderBalance = _balanceOf(sender);
         require(senderBalance >= amount, sExceedsBalance);
         //_beforeTokenTransfer(sender, recipient, amount);
-        _changeFreshBalance(sender, amount, false);
-        _changeFreshBalance(recipient, amount, true);
+        _changeBalance(sender, amount, false);
+        _changeBalance(recipient, amount, true);
         //_afterTokenTransfer(sender, recipient, amount);
 
         emit Transfer(sender, recipient, amount);
+    }
+
+    function _transferHub(address sender, address recipient, uint256 amount) internal virtual {
+        if (amount > 0) {
+            _transfer(sender, recipient, amount);
+        }
     }
 
     function _approve(
@@ -291,32 +223,45 @@ contract TGRToken is Ownable, ITGRToken {
     }
 
 
-    //==================== Main ERC20 funcitons, working on intrinsic + business internal logic ====================
-    function mint(address to, uint256 amount) public override {
-        require(_totalSupply + amount <= maxSupply, "Exceed Max Supply");
-        require(_msgSender() == nodes.farm || _msgSender() == nodes.repay, sForbidden);
+    //==================== ERC20 public funcitons ====================
+
+    function name() public view virtual returns (string memory) {
+        return _name;
+    }
+
+    function symbol() public view virtual returns (string memory) {
+        return _symbol;
+    }
+
+    function decimals() public view virtual returns (uint8) {
+        return _decimals;
+    }
+
+    function totalSupply() public view override virtual returns (uint256) {
+        return _getTotalSupply();
+    }
+
+    function balanceOf(address account) public view override virtual returns (uint256) {
+        return _balanceOf(account);
+    }
+
+    function mint(address to, uint256 amount) public override onlyOwner {
+        require(_getTotalSupply() + amount <= maxSupply, "Exceed Max Supply");
         _mint(to, amount);
-        _moveDelegates(address(0), _delegates[to], amount);
     }
 
-    function burn(address from, uint256 amount) public override {
-        require(_msgSender() == nodes.farm || _msgSender() == nodes.repay, sForbidden);
+    function burn(address from, uint256 amount) public override onlyOwner {
         _burn(from, amount);
-        _moveDelegates(_delegates[from], _delegates[address(0)], amount);
     }
 
-    function bury(address from, uint256 amount) public override {
-        require(_msgSender() == nodes.farm, sForbidden);
+    function bury(address from, uint256 amount) public override onlyOwner {
         _bury(from, amount);
-        _moveDelegates(_delegates[from], _delegates[address(0)], amount);
     }
 
     function transfer(address recipient, uint256 amount) public override virtual returns (bool) {
         _transferHub(_msgSender(), recipient, amount);
         return true;
     }
-
-
 
     function transferFrom(
         address sender,
@@ -350,8 +295,76 @@ contract TGRToken is Ownable, ITGRToken {
         return _decreaseAllowance(_msgSender(), spender, subtractedValue);
     }
 
-    //==================== Business logic ====================
+    //==================== Pulse public functions ====================
 
+    function _getDecayPer1e12(Pulse storage pulse) internal returns (uint256 decayPer1e12) {
+        // pulse.lastTime, pulse.cycle, pulse.decayRate
+
+        uint256 round = block.timestamp / pulse.cycle;
+        if (round > pulse.latestRound) {
+            uint256 missingRounds = round - pulse.latestRound;
+            pulse.latestRound = round;
+            pulse.latestTime = block.timestamp; // Not used.
+
+            decayPer1e12 = 1e12;
+            if (missingRounds <= 5) { // 5 optimized
+                uint256 remain = FeeMagnifier - pulse.decayRate; 
+                uint256 numerator = remain; 
+                uint256 denominator = FeeMagnifier;
+                for(uint256 i = 1; i < missingRounds; i++) { // note 1.
+                    numerator *= remain;
+                    denominator *= FeeMagnifier;
+                }
+                decayPer1e12 = 1e12 - 1e12 * numerator / denominator;
+            } else {
+                (uint256 P, uint256 Q) = analyticMath.pow(FeeMagnifier - pulse.decayRate, FeeMagnifier, missingRounds, uint256(1));
+                decayPer1e12 = 1e12 - 1e12 * P / Q;
+            }
+        }
+    }
+
+    function pulse_lp_reward() external {
+        // 0.69% of XDAO/FTM LP has the XDAO side sold for FTM, 
+        // then the FTM is used to buy HTZ which is added to XDAO lps airdrop rewards every 12 hours.
+
+        uint256 round = block.timestamp / lp_reward.cycle;
+        if (round > lp_reward.latestRound) {
+            uint256 missingRounds = lp_reward.latestRound - round;
+            lp_reward.latestRound = round;
+
+            uint256 decayPer1e12 = _getDecayPer1e12(lp_reward);
+            // Use decayPer12 portion of tgrftm pool to obtain FTM to buy HTZ tokens at the htzftm pool, then add them to airdrop rewards.
+            // TGR/FTM price falls and HTZ/FTM price rises, at their respective pools.
+
+            lp_reward.latestTime = block.timestamp;
+        }
+    }
+
+    function pulse_vote_burn() external {
+        // 0.07% of tokens in the Agency dapp actively being used for voting burned every 12 hours.
+
+        uint256 decayPer1e12 = _getDecayPer1e12(vote_burn);
+        // burn decayPer1e12 portion of votes account's TRG balance.
+        _burn(vote_burn.account, _balances[vote_burn.account] * decayPer1e12 / 1e12);
+
+        vote_burn.latestTime = block.timestamp;
+    }
+
+    function pulse_user_burn() external {
+        // 0.777% of tokens(not in Cyberswap/Agency dapp) burned each 24 hours from users wallets.
+        // Interpretation: TGR tokens not in Cyberswap accounts (tgrftm and tgrhtz), and not in Agency account (votes account), 
+        // will be burned at the above rate and interval.
+
+        uint256 decayPer1e12 = _getDecayPer1e12(user_burn);
+        if (decayPer1e12 > 0) {
+            uint256 net_value = user_burn.sum_balances - user_burn.pending_burn;
+            uint256 new_burn = net_value * decayPer1e12 / 1e12;
+            user_burn.pending_burn += new_burn;
+            user_burn.accDecayPerShare += new_burn * 1e12 / user_burn.sum_balances;   // Note: user_burn.sum_balance vs. net_value
+
+            user_burn.latestTime = block.timestamp;
+        }
+    }
 
 
 
