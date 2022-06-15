@@ -388,8 +388,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\TGRToken.sol": {
-      "lastModificationDate": 1655234555356,
-      "contentHash": "09ceab33d18c15583cee0ba888f36d7d",
+      "lastModificationDate": 1655290835629,
+      "contentHash": "0beaf02e3fac3d502e6f3dff457be655",
       "sourceName": "contracts/farm/TGRToken.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -653,50 +653,6 @@
       ],
       "artifacts": [
         "FixedPoint"
-      ]
-    },
-    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\utils\\UpgradableOwnable.sol": {
-      "lastModificationDate": 1649486874924,
-      "contentHash": "68862fe2ef56a6b354cb2bc4ef48acdb",
-      "sourceName": "contracts/libraries/utils/UpgradableOwnable.sol",
-      "solcConfig": {
-        "version": "0.8.14",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout",
-                "devdoc",
-                "userdoc",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/utils/Context.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "UpgradableOwnable"
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\node_modules\\@openzeppelin\\contracts\\utils\\math\\Math.sol": {
@@ -1178,8 +1134,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\IConstants.sol": {
-      "lastModificationDate": 1655224954637,
-      "contentHash": "421dc11f8871eba40636d11a3cbbbadd",
+      "lastModificationDate": 1655291879769,
+      "contentHash": "1a41eecd6572cf41538195fa93453401",
       "sourceName": "contracts/session/interfaces/IConstants.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -1216,6 +1172,321 @@
         "^0.8.0"
       ],
       "artifacts": []
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\INode.sol": {
+      "lastModificationDate": 1655291803106,
+      "contentHash": "d83836827229a2b4a90e1995adcfdc29",
+      "sourceName": "contracts/session/interfaces/INode.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IConstants.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "INode"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionRegistrar.sol": {
+      "lastModificationDate": 1655292170895,
+      "contentHash": "63bac93431b0a468a0fcf4053950d142",
+      "sourceName": "contracts/session/SessionRegistrar.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IConstants.sol",
+        "./interfaces/ISessionRegistrar.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SessionRegistrar"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionRegistrar.sol": {
+      "lastModificationDate": 1653456726140,
+      "contentHash": "f2bbdb5caa8fb8130219176adbfffcb1",
+      "sourceName": "contracts/session/interfaces/ISessionRegistrar.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IConstants.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ISessionRegistrar"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionManager.sol": {
+      "lastModificationDate": 1653457265693,
+      "contentHash": "49b628b69b0a12a8d649befdc9c59680",
+      "sourceName": "contracts/session/SessionManager.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IConstants.sol",
+        "./interfaces/ISessionRegistrar.sol",
+        "./interfaces/ISessionManager.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SessionManager"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionManager.sol": {
+      "lastModificationDate": 1649486874944,
+      "contentHash": "06645eb9ad6ff403684f26f6a619c8b3",
+      "sourceName": "contracts/session/interfaces/ISessionManager.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IConstants.sol",
+        "./ISessionRegistrar.sol",
+        "./ISessionFees.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ISessionManager"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\interfaces\\ISessionFees.sol": {
+      "lastModificationDate": 1651076465378,
+      "contentHash": "a88445f0fbbbdb02fdc946a9d98d3e39",
+      "sourceName": "contracts/session/interfaces/ISessionFees.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./IConstants.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ISessionFees"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionFees.sol": {
+      "lastModificationDate": 1655038395759,
+      "contentHash": "eb0853555616f9b3fca70a64c5cfcc85",
+      "sourceName": "contracts/session/SessionFees.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IConstants.sol",
+        "./interfaces/ISessionRegistrar.sol",
+        "./interfaces/ISessionFees.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SessionFees"
+      ]
     }
   }
 }

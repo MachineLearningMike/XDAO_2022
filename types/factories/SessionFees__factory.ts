@@ -23,22 +23,7 @@ const _abi = [
         components: [
           {
             internalType: "uint32",
-            name: "develop",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "buyback",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "liquidity",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "treasury",
+            name: "accountant",
             type: "uint32",
           },
         ],
@@ -52,7 +37,7 @@ const _abi = [
         type: "bool",
       },
     ],
-    name: "payFeeTGRLogic",
+    name: "payFeeCrssLogic",
     outputs: [
       {
         internalType: "uint256",

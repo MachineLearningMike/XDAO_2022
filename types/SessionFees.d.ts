@@ -21,26 +21,16 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SessionFeesInterface extends ethers.utils.Interface {
   functions: {
-    "payFeeTGRLogic(address,uint256,(uint32,uint32,uint32,uint32),bool)": FunctionFragment;
+    "payFeeCrssLogic(address,uint256,(uint32),bool)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "payFeeTGRLogic",
-    values: [
-      string,
-      BigNumberish,
-      {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      boolean
-    ]
+    functionFragment: "payFeeCrssLogic",
+    values: [string, BigNumberish, { accountant: BigNumberish }, boolean]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "payFeeTGRLogic",
+    functionFragment: "payFeeCrssLogic",
     data: BytesLike
   ): Result;
 
@@ -91,43 +81,28 @@ export class SessionFees extends BaseContract {
   interface: SessionFeesInterface;
 
   functions: {
-    payFeeTGRLogic(
+    payFeeCrssLogic(
       account: string,
       principal: BigNumberish,
-      rates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      rates: { accountant: BigNumberish },
       fromAllowance: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  payFeeTGRLogic(
+  payFeeCrssLogic(
     account: string,
     principal: BigNumberish,
-    rates: {
-      develop: BigNumberish;
-      buyback: BigNumberish;
-      liquidity: BigNumberish;
-      treasury: BigNumberish;
-    },
+    rates: { accountant: BigNumberish },
     fromAllowance: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    payFeeTGRLogic(
+    payFeeCrssLogic(
       account: string,
       principal: BigNumberish,
-      rates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      rates: { accountant: BigNumberish },
       fromAllowance: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -136,30 +111,20 @@ export class SessionFees extends BaseContract {
   filters: {};
 
   estimateGas: {
-    payFeeTGRLogic(
+    payFeeCrssLogic(
       account: string,
       principal: BigNumberish,
-      rates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      rates: { accountant: BigNumberish },
       fromAllowance: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    payFeeTGRLogic(
+    payFeeCrssLogic(
       account: string,
       principal: BigNumberish,
-      rates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      rates: { accountant: BigNumberish },
       fromAllowance: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

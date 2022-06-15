@@ -11,46 +11,25 @@ import type {
 
 const _abi = [
   {
-    inputs: [],
-    name: "getInnermostSType",
-    outputs: [
-      {
-        internalType: "enum SessionType",
-        name: "",
-        type: "uint8",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getOutermostSType",
-    outputs: [
-      {
-        internalType: "enum SessionType",
-        name: "",
-        type: "uint8",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [
       {
-        internalType: "enum SessionType",
-        name: "sessionType",
+        internalType: "enum ActionType",
+        name: "actionType",
         type: "uint8",
       },
+      {
+        internalType: "bool",
+        name: "blockReentry",
+        type: "bool",
+      },
     ],
-    name: "registerSession",
+    name: "registerAction",
     outputs: [
       {
         components: [
           {
-            internalType: "enum SessionType",
-            name: "sessionType",
+            internalType: "enum ActionType",
+            name: "actionType",
             type: "uint8",
           },
           {
@@ -65,12 +44,12 @@ const _abi = [
           },
           {
             internalType: "bool",
-            name: "isOriginAction",
+            name: "isUserAction",
             type: "bool",
           },
         ],
-        internalType: "struct SessionParams",
-        name: "sessionParams",
+        internalType: "struct ActionParams",
+        name: "actionParams",
         type: "tuple",
       },
     ],
@@ -79,7 +58,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "unregisterSession",
+    name: "unregisterAction",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

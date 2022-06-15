@@ -21,43 +21,25 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface ISessionRegistrarInterface extends ethers.utils.Interface {
   functions: {
-    "getInnermostSType()": FunctionFragment;
-    "getOutermostSType()": FunctionFragment;
-    "registerSession(uint8)": FunctionFragment;
-    "unregisterSession()": FunctionFragment;
+    "registerAction(uint8,bool)": FunctionFragment;
+    "unregisterAction()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getInnermostSType",
-    values?: undefined
+    functionFragment: "registerAction",
+    values: [BigNumberish, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "getOutermostSType",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "registerSession",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "unregisterSession",
+    functionFragment: "unregisterAction",
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getInnermostSType",
+    functionFragment: "registerAction",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getOutermostSType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "registerSession",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "unregisterSession",
+    functionFragment: "unregisterAction",
     data: BytesLike
   ): Result;
 
@@ -108,97 +90,66 @@ export class ISessionRegistrar extends BaseContract {
   interface: ISessionRegistrarInterface;
 
   functions: {
-    getInnermostSType(
+    registerAction(
+      actionType: BigNumberish,
+      blockReentry: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getOutermostSType(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    registerSession(
-      sessionType: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    unregisterSession(
+    unregisterAction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  getInnermostSType(
+  registerAction(
+    actionType: BigNumberish,
+    blockReentry: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getOutermostSType(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  registerSession(
-    sessionType: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  unregisterSession(
+  unregisterAction(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    getInnermostSType(overrides?: CallOverrides): Promise<number>;
-
-    getOutermostSType(overrides?: CallOverrides): Promise<number>;
-
-    registerSession(
-      sessionType: BigNumberish,
+    registerAction(
+      actionType: BigNumberish,
+      blockReentry: boolean,
       overrides?: CallOverrides
     ): Promise<
       [number, BigNumber, BigNumber, boolean] & {
-        sessionType: number;
+        actionType: number;
         session: BigNumber;
         lastSession: BigNumber;
-        isOriginAction: boolean;
+        isUserAction: boolean;
       }
     >;
 
-    unregisterSession(overrides?: CallOverrides): Promise<void>;
+    unregisterAction(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
-    getInnermostSType(
+    registerAction(
+      actionType: BigNumberish,
+      blockReentry: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getOutermostSType(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    registerSession(
-      sessionType: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    unregisterSession(
+    unregisterAction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getInnermostSType(
+    registerAction(
+      actionType: BigNumberish,
+      blockReentry: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getOutermostSType(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerSession(
-      sessionType: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    unregisterSession(
+    unregisterAction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -21,55 +21,55 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SessionRegistrarInterface extends ethers.utils.Interface {
   functions: {
-    "getInnermostSType()": FunctionFragment;
-    "getOutermostSType()": FunctionFragment;
-    "registerSession(uint8)": FunctionFragment;
+    "lastSession()": FunctionFragment;
+    "pause()": FunctionFragment;
+    "paused()": FunctionFragment;
+    "registerAction(uint8,bool)": FunctionFragment;
+    "resume()": FunctionFragment;
     "session()": FunctionFragment;
     "sessionsLastSeenBySType(uint8)": FunctionFragment;
-    "unregisterSession()": FunctionFragment;
+    "unregisterAction()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getInnermostSType",
+    functionFragment: "lastSession",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getOutermostSType",
-    values?: undefined
+    functionFragment: "registerAction",
+    values: [BigNumberish, boolean]
   ): string;
-  encodeFunctionData(
-    functionFragment: "registerSession",
-    values: [BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: "resume", values?: undefined): string;
   encodeFunctionData(functionFragment: "session", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "sessionsLastSeenBySType",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "unregisterSession",
+    functionFragment: "unregisterAction",
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getInnermostSType",
+    functionFragment: "lastSession",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getOutermostSType",
+    functionFragment: "registerAction",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "registerSession",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "resume", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "session", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "sessionsLastSeenBySType",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "unregisterSession",
+    functionFragment: "unregisterAction",
     data: BytesLike
   ): Result;
 
@@ -120,12 +120,21 @@ export class SessionRegistrar extends BaseContract {
   interface: SessionRegistrarInterface;
 
   functions: {
-    getInnermostSType(overrides?: CallOverrides): Promise<[number]>;
+    lastSession(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getOutermostSType(overrides?: CallOverrides): Promise<[number]>;
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    registerSession(
-      sessionType: BigNumberish,
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
+    registerAction(
+      actionType: BigNumberish,
+      blockReentry: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    resume(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -136,17 +145,26 @@ export class SessionRegistrar extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    unregisterSession(
+    unregisterAction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  getInnermostSType(overrides?: CallOverrides): Promise<number>;
+  lastSession(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getOutermostSType(overrides?: CallOverrides): Promise<number>;
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  registerSession(
-    sessionType: BigNumberish,
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
+  registerAction(
+    actionType: BigNumberish,
+    blockReentry: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  resume(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -157,26 +175,31 @@ export class SessionRegistrar extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  unregisterSession(
+  unregisterAction(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    getInnermostSType(overrides?: CallOverrides): Promise<number>;
+    lastSession(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getOutermostSType(overrides?: CallOverrides): Promise<number>;
+    pause(overrides?: CallOverrides): Promise<void>;
 
-    registerSession(
-      sessionType: BigNumberish,
+    paused(overrides?: CallOverrides): Promise<boolean>;
+
+    registerAction(
+      actionType: BigNumberish,
+      blockReentry: boolean,
       overrides?: CallOverrides
     ): Promise<
       [number, BigNumber, BigNumber, boolean] & {
-        sessionType: number;
+        actionType: number;
         session: BigNumber;
         lastSession: BigNumber;
-        isOriginAction: boolean;
+        isUserAction: boolean;
       }
     >;
+
+    resume(overrides?: CallOverrides): Promise<void>;
 
     session(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -185,18 +208,27 @@ export class SessionRegistrar extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    unregisterSession(overrides?: CallOverrides): Promise<void>;
+    unregisterAction(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
-    getInnermostSType(overrides?: CallOverrides): Promise<BigNumber>;
+    lastSession(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getOutermostSType(overrides?: CallOverrides): Promise<BigNumber>;
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    registerSession(
-      sessionType: BigNumberish,
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
+    registerAction(
+      actionType: BigNumberish,
+      blockReentry: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    resume(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -207,18 +239,27 @@ export class SessionRegistrar extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    unregisterSession(
+    unregisterAction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getInnermostSType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    lastSession(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getOutermostSType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
-    registerSession(
-      sessionType: BigNumberish,
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    registerAction(
+      actionType: BigNumberish,
+      blockReentry: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    resume(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -229,7 +270,7 @@ export class SessionRegistrar extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    unregisterSession(
+    unregisterAction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

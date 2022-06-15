@@ -9,10 +9,66 @@ import type { INode, INodeInterface } from "../INode";
 const _abi = [
   {
     anonymous: false,
+    inputs: [],
+    name: "Begin",
+    type: "event",
+  },
+  {
+    anonymous: false,
     inputs: [
       {
         indexed: false,
-        internalType: "enum SessionType",
+        internalType: "address",
+        name: "pair",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "tokenA",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "tokenB",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "enum ListStatus",
+        name: "status",
+        type: "uint8",
+      },
+    ],
+    name: "ChangePairStatus",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "msgSender",
+        type: "address",
+      },
+    ],
+    name: "DeenlistToken",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "enum ActionType",
         name: "_sessionType",
         type: "uint8",
       },
@@ -20,22 +76,7 @@ const _abi = [
         components: [
           {
             internalType: "uint32",
-            name: "develop",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "buyback",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "liquidity",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "treasury",
+            name: "accountant",
             type: "uint32",
           },
         ],
@@ -55,22 +96,7 @@ const _abi = [
         components: [
           {
             internalType: "address",
-            name: "develop",
-            type: "address",
-          },
-          {
-            internalType: "address",
-            name: "buyback",
-            type: "address",
-          },
-          {
-            internalType: "address",
-            name: "liquidity",
-            type: "address",
-          },
-          {
-            internalType: "address",
-            name: "treasury",
+            name: "accountant",
             type: "address",
           },
         ],
@@ -98,15 +124,22 @@ const _abi = [
         name: "node",
         type: "address",
       },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "msgSender",
-        type: "address",
-      },
     ],
     name: "SetNode",
     type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "caller",
+        type: "address",
+      },
+    ],
+    name: "begin",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [
@@ -126,12 +159,17 @@ const _abi = [
         type: "address",
       },
       {
+        internalType: "enum ListStatus",
+        name: "status",
+        type: "uint8",
+      },
+      {
         internalType: "address",
         name: "caller",
         type: "address",
       },
     ],
-    name: "informOfPair",
+    name: "changePairStatus",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -139,7 +177,7 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "enum SessionType",
+        internalType: "enum ActionType",
         name: "_sessionType",
         type: "uint8",
       },
@@ -147,22 +185,7 @@ const _abi = [
         components: [
           {
             internalType: "uint32",
-            name: "develop",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "buyback",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "liquidity",
-            type: "uint32",
-          },
-          {
-            internalType: "uint32",
-            name: "treasury",
+            name: "accountant",
             type: "uint32",
           },
         ],
@@ -187,22 +210,7 @@ const _abi = [
         components: [
           {
             internalType: "address",
-            name: "develop",
-            type: "address",
-          },
-          {
-            internalType: "address",
-            name: "buyback",
-            type: "address",
-          },
-          {
-            internalType: "address",
-            name: "liquidity",
-            type: "address",
-          },
-          {
-            internalType: "address",
-            name: "treasury",
+            name: "accountant",
             type: "address",
           },
         ],

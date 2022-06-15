@@ -21,36 +21,26 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface INodeInterface extends ethers.utils.Interface {
   functions: {
-    "informOfPair(address,address,address,address)": FunctionFragment;
-    "setFeeRates(uint8,(uint32,uint32,uint32,uint32),address)": FunctionFragment;
-    "setFeeStores((address,address,address,address),address)": FunctionFragment;
+    "begin(address)": FunctionFragment;
+    "changePairStatus(address,address,address,uint8,address)": FunctionFragment;
+    "setFeeRates(uint8,(uint32),address)": FunctionFragment;
+    "setFeeStores((address),address)": FunctionFragment;
     "setNode(uint8,address,address)": FunctionFragment;
     "wire(address,address)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "begin", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "informOfPair",
-    values: [string, string, string, string]
+    functionFragment: "changePairStatus",
+    values: [string, string, string, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "setFeeRates",
-    values: [
-      BigNumberish,
-      {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      string
-    ]
+    values: [BigNumberish, { accountant: BigNumberish }, string]
   ): string;
   encodeFunctionData(
     functionFragment: "setFeeStores",
-    values: [
-      { develop: string; buyback: string; liquidity: string; treasury: string },
-      string
-    ]
+    values: [{ accountant: string }, string]
   ): string;
   encodeFunctionData(
     functionFragment: "setNode",
@@ -61,8 +51,9 @@ interface INodeInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
 
+  decodeFunctionResult(functionFragment: "begin", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "informOfPair",
+    functionFragment: "changePairStatus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -77,60 +68,52 @@ interface INodeInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "wire", data: BytesLike): Result;
 
   events: {
+    "Begin()": EventFragment;
+    "ChangePairStatus(address,address,address,uint8)": EventFragment;
+    "DeenlistToken(address,address)": EventFragment;
     "SetFeeRates(uint8,tuple)": EventFragment;
     "SetFeeStores(tuple)": EventFragment;
-    "SetNode(uint8,address,address)": EventFragment;
+    "SetNode(uint8,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "Begin"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChangePairStatus"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DeenlistToken"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetFeeRates"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetFeeStores"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetNode"): EventFragment;
 }
 
+export type BeginEvent = TypedEvent<[] & {}>;
+
+export type ChangePairStatusEvent = TypedEvent<
+  [string, string, string, number] & {
+    pair: string;
+    tokenA: string;
+    tokenB: string;
+    status: number;
+  }
+>;
+
+export type DeenlistTokenEvent = TypedEvent<
+  [string, string] & { token: string; msgSender: string }
+>;
+
 export type SetFeeRatesEvent = TypedEvent<
-  [
-    number,
-    [number, number, number, number] & {
-      develop: number;
-      buyback: number;
-      liquidity: number;
-      treasury: number;
-    }
-  ] & {
+  [number, [number] & { accountant: number }] & {
     _sessionType: number;
-    _feeRates: [number, number, number, number] & {
-      develop: number;
-      buyback: number;
-      liquidity: number;
-      treasury: number;
-    };
+    _feeRates: [number] & { accountant: number };
   }
 >;
 
 export type SetFeeStoresEvent = TypedEvent<
-  [
-    [string, string, string, string] & {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    }
-  ] & {
-    _feeStores: [string, string, string, string] & {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    };
+  [[string] & { accountant: string }] & {
+    _feeStores: [string] & { accountant: string };
   }
 >;
 
 export type SetNodeEvent = TypedEvent<
-  [number, string, string] & {
-    nodeType: number;
-    node: string;
-    msgSender: string;
-  }
+  [number, string] & { nodeType: number; node: string }
 >;
 
 export class INode extends BaseContract {
@@ -177,33 +160,29 @@ export class INode extends BaseContract {
   interface: INodeInterface;
 
   functions: {
-    informOfPair(
+    begin(
+      caller: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    changePairStatus(
       pair: string,
       token0: string,
       token1: string,
+      status: BigNumberish,
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setFeeRates(
       _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      _feeRates: { accountant: BigNumberish },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
+      _feeStores: { accountant: string },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -222,33 +201,29 @@ export class INode extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  informOfPair(
+  begin(
+    caller: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  changePairStatus(
     pair: string,
     token0: string,
     token1: string,
+    status: BigNumberish,
     caller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setFeeRates(
     _sessionType: BigNumberish,
-    _feeRates: {
-      develop: BigNumberish;
-      buyback: BigNumberish;
-      liquidity: BigNumberish;
-      treasury: BigNumberish;
-    },
+    _feeRates: { accountant: BigNumberish },
     caller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setFeeStores(
-    _feeStores: {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    },
+    _feeStores: { accountant: string },
     caller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -267,33 +242,26 @@ export class INode extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    informOfPair(
+    begin(caller: string, overrides?: CallOverrides): Promise<void>;
+
+    changePairStatus(
       pair: string,
       token0: string,
       token1: string,
+      status: BigNumberish,
       caller: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setFeeRates(
       _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      _feeRates: { accountant: BigNumberish },
       caller: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
+      _feeStores: { accountant: string },
       caller: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -313,143 +281,105 @@ export class INode extends BaseContract {
   };
 
   filters: {
+    "Begin()"(): TypedEventFilter<[], {}>;
+
+    Begin(): TypedEventFilter<[], {}>;
+
+    "ChangePairStatus(address,address,address,uint8)"(
+      pair?: null,
+      tokenA?: null,
+      tokenB?: null,
+      status?: null
+    ): TypedEventFilter<
+      [string, string, string, number],
+      { pair: string; tokenA: string; tokenB: string; status: number }
+    >;
+
+    ChangePairStatus(
+      pair?: null,
+      tokenA?: null,
+      tokenB?: null,
+      status?: null
+    ): TypedEventFilter<
+      [string, string, string, number],
+      { pair: string; tokenA: string; tokenB: string; status: number }
+    >;
+
+    "DeenlistToken(address,address)"(
+      token?: null,
+      msgSender?: null
+    ): TypedEventFilter<[string, string], { token: string; msgSender: string }>;
+
+    DeenlistToken(
+      token?: null,
+      msgSender?: null
+    ): TypedEventFilter<[string, string], { token: string; msgSender: string }>;
+
     "SetFeeRates(uint8,tuple)"(
       _sessionType?: null,
       _feeRates?: null
     ): TypedEventFilter<
-      [
-        number,
-        [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        }
-      ],
-      {
-        _sessionType: number;
-        _feeRates: [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        };
-      }
+      [number, [number] & { accountant: number }],
+      { _sessionType: number; _feeRates: [number] & { accountant: number } }
     >;
 
     SetFeeRates(
       _sessionType?: null,
       _feeRates?: null
     ): TypedEventFilter<
-      [
-        number,
-        [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        }
-      ],
-      {
-        _sessionType: number;
-        _feeRates: [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        };
-      }
+      [number, [number] & { accountant: number }],
+      { _sessionType: number; _feeRates: [number] & { accountant: number } }
     >;
 
     "SetFeeStores(tuple)"(
       _feeStores?: null
     ): TypedEventFilter<
-      [
-        [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        }
-      ],
-      {
-        _feeStores: [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        };
-      }
+      [[string] & { accountant: string }],
+      { _feeStores: [string] & { accountant: string } }
     >;
 
     SetFeeStores(
       _feeStores?: null
     ): TypedEventFilter<
-      [
-        [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        }
-      ],
-      {
-        _feeStores: [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        };
-      }
+      [[string] & { accountant: string }],
+      { _feeStores: [string] & { accountant: string } }
     >;
 
-    "SetNode(uint8,address,address)"(
+    "SetNode(uint8,address)"(
       nodeType?: null,
-      node?: null,
-      msgSender?: null
-    ): TypedEventFilter<
-      [number, string, string],
-      { nodeType: number; node: string; msgSender: string }
-    >;
+      node?: null
+    ): TypedEventFilter<[number, string], { nodeType: number; node: string }>;
 
     SetNode(
       nodeType?: null,
-      node?: null,
-      msgSender?: null
-    ): TypedEventFilter<
-      [number, string, string],
-      { nodeType: number; node: string; msgSender: string }
-    >;
+      node?: null
+    ): TypedEventFilter<[number, string], { nodeType: number; node: string }>;
   };
 
   estimateGas: {
-    informOfPair(
+    begin(
+      caller: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    changePairStatus(
       pair: string,
       token0: string,
       token1: string,
+      status: BigNumberish,
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setFeeRates(
       _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      _feeRates: { accountant: BigNumberish },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
+      _feeStores: { accountant: string },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -469,33 +399,29 @@ export class INode extends BaseContract {
   };
 
   populateTransaction: {
-    informOfPair(
+    begin(
+      caller: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    changePairStatus(
       pair: string,
       token0: string,
       token1: string,
+      status: BigNumberish,
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setFeeRates(
       _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      _feeRates: { accountant: BigNumberish },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
+      _feeStores: { accountant: string },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

@@ -12,12 +12,12 @@ import type {
 const _abi = [
   {
     inputs: [],
-    name: "getInnermostSType",
+    name: "lastSession",
     outputs: [
       {
-        internalType: "enum SessionType",
+        internalType: "uint256",
         name: "",
-        type: "uint8",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -25,12 +25,19 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "getOutermostSType",
+    name: "pause",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "paused",
     outputs: [
       {
-        internalType: "enum SessionType",
+        internalType: "bool",
         name: "",
-        type: "uint8",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -39,18 +46,23 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "enum SessionType",
-        name: "sessionType",
+        internalType: "enum ActionType",
+        name: "actionType",
         type: "uint8",
       },
+      {
+        internalType: "bool",
+        name: "blockReentry",
+        type: "bool",
+      },
     ],
-    name: "registerSession",
+    name: "registerAction",
     outputs: [
       {
         components: [
           {
-            internalType: "enum SessionType",
-            name: "sessionType",
+            internalType: "enum ActionType",
+            name: "actionType",
             type: "uint8",
           },
           {
@@ -65,15 +77,22 @@ const _abi = [
           },
           {
             internalType: "bool",
-            name: "isOriginAction",
+            name: "isUserAction",
             type: "bool",
           },
         ],
-        internalType: "struct SessionParams",
-        name: "sessionParams",
+        internalType: "struct ActionParams",
+        name: "actionParams",
         type: "tuple",
       },
     ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "resume",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -93,7 +112,7 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "enum SessionType",
+        internalType: "enum ActionType",
         name: "",
         type: "uint8",
       },
@@ -111,7 +130,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "unregisterSession",
+    name: "unregisterAction",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

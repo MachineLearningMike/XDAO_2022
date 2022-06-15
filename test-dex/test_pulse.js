@@ -11,7 +11,7 @@ const {
     deployFarmLibrary,
     deployFarm,
     deployCenter,
-    deployCrossLibrary,
+    deployXLibrary,
     deployRouterLibrary,
     deployMaker,
     deployTaker,
@@ -34,7 +34,7 @@ const {
     
     let wireLib, factory, wbnb, center, crossLib, routerLib, maker, taker, tgr, mock, mock2, farm, farmLib, xCrss, referral, rCrss, rSyrup, repay;
     let crss_bnb, crss_mck, crss_mck2;
-    let owner, alice, bob, carol, dev, buyback, liquidity, treasury;
+    let owner, alice, bob, carol, tgrftm, tgrhtz, votes;
     let tx;
     
     const FeeMagnifier = Number(1e5); // 
@@ -94,30 +94,47 @@ async function mintTime(seconds) {
 
 async function showVirtualBurn() {
     let user_burn = await tgr.user_burn();
-    console.log("\n\tsum_balances: %s, pending_burn: %s, latestRound: %s", 
-    user_burn.sum_balances, user_burn.pending_burn, user_burn.latestRound);
-    
-    console.log("\towner: %s, alice: %s, bob: %s, carol: %s",
-    await tgr.balanceOf(owner.address), await tgr.balanceOf(alice.address), await tgr.balanceOf(bob.address), await tgr.balanceOf(carol.address) );
+    console.log("\n\tsum_balances: %s, pending_burn: %s, totalSupply: %s", 
+    user_burn.sum_balances, user_burn.pending_burn, await tgr.totalSupply());
+
+    // console.log("\towner: %s, alice: %s, bob: %s, carol: %s",
+    // await tgr.balanceOf(owner.address), await tgr.balanceOf(alice.address), await tgr.balanceOf(bob.address), await tgr.balanceOf(carol.address) );
 
     await tgr.checkForConsistency();
     console.log("\tConsistency checked!");
 }
 
+async function transfer(sender, recipient, amount) {
+  let balance = await tgr.balanceOf(sender.address);
+  if (ethToWei(amount) > balance) amount = weiToEth(balance);
+  console.log("\t%s is transferring %s %s TGR ...".yellow, sender.name, recipient.name, amount);
+  tx = tgr.connect(sender).transfer(recipient.address, ethToWei(amount));
+  (await tx).wait();
+  console.log("\tTransfer done".green);
+}
+
 describe("====================== Stage 1: ======================\n".yellow, async function () {
     it("Main contracts are deployed.\n".green, async function () {
-        [owner, alice, bob, carol] = await ethers.getSigners();
+        // For the sake of transfer test, the pools tgrftm, tgrhtz and votes are wallet accounts.
+        // This way we can simulate a transfer from/to/between those pools.
+
+        [owner, alice, bob, carol, tgrftm, tgrhtz, votes] = await ethers.getSigners();
         owner.name = "Owner"; alice.name = "Alice"; bob.name = "Bob"; carol.name = "Carol";
+        tgrftm.name = "TgrFtm"; tgrhtz.name = "TgrHtz"; votes.name = "Votes";
 
         console.log("\tOwner address: ".cyan, owner.address);
         console.log("\tAlice address: ".cyan, alice.address);
         console.log("\tBob address: ".cyan, bob.address);
         console.log("\tCarol address: ".cyan, carol.address);
+        console.log("\tTgrFtm address: ".cyan, tgrftm.address);
+        console.log("\tTgrHtz address: ".cyan, tgrhtz.address);
+        console.log("\tVotes address: ".cyan, votes.address);
 
-		const AnalyticMath = await ethers.getContractFactory("AnalyticMath", owner);
-		analyticMath = await AnalyticMath.deploy();
+
+    		const AnalyticMath = await ethers.getContractFactory("AnalyticMath", owner);
+		    analyticMath = await AnalyticMath.deploy();
         await analyticMath.init();
-		console.log("\tAnalyticMath contract was deployed at: ", analyticMath.address);
+		    console.log("\tAnalyticMath contract was deployed at: ", analyticMath.address);
 
         tgr = await deployTGR(owner, analyticMath.address);
         console.log("\tTGR contract deployed at: %s", tgr.address);
@@ -125,28 +142,60 @@ describe("====================== Stage 1: ======================\n".yellow, asyn
 
         await showVirtualBurn();
 
+        await mintBlocks(50);
+        await tgr.pulse_user_burn();
+        await showVirtualBurn();
+
+        await transfer(owner, alice, 10);
         await mintBlocks(5);
         await tgr.pulse_user_burn();
         await showVirtualBurn();
 
-        await tgr.connect(owner).transfer(alice.address, ethToWei(10));
-        await mintBlocks(5);
+        await transfer(owner, bob, 1000);
+        await mintBlocks(50);
         await tgr.pulse_user_burn();
         await showVirtualBurn();
 
-        await tgr.connect(owner).transfer(bob.address, ethToWei(1000));
-        await mintBlocks(5);
+        await transfer(owner, carol, 5000);
+        await mintBlocks(50);
         await tgr.pulse_user_burn();
         await showVirtualBurn();
 
-        await tgr.connect(owner).transfer(carol.address, ethToWei(5000));
-        await mintBlocks(5);
+        await mintBlocks(50);
         await tgr.pulse_user_burn();
         await showVirtualBurn();
 
-        await mintBlocks(500);
+        await transfer(owner, carol, 100);
+        await mintBlocks(50);
         await tgr.pulse_user_burn();
         await showVirtualBurn();
+
+        await transfer(carol, carol, 100);
+        await mintBlocks(50);
+        await tgr.pulse_user_burn();
+        await showVirtualBurn();
+
+        await transfer(carol, alice, 100);
+        await mintBlocks(50);
+        await tgr.pulse_user_burn();
+        await showVirtualBurn();
+
+        await transfer(owner, tgrftm, 100);
+        await mintBlocks(50);
+        await tgr.pulse_user_burn();
+        await showVirtualBurn();
+
+        await transfer(tgrftm, tgrhtz, 101);
+        await mintBlocks(50);
+        await tgr.pulse_user_burn();
+        await showVirtualBurn();
+
+        await transfer(owner, votes, 10000);
+        await showVirtualBurn();
+        await mintBlocks(20);
+        await tgr.pulse_vote_burn();
+        await showVirtualBurn();
+
 
     });
 

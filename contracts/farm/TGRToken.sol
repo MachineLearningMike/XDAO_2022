@@ -11,8 +11,8 @@ import "../session/interfaces/IConstants.sol";
 // import "../session/SessionFees.sol";
 // import "../session/Node.sol";
 // import "../libraries/WireLib.sol";
-// import "../periphery/interfaces/IMaker.sol";
-// import "../periphery/interfaces/ITaker.sol";
+// import "../periphery/interfaces/IXMaker.sol";
+// import "../periphery/interfaces/IXTaker.sol";
 // import "../core/interfaces/IXDAOFactory.sol"; 
 // import "../core/interfaces/IXDAOPair.sol";
 // import "../farm/interfaces/IXDAOFarm.sol";
@@ -62,21 +62,20 @@ contract TGRToken is Ownable, ITGRToken {
 
     //====================== Pulse internal functions ============================
 
-    function _checkForConsistency() internal view {
-        // Defines user_burn attributes, based on the ERC20 core data.
-        require(user_burn.sum_balances + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply, 
-        "sum_balances + _bal[tgrftm] + _bal[tgrhtz + _bal[votes != _totalSupply");
-        require(_balances[admin] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balances,
-        "_bal[admin] + _bal[alice] + _bal[bob] + _bal[carol] != sum_balances");
-    }
-
     function _isUserAccount(address account) internal view returns (bool) {
         return account != tgrftm && account != tgrhtz && account != votes;
     }
 
+    function _pendingBurn(address account) internal view returns (uint256 pendingBurn) {
+        pendingBurn = _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn;
+        if (pendingBurn > _balances[account]) {
+            console.log("pendingBurn exceeds _balances", pendingBurn, _balances[account]);
+        }
+    }
 
     function _settleWithPendingBurn(address account) internal { // user account only
-        uint256 pendingBurn = _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn; // smaller than its real value
+        uint256 pendingBurn = _pendingBurn(account);
+        // uint256 pendingBurn = (_balances[account] * user_burn.accDecayPerShare - Users[account].debtToPendingBurn * 1e12) / (1e12 + user_burn.accDecayPerShare);
         if (pendingBurn > 0) {
             _balances[account] -= pendingBurn; // larger than its real value
             _totalSupply -= pendingBurn; // larger than its real value
@@ -103,19 +102,19 @@ contract TGRToken is Ownable, ITGRToken {
     constructor(address _analyticMath) Ownable() {
         analyticMath = AnalyticMath(_analyticMath);
 
-        //--------- test users ---------
+        //--------- test ---------
         admin = _msgSender();
         alice = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
         bob = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;
         carol = 0x90F79bf6EB2c4f870365E785982E1f101E93b906;
 
-        tgrftm = 0x97713c3c752F3bb80CBFAaCC6830a36A72Eb6E97; // tgr_bnb
-        tgrhtz = 0x3924A2cf72d190023667609Dd91e70Ed11127D78; // tgr_mck
-        votes = 0x02EED5Ac83f1c3D1624c0437c9E682e83E95BcFf; // tgr_mck2
+        tgrftm = 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65; // tgr_bnb
+        tgrhtz = 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc; // tgr_mck
+        votes = 0x976EA74026E726554dB657fA54763abd0C3a0aa9; // tgr_mck2
 
-        lp_reward = Pulse(0, 2 seconds, 690, tgrftm, 0, 0, 0, block.timestamp / (2 seconds));
-        vote_burn = Pulse(0, 2 seconds, 70, votes, 0, 0, 0, block.timestamp / (2 seconds));
-        user_burn = Pulse(0, 4 seconds, 777, zero_address, 0, 0, 0, block.timestamp / (4 seconds));
+        lp_reward = Pulse(block.timestamp, 2 seconds, 690, tgrftm, 0, 0, 0, block.timestamp / (2 seconds));
+        vote_burn = Pulse(block.timestamp, 2 seconds, 70, votes, 0, 0, 0, block.timestamp / (2 seconds));
+        user_burn = Pulse(block.timestamp, 4 seconds, 777, zero_address, 0, 0, 0, block.timestamp / (4 seconds));
 
         _mint(_msgSender(), 1e6 * 10 ** _decimals);
 
@@ -126,7 +125,7 @@ contract TGRToken is Ownable, ITGRToken {
     function _balanceOf(address account) internal view returns (uint256 balance) {
         if (_isUserAccount(account)) {
             // This line of code produces dust, due to numerical error. pendingBurn becomes less than its real value.
-            uint256 pendingBurn = _balances[account] * user_burn.accDecayPerShare / 1e12 - Users[account].debtToPendingBurn;
+            uint256 pendingBurn = _pendingBurn(account);
             // so, balance becomes greater than its real value.
             balance = _balances[account] - pendingBurn; // larger than its real value
         } else {
@@ -309,12 +308,15 @@ contract TGRToken is Ownable, ITGRToken {
             pulse.latestRound = round;
             pulse.latestTime = block.timestamp; // Not used.
 
+            //require(missingRounds <= 30, "Beyond math library capability");
+            if (missingRounds > 30) missingRounds = 30; // for test only
+
             decayPer1e12 = 1e12;
             if (missingRounds <= 5) { // 5 optimized
-                uint256 remain = FeeMagnifier - pulse.decayRate; 
+                uint256 remain = FeeMagnifier - pulse.decayRate;
                 uint256 numerator = remain; 
                 uint256 denominator = FeeMagnifier;
-                for(uint256 i = 1; i < missingRounds; i++) { // note 1.
+                for(uint256 i = 1; i < missingRounds; i++) { // note it starts from 1.
                     numerator *= remain;
                     denominator *= FeeMagnifier;
                 }
@@ -375,7 +377,12 @@ contract TGRToken is Ownable, ITGRToken {
     }
 
     function checkForConsistency() external view {
-        _checkForConsistency();
+
+        // Defines user_burn attributes, based on the ERC20 core data.
+        require(user_burn.sum_balances + _balances[tgrftm] + _balances[tgrhtz] + _balances[votes] == _totalSupply, 
+        "sum_balances + _bal[tgrftm] + _bal[tgrhtz + _bal[votes != _totalSupply");
+        require(_balances[admin] + _balances[alice] + _balances[bob] + _balances[carol] == user_burn.sum_balances,
+        "_bal[admin] + _bal[alice] + _bal[bob] + _bal[carol] != sum_balances");
 
         // This requirement cannot be met due to numerical errors.
         // require(user_burn.sum_balances - user_burn.pending_burn == balanceOf(admin) + balanceOf(alice) + balanceOf(bob) + balanceOf(carol),
@@ -396,6 +403,6 @@ contract TGRToken is Ownable, ITGRToken {
     }
 
     //======================= Fees on transfer ===============================
-    
+
 
 }

@@ -15,14 +15,14 @@ exports.deployWireLib = async function (deployer) {
 };
 
 exports.deployFactory = async function (deployer, feeToSetter, wireLib) {
-  const Factory = await ethers.getContractFactory("XDAOFactory", {
+  const XFactory = await ethers.getContractFactory("XDAOFactory", {
     signer: deployer,
     libraries: {
       WireLib: wireLib,
     },
   });
 
-  const factory = await Factory.connect(deployer).deploy(feeToSetter);
+  const factory = await XFactory.connect(deployer).deploy(feeToSetter);
   await factory.deployed();
 
   return factory;
