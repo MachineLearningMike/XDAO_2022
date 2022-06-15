@@ -6,23 +6,22 @@ import "solidity-math-utils/project/contracts/AnalyticMath.sol";
 
 import "./interfaces/ITGRToken.sol";
 import "../session/interfaces/IConstants.sol";
-// import "../session/SessionRegistrar.sol";
-// import "../session/SessionManager.sol";
-// import "../session/SessionFees.sol";
-// import "../session/Node.sol";
-// import "../libraries/WireLib.sol";
-// import "../periphery/interfaces/IXMaker.sol";
-// import "../periphery/interfaces/IXTaker.sol";
-// import "../core/interfaces/IXDAOFactory.sol"; 
-// import "../core/interfaces/IXDAOPair.sol";
-// import "../farm/interfaces/IXDAOFarm.sol";
+import "../session/SessionRegistrar.sol";
+import "../session/SessionManager.sol";
+import "../session/SessionFees.sol";
+import "../session/Node.sol";
+import "../libraries/WireLibrary.sol";
+import "../periphery/interfaces/IXMaker.sol";
+import "../periphery/interfaces/IXTaker.sol";
+import "../core/interfaces/IXFactory.sol"; 
+import "../core/interfaces/IXPair.sol";
 import "../libraries/math/SafeMath.sol";
-// import "../libraries/GovLib.sol";
+import "../libraries/GovLib.sol";
 
 import "hardhat/console.sol";
 
 // TGRToken with Governance.
-contract TGRToken is Ownable, ITGRToken {
+contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, SessionManager {
     using SafeMath for uint256;
 
     //==================== Constants ====================
@@ -99,7 +98,7 @@ contract TGRToken is Ownable, ITGRToken {
 
     AnalyticMath analyticMath;
 
-    constructor(address _analyticMath) Ownable() {
+    constructor(address _analyticMath) Ownable() Node(NodeType.Token) {
         analyticMath = AnalyticMath(_analyticMath);
 
         //--------- test ---------
@@ -402,7 +401,45 @@ contract TGRToken is Ownable, ITGRToken {
         require( 1e6 * abs_error < net_collective, "Error exceeds a million-th");
     }
 
-    //======================= Fees on transfer ===============================
+    //======================= DEX cooperations ===============================
 
+    function transferDirectSafe(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external virtual override {
+        address msgSender = _msgSender();
+        require(
+        msgSender == nodes.taker 
+        || msgSender == nodes.maker 
+        || pairs[msgSender].token0 != address(0),    // coming from a pair
+        sForbidden);
+
+        if (amount > _balances[sender]) amount = _balances[sender];
+        if (amount > 0) {
+            _transfer(sender, recipient, amount);
+            //_moveDelegates(_delegates[sender], _delegates[recipient], amount);
+        }
+    }
+
+    modifier onlySessionManager() virtual override(SessionFees, SessionRegistrar) {
+        address msgSender = _msgSender();
+        require(
+            msgSender == nodes.token ||
+                msgSender == nodes.maker ||
+                msgSender == nodes.taker,
+            "Not a session manager"
+        );
+        _;
+    }
+
+    modifier ownerOnly() virtual override {
+        require(_msgSender() == owner(), "Not owner");
+        _;
+    }
+
+    function getOwner() public view override returns (address) {
+        return owner();
+    }
 
 }

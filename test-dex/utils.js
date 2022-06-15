@@ -4,8 +4,8 @@ const { getAddress, keccak256, solidityPack } = require("ethers/lib/utils");
 const ONE = ethers.BigNumber.from(1);
 const TWO = ethers.BigNumber.from(2);
 
-exports.deployWireLib = async function (deployer) {
-  const WireLib = await ethers.getContractFactory("WireLib", {
+exports.deployWireLibrary = async function (deployer) {
+  const WireLib = await ethers.getContractFactory("WireLibrary", {
     signer: deployer,
   });
   const wireLib = await WireLib.deploy();
@@ -18,7 +18,7 @@ exports.deployFactory = async function (deployer, feeToSetter, wireLib) {
   const XFactory = await ethers.getContractFactory("XDAOFactory", {
     signer: deployer,
     libraries: {
-      WireLib: wireLib,
+      WireLibrary: wireLib,
     },
   });
 
@@ -36,7 +36,7 @@ exports.deployWBNB = async function (deployer) {
   return wbnb;
 };
 
-exports.deployGovLib = async function (deployer) {
+exports.deployGovLibrary = async function (deployer) {
   const GovernanceLib = await ethers.getContractFactory("GovLib", {
     signer: deployer,
   });
@@ -47,9 +47,12 @@ exports.deployGovLib = async function (deployer) {
 };
 
 
-exports.deployTGR = async function (deployer, analyticMath) {
+exports.deployTGR = async function (deployer, analyticMath, wireLib) {
   const TGRToken = await ethers.getContractFactory("TGRToken", {
     signer: deployer,
+    libraries: {
+      WireLibrary: wireLib,
+    },
 });
 
   const crssToken = await TGRToken.connect(deployer).deploy(analyticMath);
@@ -87,7 +90,7 @@ exports.deployMaker = async function (deployer, wbnb, wireLib) {
   const Router = await ethers.getContractFactory("Maker", {
     signer: deployer,
     libraries: {
-      WireLib: wireLib,
+      WireLibrary: wireLib,
     },
   });
 
@@ -101,7 +104,7 @@ exports.deployTaker = async function (deployer, wbnb, wireLib) {
   const Router = await ethers.getContractFactory("Taker", {
     signer: deployer,
     libraries: {
-      WireLib: wireLib,
+      WireLibrary: wireLib,
     },
   });
 
@@ -128,7 +131,7 @@ exports.verifyUpgradeable = async function (address) {
   }
 };
 
-exports.deployFarmLib = async function (deployer) {
+exports.deployFarmLibrary = async function (deployer) {
   const FarmLib = await ethers.getContractFactory("FarmLib", {
     signer: deployer,
   });

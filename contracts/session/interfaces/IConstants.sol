@@ -50,7 +50,7 @@ enum ListStatus {
     Delisted
 }
 
-struct XPair {
+struct Pair {
     address token0;
     address token1;
     ListStatus status;

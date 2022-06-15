@@ -130,13 +130,15 @@ describe("====================== Stage 1: ======================\n".yellow, asyn
         console.log("\tTgrHtz address: ".cyan, tgrhtz.address);
         console.log("\tVotes address: ".cyan, votes.address);
 
+        wireLib = await deployWireLibrary(owner);
+        console.log("\tWireLibrary deployed at: %s", wireLib.address);
 
     		const AnalyticMath = await ethers.getContractFactory("AnalyticMath", owner);
 		    analyticMath = await AnalyticMath.deploy();
         await analyticMath.init();
 		    console.log("\tAnalyticMath contract was deployed at: ", analyticMath.address);
 
-        tgr = await deployTGR(owner, analyticMath.address);
+        tgr = await deployTGR(owner, analyticMath.address, wireLib.address);
         console.log("\tTGR contract deployed at: %s", tgr.address);
         console.log("\tOwner's balance: %s", await tgr.balanceOf(owner.address));
 

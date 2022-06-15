@@ -6,7 +6,7 @@ import "../../session/interfaces/IConstants.sol";
 
 interface IXPair is IPancakePair {
     function initialize(address, address) external;
-    function setNodes(address token, address maker, address taker, address farm) external;
+    function setNodes(address token, address maker, address taker) external;
     function status() external view returns (ListStatus);
     function changeStatus(ListStatus _status) external;
 }

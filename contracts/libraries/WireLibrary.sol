@@ -28,10 +28,7 @@ library WireLibrary {
             (msg.sender == nodes.token ||
                 msg.sender == nodes.maker ||
                 msg.sender == nodes.taker ||
-                msg.sender == nodes.farm ||
-                msg.sender == nodes.repay ||
-                msg.sender == nodes.factory ||
-                msg.sender == nodes.xToken);
+                msg.sender == nodes.factory);
     }
 
     function setFeeStores(FeeStores storage feeStores, FeeStores memory _feeStores) external {

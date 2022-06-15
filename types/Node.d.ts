@@ -21,42 +21,46 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface NodeInterface extends ethers.utils.Interface {
   functions: {
+    "begin(address)": FunctionFragment;
+    "changePairStatus(address,address,address,uint8,address)": FunctionFragment;
+    "feeRates(uint8)": FunctionFragment;
+    "feeStores()": FunctionFragment;
     "getOwner()": FunctionFragment;
-    "informOfPair(address,address,address,address)": FunctionFragment;
     "nextNode()": FunctionFragment;
+    "pairFor(address,address)": FunctionFragment;
+    "pairs(address)": FunctionFragment;
     "prevNode()": FunctionFragment;
-    "setFeeRates(uint8,(uint32,uint32,uint32,uint32),address)": FunctionFragment;
-    "setFeeStores((address,address,address,address),address)": FunctionFragment;
+    "setFeeRates(uint8,(uint32),address)": FunctionFragment;
+    "setFeeStores((address),address)": FunctionFragment;
     "setNode(uint8,address,address)": FunctionFragment;
     "wire(address,address)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "getOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "begin", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "informOfPair",
-    values: [string, string, string, string]
+    functionFragment: "changePairStatus",
+    values: [string, string, string, BigNumberish, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "feeRates",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "feeStores", values?: undefined): string;
+  encodeFunctionData(functionFragment: "getOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "nextNode", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "pairFor",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(functionFragment: "pairs", values: [string]): string;
   encodeFunctionData(functionFragment: "prevNode", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setFeeRates",
-    values: [
-      BigNumberish,
-      {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
-      string
-    ]
+    values: [BigNumberish, { accountant: BigNumberish }, string]
   ): string;
   encodeFunctionData(
     functionFragment: "setFeeStores",
-    values: [
-      { develop: string; buyback: string; liquidity: string; treasury: string },
-      string
-    ]
+    values: [{ accountant: string }, string]
   ): string;
   encodeFunctionData(
     functionFragment: "setNode",
@@ -67,12 +71,17 @@ interface NodeInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
 
-  decodeFunctionResult(functionFragment: "getOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "begin", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "informOfPair",
+    functionFragment: "changePairStatus",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "feeRates", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "feeStores", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nextNode", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pairFor", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pairs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "prevNode", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setFeeRates",
@@ -86,60 +95,52 @@ interface NodeInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "wire", data: BytesLike): Result;
 
   events: {
+    "Begin()": EventFragment;
+    "ChangePairStatus(address,address,address,uint8)": EventFragment;
+    "DeenlistToken(address,address)": EventFragment;
     "SetFeeRates(uint8,tuple)": EventFragment;
     "SetFeeStores(tuple)": EventFragment;
-    "SetNode(uint8,address,address)": EventFragment;
+    "SetNode(uint8,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "Begin"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChangePairStatus"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DeenlistToken"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetFeeRates"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetFeeStores"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetNode"): EventFragment;
 }
 
+export type BeginEvent = TypedEvent<[] & {}>;
+
+export type ChangePairStatusEvent = TypedEvent<
+  [string, string, string, number] & {
+    pair: string;
+    tokenA: string;
+    tokenB: string;
+    status: number;
+  }
+>;
+
+export type DeenlistTokenEvent = TypedEvent<
+  [string, string] & { token: string; msgSender: string }
+>;
+
 export type SetFeeRatesEvent = TypedEvent<
-  [
-    number,
-    [number, number, number, number] & {
-      develop: number;
-      buyback: number;
-      liquidity: number;
-      treasury: number;
-    }
-  ] & {
+  [number, [number] & { accountant: number }] & {
     _sessionType: number;
-    _feeRates: [number, number, number, number] & {
-      develop: number;
-      buyback: number;
-      liquidity: number;
-      treasury: number;
-    };
+    _feeRates: [number] & { accountant: number };
   }
 >;
 
 export type SetFeeStoresEvent = TypedEvent<
-  [
-    [string, string, string, string] & {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    }
-  ] & {
-    _feeStores: [string, string, string, string] & {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    };
+  [[string] & { accountant: string }] & {
+    _feeStores: [string] & { accountant: string };
   }
 >;
 
 export type SetNodeEvent = TypedEvent<
-  [number, string, string] & {
-    nodeType: number;
-    node: string;
-    msgSender: string;
-  }
+  [number, string] & { nodeType: number; node: string }
 >;
 
 export class Node extends BaseContract {
@@ -186,41 +187,63 @@ export class Node extends BaseContract {
   interface: NodeInterface;
 
   functions: {
-    getOwner(
+    begin(
+      caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    informOfPair(
+    changePairStatus(
       pair: string,
       token0: string,
       token1: string,
+      status: BigNumberish,
       caller: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    feeRates(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[number] & { accountant: number }>;
+
+    feeStores(
+      overrides?: CallOverrides
+    ): Promise<[string] & { accountant: string }>;
+
+    getOwner(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     nextNode(overrides?: CallOverrides): Promise<[string]>;
 
+    pairFor(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    pairs(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, number] & {
+        token0: string;
+        token1: string;
+        status: number;
+      }
+    >;
+
     prevNode(overrides?: CallOverrides): Promise<[string]>;
 
     setFeeRates(
       _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      _feeRates: { accountant: BigNumberish },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
+      _feeStores: { accountant: string },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -239,41 +262,58 @@ export class Node extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  getOwner(
+  begin(
+    caller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  informOfPair(
+  changePairStatus(
     pair: string,
     token0: string,
     token1: string,
+    status: BigNumberish,
     caller: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  feeRates(arg0: BigNumberish, overrides?: CallOverrides): Promise<number>;
+
+  feeStores(overrides?: CallOverrides): Promise<string>;
+
+  getOwner(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   nextNode(overrides?: CallOverrides): Promise<string>;
 
+  pairFor(
+    arg0: string,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  pairs(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, number] & {
+      token0: string;
+      token1: string;
+      status: number;
+    }
+  >;
+
   prevNode(overrides?: CallOverrides): Promise<string>;
 
   setFeeRates(
     _sessionType: BigNumberish,
-    _feeRates: {
-      develop: BigNumberish;
-      buyback: BigNumberish;
-      liquidity: BigNumberish;
-      treasury: BigNumberish;
-    },
+    _feeRates: { accountant: BigNumberish },
     caller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setFeeStores(
-    _feeStores: {
-      develop: string;
-      buyback: string;
-      liquidity: string;
-      treasury: string;
-    },
+    _feeStores: { accountant: string },
     caller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -292,39 +332,53 @@ export class Node extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    getOwner(overrides?: CallOverrides): Promise<string>;
+    begin(caller: string, overrides?: CallOverrides): Promise<void>;
 
-    informOfPair(
+    changePairStatus(
       pair: string,
       token0: string,
       token1: string,
+      status: BigNumberish,
       caller: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    feeRates(arg0: BigNumberish, overrides?: CallOverrides): Promise<number>;
+
+    feeStores(overrides?: CallOverrides): Promise<string>;
+
+    getOwner(overrides?: CallOverrides): Promise<string>;
+
     nextNode(overrides?: CallOverrides): Promise<string>;
+
+    pairFor(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    pairs(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, number] & {
+        token0: string;
+        token1: string;
+        status: number;
+      }
+    >;
 
     prevNode(overrides?: CallOverrides): Promise<string>;
 
     setFeeRates(
       _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      _feeRates: { accountant: BigNumberish },
       caller: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
+      _feeStores: { accountant: string },
       caller: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -344,151 +398,125 @@ export class Node extends BaseContract {
   };
 
   filters: {
+    "Begin()"(): TypedEventFilter<[], {}>;
+
+    Begin(): TypedEventFilter<[], {}>;
+
+    "ChangePairStatus(address,address,address,uint8)"(
+      pair?: null,
+      tokenA?: null,
+      tokenB?: null,
+      status?: null
+    ): TypedEventFilter<
+      [string, string, string, number],
+      { pair: string; tokenA: string; tokenB: string; status: number }
+    >;
+
+    ChangePairStatus(
+      pair?: null,
+      tokenA?: null,
+      tokenB?: null,
+      status?: null
+    ): TypedEventFilter<
+      [string, string, string, number],
+      { pair: string; tokenA: string; tokenB: string; status: number }
+    >;
+
+    "DeenlistToken(address,address)"(
+      token?: null,
+      msgSender?: null
+    ): TypedEventFilter<[string, string], { token: string; msgSender: string }>;
+
+    DeenlistToken(
+      token?: null,
+      msgSender?: null
+    ): TypedEventFilter<[string, string], { token: string; msgSender: string }>;
+
     "SetFeeRates(uint8,tuple)"(
       _sessionType?: null,
       _feeRates?: null
     ): TypedEventFilter<
-      [
-        number,
-        [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        }
-      ],
-      {
-        _sessionType: number;
-        _feeRates: [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        };
-      }
+      [number, [number] & { accountant: number }],
+      { _sessionType: number; _feeRates: [number] & { accountant: number } }
     >;
 
     SetFeeRates(
       _sessionType?: null,
       _feeRates?: null
     ): TypedEventFilter<
-      [
-        number,
-        [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        }
-      ],
-      {
-        _sessionType: number;
-        _feeRates: [number, number, number, number] & {
-          develop: number;
-          buyback: number;
-          liquidity: number;
-          treasury: number;
-        };
-      }
+      [number, [number] & { accountant: number }],
+      { _sessionType: number; _feeRates: [number] & { accountant: number } }
     >;
 
     "SetFeeStores(tuple)"(
       _feeStores?: null
     ): TypedEventFilter<
-      [
-        [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        }
-      ],
-      {
-        _feeStores: [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        };
-      }
+      [[string] & { accountant: string }],
+      { _feeStores: [string] & { accountant: string } }
     >;
 
     SetFeeStores(
       _feeStores?: null
     ): TypedEventFilter<
-      [
-        [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        }
-      ],
-      {
-        _feeStores: [string, string, string, string] & {
-          develop: string;
-          buyback: string;
-          liquidity: string;
-          treasury: string;
-        };
-      }
+      [[string] & { accountant: string }],
+      { _feeStores: [string] & { accountant: string } }
     >;
 
-    "SetNode(uint8,address,address)"(
+    "SetNode(uint8,address)"(
       nodeType?: null,
-      node?: null,
-      msgSender?: null
-    ): TypedEventFilter<
-      [number, string, string],
-      { nodeType: number; node: string; msgSender: string }
-    >;
+      node?: null
+    ): TypedEventFilter<[number, string], { nodeType: number; node: string }>;
 
     SetNode(
       nodeType?: null,
-      node?: null,
-      msgSender?: null
-    ): TypedEventFilter<
-      [number, string, string],
-      { nodeType: number; node: string; msgSender: string }
-    >;
+      node?: null
+    ): TypedEventFilter<[number, string], { nodeType: number; node: string }>;
   };
 
   estimateGas: {
-    getOwner(
+    begin(
+      caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    informOfPair(
+    changePairStatus(
       pair: string,
       token0: string,
       token1: string,
+      status: BigNumberish,
       caller: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    feeRates(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+    feeStores(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getOwner(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     nextNode(overrides?: CallOverrides): Promise<BigNumber>;
 
+    pairFor(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    pairs(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     prevNode(overrides?: CallOverrides): Promise<BigNumber>;
 
     setFeeRates(
       _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      _feeRates: { accountant: BigNumberish },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
+      _feeStores: { accountant: string },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -508,41 +536,55 @@ export class Node extends BaseContract {
   };
 
   populateTransaction: {
-    getOwner(
+    begin(
+      caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    informOfPair(
+    changePairStatus(
       pair: string,
       token0: string,
       token1: string,
+      status: BigNumberish,
       caller: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    feeRates(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    feeStores(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getOwner(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     nextNode(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    pairFor(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    pairs(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     prevNode(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setFeeRates(
       _sessionType: BigNumberish,
-      _feeRates: {
-        develop: BigNumberish;
-        buyback: BigNumberish;
-        liquidity: BigNumberish;
-        treasury: BigNumberish;
-      },
+      _feeRates: { accountant: BigNumberish },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setFeeStores(
-      _feeStores: {
-        develop: string;
-        buyback: string;
-        liquidity: string;
-        treasury: string;
-      },
+      _feeStores: { accountant: string },
       caller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

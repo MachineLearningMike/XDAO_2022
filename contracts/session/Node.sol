@@ -12,7 +12,7 @@ abstract contract Node is INode {
 
     Nodes nodes;
 
-    mapping(address => XPair) public pairs;
+    mapping(address => Pair) public pairs;
     mapping(address => mapping(address => address)) public pairFor;
 
     FeeStores public feeStores;
@@ -67,7 +67,7 @@ abstract contract Node is INode {
         if (caller != address(this)) {
             // let caller be address(0) when an actor initiats this loop.
             if (trackPairStatus) {
-                pairs[pair] = XPair(token0, token1, status);
+                pairs[pair] = Pair(token0, token1, status);
                 pairFor[token0][token1] = pair;
                 pairFor[token1][token0] = pair;
             }

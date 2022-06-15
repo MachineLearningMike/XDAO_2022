@@ -29,9 +29,9 @@ contract XFactory is Node, IXFactory, Ownable {
     function setNode(NodeType nodeType, address node, address caller) public override {
         if (caller != address(this)) {  // let caller be address(0) when an actor initiats this loop
             WireLibrary.setNode(nodeType, node, nodes);
-            if (nodeType == NodeType.Token || nodeType == NodeType.Maker || nodeType == NodeType.Taker || nodeType == NodeType.Farm ) {
+            if (nodeType == NodeType.Token || nodeType == NodeType.Maker || nodeType == NodeType.Taker) {
                 for (uint256 i = 0; i < allPairs.length; i++) {
-                    IXPair(allPairs[i]).setNodes(nodes.token, nodes.maker, nodes.taker, nodes.farm);
+                    IXPair(allPairs[i]).setNodes(nodes.token, nodes.maker, nodes.taker);
                 }
             }
             address trueCaller = caller == address(0) ? address(this) : caller;
@@ -112,7 +112,7 @@ contract XFactory is Node, IXFactory, Ownable {
             pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
         IXPair(pair).initialize(token0, token1);
-        IXPair(pair).setNodes(nodes.token, nodes.maker, nodes.taker, nodes.farm);
+        IXPair(pair).setNodes(nodes.token, nodes.maker, nodes.taker);
         
         INode(this).changePairStatus(pair, token0, token1, ListStatus.Enlisted, address(0));
         allPairs.push(pair);
