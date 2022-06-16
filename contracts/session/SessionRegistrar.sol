@@ -27,17 +27,17 @@ abstract contract SessionRegistrar is ISessionRegistrar {
 
     function registerAction(ActionType actionType,  bool blockReentry) external override virtual onlySessionManager returns (ActionParams memory actionParams) {
         require(! paused, "System paused");
-        require(actionType != ActionType.None, "Invalid ActionType Type");
+        require(actionType != ActionType.None, "Invalid action");
 
         if (blockReentry) {
             for (uint256 i; i <= stackPointer; i++) {
-                require(actionStack[i] != actionType, "Reentry found");
+                require(actionStack[i] != actionType, "Reentry");
             }
         }
 
         // reading stackPointer costs 5,000 gas, while updating costs 20,000 gas.
         if ( ! (stackPointer == 0 && actionStack[0] == ActionType.None) ) stackPointer ++;
-        require(stackPointer < actionStack.length, "Action stack overflow");
+        require(stackPointer < actionStack.length, "Stack overflow");
 
         actionStack[stackPointer] = actionType;
 
