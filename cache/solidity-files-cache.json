@@ -388,8 +388,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\TGRToken.sol": {
-      "lastModificationDate": 1655325562794,
-      "contentHash": "c26e0082e87017cfa49feb3cbc9767ca",
+      "lastModificationDate": 1655548309008,
+      "contentHash": "758ed340989e7c79ef5613e54fe5adae",
       "sourceName": "contracts/farm/TGRToken.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -1228,8 +1228,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\session\\SessionRegistrar.sol": {
-      "lastModificationDate": 1655292170895,
-      "contentHash": "63bac93431b0a468a0fcf4053950d142",
+      "lastModificationDate": 1655353547199,
+      "contentHash": "a6b26731b4e801903b4f7a64353ad3df",
       "sourceName": "contracts/session/SessionRegistrar.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -1541,8 +1541,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\XPair.sol": {
-      "lastModificationDate": 1655325359387,
-      "contentHash": "35c04426288872916e907355b4a2248d",
+      "lastModificationDate": 1655548602666,
+      "contentHash": "9fd819b4c1f636116dacf680cf0aa593",
       "sourceName": "contracts/core/XPair.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -1592,8 +1592,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\core\\interfaces\\IXPair.sol": {
-      "lastModificationDate": 1655325340501,
-      "contentHash": "ec108da85ad036fbdae7a962ea688f00",
+      "lastModificationDate": 1655547709414,
+      "contentHash": "10aaab16e24e9b04314031d875c8a984",
       "sourceName": "contracts/core/interfaces/IXPair.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -1771,8 +1771,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\XTaker.sol": {
-      "lastModificationDate": 1655297130391,
-      "contentHash": "6591bdf73a9ba01eedd093cd0adfa79e",
+      "lastModificationDate": 1655548174214,
+      "contentHash": "abc6a39e078802f36771b410a5aa3945",
       "sourceName": "contracts/periphery/XTaker.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -1919,8 +1919,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IXTaker.sol": {
-      "lastModificationDate": 1655297208533,
-      "contentHash": "29702eeef46155ff21e7389bec84b9b3",
+      "lastModificationDate": 1655547989516,
+      "contentHash": "05701f59b0e7e22092b9b6160288fb0b",
       "sourceName": "contracts/periphery/interfaces/IXTaker.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -2154,8 +2154,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\XMaker.sol": {
-      "lastModificationDate": 1655297115688,
-      "contentHash": "c51d0f24dfc54ae2fc55bd079b8b5049",
+      "lastModificationDate": 1655548223153,
+      "contentHash": "61697fe07540e74ef76fe60ad7484916",
       "sourceName": "contracts/periphery/XMaker.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -2211,8 +2211,8 @@
       ]
     },
     "D:\\HARDHAT\\XDAO_2022\\contracts\\periphery\\interfaces\\IXMaker.sol": {
-      "lastModificationDate": 1655297216458,
-      "contentHash": "3ffd826582eb6c0927533c731478c398",
+      "lastModificationDate": 1655547951327,
+      "contentHash": "6bb58cb05eebed4efc63f6dc94b8aaa0",
       "sourceName": "contracts/periphery/interfaces/IXMaker.sol",
       "solcConfig": {
         "version": "0.8.14",
@@ -2474,6 +2474,135 @@
       ],
       "artifacts": [
         "IPancakeRouter01"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\libraries\\token\\WBNB.sol": {
+      "lastModificationDate": 1655426268556,
+      "contentHash": "1f041edde9a2bbeb01703494b8ac5a74",
+      "sourceName": "contracts/libraries/token/WBNB.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "WBNB"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\Referral.sol": {
+      "lastModificationDate": 1655426767935,
+      "contentHash": "073392260d60ab9349fff95248c4a212",
+      "sourceName": "contracts/farm/Referral.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./interfaces/IReferral.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Referral"
+      ]
+    },
+    "D:\\HARDHAT\\XDAO_2022\\contracts\\farm\\interfaces\\IReferral.sol": {
+      "lastModificationDate": 1655426753952,
+      "contentHash": "020a744194e2d73c03d00bbab30bc7c4",
+      "sourceName": "contracts/farm/interfaces/IReferral.sol",
+      "solcConfig": {
+        "version": "0.8.14",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout",
+                "devdoc",
+                "userdoc",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IReferral"
       ]
     }
   }

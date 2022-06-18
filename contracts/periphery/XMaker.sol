@@ -156,6 +156,35 @@ contract XMaker is Node, IXMaker, Ownable, SessionManager {
         }
     }
 
+    function wired_addLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 amountADesired,
+        uint256 amountBDesired,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to,
+        uint256 deadline
+    )
+        external
+        virtual override ensure(deadline)
+        returns (uint256 amountA, uint256 amountB, uint256 liquidity)
+    {
+        require(_msgSender() == nodes.token, sForbidden);
+
+        (amountA, amountB) = _addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin);
+
+        address pair = pairFor[tokenA][tokenB];
+        _checkEnlisted(pair);
+
+        XLibrary.lightTransferFrom(tokenA, msg.sender, pair, amountA, nodes.token);
+        XLibrary.lightTransferFrom(tokenB, msg.sender, pair, amountB, nodes.token);
+        liquidity = IXPair(pair).mint(address(this));
+
+        if (tokenA == nodes.token || tokenB == nodes.token) liquidity -= _payTransactionFeeLP(pair, liquidity);
+        TransferHelper.safeTransfer(pair, to, liquidity);
+    }
+
     function addLiquidityETH(
         address _token,
         uint256 amountTokenDesired,
@@ -248,6 +277,37 @@ contract XMaker is Node, IXMaker, Ownable, SessionManager {
         (amountA, amountB) = _removeLiquidity(tokenA, tokenB, liquidity, amountAMin, amountBMin, to);
 
         _closeAction();
+    }
+
+    function wired_removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 liquidity,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to,
+        uint256 deadline
+    ) public virtual override ensure(deadline) returns (uint256 amountA, uint256 amountB) {
+        require(_msgSender() == nodes.token, sForbidden);
+
+        (amountA, amountB) = _removeLiquidity(tokenA, tokenB, liquidity, amountAMin, amountBMin, to);
+    }
+
+    function sim_removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 liquidity
+    ) external view virtual override returns (uint256 amountA, uint256 amountB) {
+        address pair = pairFor[tokenA][tokenB];
+
+        if (IXPair(pair).balanceOf(msg.sender) < liquidity) {
+            liquidity = IXPair(pair).balanceOf(msg.sender);
+        }
+
+        (uint256 amount0, uint256 amount1) = IXPair(pair).sim_burn(liquidity);
+
+        (address token0, ) = XLibrary.sortTokens(tokenA, tokenB);
+        (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
     }
 
     function removeLiquidityETH(

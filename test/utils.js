@@ -14,15 +14,15 @@ exports.deployWireLibrary = async function (deployer) {
   return wireLib;
 };
 
-exports.deployFactory = async function (deployer, feeToSetter, wireLib) {
-  const XFactory = await ethers.getContractFactory("XDAOFactory", {
+exports.deployFactory = async function (deployer, wireLib) {
+  const Factory = await ethers.getContractFactory("XFactory", {
     signer: deployer,
     libraries: {
       WireLibrary: wireLib,
     },
   });
 
-  const factory = await XFactory.connect(deployer).deploy(feeToSetter);
+  const factory = await Factory.connect(deployer).deploy();
   await factory.deployed();
 
   return factory;
@@ -36,29 +36,18 @@ exports.deployWBNB = async function (deployer) {
   return wbnb;
 };
 
-exports.deployGovLibrary = async function (deployer) {
-  const GovernanceLib = await ethers.getContractFactory("GovLib", {
-    signer: deployer,
-  });
-  const governanceLib = await GovernanceLib.deploy();
-  await governanceLib.deployed();
-
-  return governanceLib;
-};
-
-
 exports.deployTGR = async function (deployer, analyticMath, wireLib) {
-  const TGRToken = await ethers.getContractFactory("TGRToken", {
+  const Token = await ethers.getContractFactory("TGRToken", {
     signer: deployer,
     libraries: {
       WireLibrary: wireLib,
     },
-});
+  });
 
-  const crssToken = await TGRToken.connect(deployer).deploy(analyticMath);
-  await crssToken.deployed();
+  const token = await Token.connect(deployer).deploy(analyticMath);
+  await token.deployed();
 
-  return crssToken;
+  return token;
 };
 
 exports.deployMockToken = async function (deployer, name, symbol) {
@@ -86,8 +75,41 @@ exports.verifyContract = async function (contract, params) {
   }
 };
 
+exports.deployCenter = async function (deployer, wireLib) {
+  const Center = await ethers.getContractFactory("ControlCenter", {
+    signer: deployer,
+    libraries: {
+      WireLibrary: wireLib,
+    },
+  });
+  const center = await Center.connect(deployer).deploy();
+  await center.deployed();
+
+  return center;
+};
+
+exports.deployXLibrary = async function (deployer) {
+  const Lib = await ethers.getContractFactory("XLibrary", {
+    signer: deployer,
+  });
+  const lib = await Lib.deploy();
+  await lib.deployed();
+
+  return lib;
+};
+
+exports.deployRouterLibrary = async function (deployer) {
+  const RouterLib = await ethers.getContractFactory("RouterLibrary", {
+    signer: deployer,
+  });
+  const routerLib = await RouterLib.deploy();
+  await routerLib.deployed();
+
+  return routerLib;
+};
+
 exports.deployMaker = async function (deployer, wbnb, wireLib) {
-  const Router = await ethers.getContractFactory("Maker", {
+  const Router = await ethers.getContractFactory("XMaker", {
     signer: deployer,
     libraries: {
       WireLibrary: wireLib,
@@ -100,11 +122,12 @@ exports.deployMaker = async function (deployer, wbnb, wireLib) {
   return router;
 };
 
-exports.deployTaker = async function (deployer, wbnb, wireLib) {
-  const Router = await ethers.getContractFactory("Taker", {
+exports.deployTaker = async function (deployer, wbnb, wireLib, routerLib) {
+  const Router = await ethers.getContractFactory("XTaker", {
     signer: deployer,
     libraries: {
       WireLibrary: wireLib,
+      RouterLibrary: routerLib,
     },
   });
 
@@ -132,7 +155,7 @@ exports.verifyUpgradeable = async function (address) {
 };
 
 exports.deployFarmLibrary = async function (deployer) {
-  const FarmLib = await ethers.getContractFactory("FarmLib", {
+  const FarmLib = await ethers.getContractFactory("FarmLibrary", {
     signer: deployer,
   });
   const farmLib = await FarmLib.deploy();
@@ -142,54 +165,54 @@ exports.deployFarmLibrary = async function (deployer) {
 };
 
 exports.deployFarm = async function (deployer, crssAddr, crssPerBlock, startBlock, wireLib, farmLib) {
-  const XDAOFarm = await ethers.getContractFactory("XDAOFarm", {
+  const CrossFarm = await ethers.getContractFactory("CrossFarm", {
     signer: deployer,
     libraries: {
-      WireLib: wireLib,
-      FarmLib: farmLib
+      WireLibrary: wireLib,
+      FarmLibrary: farmLib
     },
   });
 
-  const crossFarm = await XDAOFarm.connect(deployer).deploy(crssAddr, crssPerBlock, startBlock);
+  const crossFarm = await CrossFarm.connect(deployer).deploy(crssAddr, crssPerBlock, startBlock);
   await crossFarm.deployed();
 
   return crossFarm;
 };
 
-exports.deployXTGR = async function (deployer, name, symbol, wireLib) {
-  const XTGRToken = await ethers.getContractFactory("XTGRToken", {
+exports.deployXCrss = async function (deployer, name, symbol, wireLib) {
+  const XCrssToken = await ethers.getContractFactory("xCrssToken", {
     signer: deployer,
     libraries: {
-      WireLib: wireLib
+      WireLibrary: wireLib
     },
   });
 
-  const xTGRToken = await XTGRToken.connect(deployer).deploy(name, symbol);
-  await xTGRToken.deployed();
+  const xCrssToken = await XCrssToken.connect(deployer).deploy(name, symbol);
+  await xCrssToken.deployed();
 
-  return xTGRToken;
+  return xCrssToken;
 };
 
 exports.deployReferral = async function (deployer) {
-  const Referral = await ethers.getContractFactory("TGRReferral", {
+  const Referral = await ethers.getContractFactory("Referral", {
     signer: deployer,
   });
 
   const referral = await Referral.connect(deployer).deploy();
   await referral.deployed();
-  
+
   return referral;
 };
 
-exports.deployRTGR = async function (deployer) {
-  const RTGRToken = await ethers.getContractFactory("RTGRToken", {
+exports.deployRCrss = async function (deployer) {
+  const RCrssToken = await ethers.getContractFactory("RCrssToken", {
     signer: deployer,
   });
 
-  const rTGRToken = await RTGRToken.connect(deployer).deploy();
-  await rTGRToken.deployed();
-  
-  return rTGRToken;
+  const rCrssToken = await RCrssToken.connect(deployer).deploy();
+  await rCrssToken.deployed();
+
+  return rCrssToken;
 };
 
 exports.deployRSyrup = async function (deployer, crssAddr) {
@@ -199,21 +222,21 @@ exports.deployRSyrup = async function (deployer, crssAddr) {
 
   const rSyrup = await RSyrup.connect(deployer).deploy(crssAddr);
   await rSyrup.deployed();
-  
+
   return rSyrup;
 };
 
-exports.deployRepay = async function (deployer, crssAddr, rTGRAddr, rSyrupAddr, crssPerBlock, startBlock, wireLib) {
+exports.deployRepay = async function (deployer, crssAddr, rCrssAddr, rSyrupAddr, crssPerBlock, startBlock, wireLib) {
   const Repay = await ethers.getContractFactory("Repay", {
     signer: deployer,
     libraries: {
-      WireLib: wireLib
+      WireLibrary: wireLib
     },
   });
 
-  const repay = await Repay.connect(deployer).deploy(crssAddr, rTGRAddr, rSyrupAddr, crssPerBlock, startBlock);
+  const repay = await Repay.connect(deployer).deploy(crssAddr, rCrssAddr, rSyrupAddr, crssPerBlock, startBlock);
   await repay.deployed();
-  
+
   return repay;
 };
 

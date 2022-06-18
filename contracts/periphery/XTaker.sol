@@ -117,6 +117,27 @@ contract XTaker is Node, IXTaker, Ownable, SessionManager {
         _closeAction();
     }
 
+    function wired_swapExactTokensForTokens(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to
+    ) external virtual override returns (uint256[] memory amounts) {
+        require(_msgSender() == nodes.token, sForbidden);
+
+        amounts = XLibrary.getAmountsOut(nodes.factory, amountIn, path);
+        require(amounts[amounts.length - 1] >= amountOutMin, sInsufficientOutput);
+        XLibrary.lightTransferFrom(path[0], msg.sender, pairFor[path[0]][path[1]], amounts[0], nodes.token);
+        _swap(amounts, path, to); // gas-saving. Will attackers dodge price control indirectly thru farm?
+    }
+
+    function sim_swapExactTokensForTokens(
+        uint256 amountIn,
+        address[] calldata path
+    ) external view virtual override returns (uint256[] memory amounts) {
+        amounts = XLibrary.getAmountsOut(nodes.factory, amountIn, path);
+    }
+
     function swapTokensForExactTokens(
         uint256 amountOut,
         uint256 amountInMax,

@@ -62,20 +62,34 @@ function uiAddr(address) {
 }
 
 function stringify(strValue) {
-  return strValue.toString();
-}
-
-async function expectRevertedWith(tx, withMsg) {
-  await expect(tx).to.be.revertedWith(withMsg);
-}
-
-async function expectNotReverted(tx) {
-  await expect(tx).to.be.not.reverted;
-}
-
-async function expectReverted(tx) {
-  await expect(tx).to.be.reverted;
-}
+    return strValue.toString();
+  }
+  
+  async function expectRevertedWith(tx, withMsg) {
+    await expect(tx).to.be.revertedWith(withMsg);
+  }
+  
+  async function expectNotReverted(tx) {
+    await expect(tx).to.be.not.reverted;
+  }
+  
+  async function expectReverted(tx) {
+    await expect(tx).to.be.reverted;
+  }
+  
+  async function eventTrigger(factory, tx, eventName, args) {
+    await expect(tx)
+      .to.emit(factory, eventName)
+      .withArgs(...args);
+  }
+  
+  function expectEqual(a, b) {
+    expect(a).to.be.eq(b);
+  }
+  
+  function expectNotEqual(a, b) {
+    expect(a).to.be.not.eq(b);
+  }
 
 async function mintBlocks(blocks) {
     let bn0 = (await ethers.provider.getBlock("latest")).number;
@@ -204,18 +218,82 @@ describe("====================== Stage 1: Test TGR Pulses ======================
 });
 
 
-describe("====================== Stage 2: Test TGR with Dex ======================\n".yellow, async function () {
+describe("====================== Stage 2: Deploy contracts ======================\n".yellow, async function () {
     it("Main contracts are deployed.\n".green, async function () {
 
-    // Factory Deployment.
-    factory = await deployFactory(owner, wireLib.address);
-    consoleLogWithTab(`Factory deployed at: ${factory.address}`);
+        // Factory Deployment.
+        factory = await deployFactory(owner, wireLib.address);
+        console.log("\tFactory deployed at %s", factory.address);
 
-    console.log("\tXFactory contract was deployed at: ", factory.address);
-    console.log("\t!!! Pair's bytecode hash = \n\t", (await factory.INIT_CODE_PAIR_HASH()).substring(2));
-    console.log("\t!!! Please make sure the pairFor(...) function of XLibrary.sol file has the same hash.");
+        console.log("\tXFactory contract was deployed at: %s", factory.address);
+        console.log("\t!!! Pair's bytecode hash = \n\t", (await factory.INIT_CODE_PAIR_HASH()).substring(2));
+        console.log("\t!!! Please make sure the pairFor(...) function of XLibrary.sol file has the same hash.");
 
+        // WBNB Deployment.
+        wbnb = await deployWBNB(owner);
+        console.log("\tWBNB deployed at: %s", wbnb.address);
+
+        center = await deployCenter(owner, wireLib.address);
+        center.address = center.address;
+        console.log("\tContralCenter deployed at %s", center.address);
+
+        crossLib = await deployXLibrary(owner);
+        console.log("\tXLibrary deployed at %s", crossLib.address);
+
+        // RouterLibrary Deployment for Maker and Taker.
+        routerLib = await deployRouterLibrary(owner);
+        console.log("\tRouterLibrary deployed at %s", routerLib.address);
+
+        // Maker Deployment.
+        maker = await deployMaker(owner, wbnb.address, wireLib.address, routerLib.address);
+        console.log("\tMaker deployed at %s", maker.address);
+
+        // Taker Deployment.
+        taker = await deployTaker(owner, wbnb.address, wireLib.address, routerLib.address);
+        console.log("\tTaker deployed at %s", taker.address);
+
+        // Referral Deployment.
+        referral = await deployReferral(owner);
+        console.log("\tReferral deployed at %s", referral.address);
+
+        // Mock Token Deployment.
+        mock = await deployMockToken(owner, "Mock", "MCK");
+        console.log("\tmock deployed at %s", mock.address);
+
+        // Mock Token Deployment.
+        mock2 = await deployMockToken(owner, "Mock2", "MCK2");
+        console.log("\tmock2 deployed at %s", mock2.address);
 
     });
+
+    describe("====================== Stage 3: Test CrossFactory ======================\n".yellow, async function () {
+        it("\tInitial values were checked.\n".green, async function () {
+            let feeTo = await factory.feeTo();
+            expectEqual(feeTo, zero_address);
+            console.log("\tInitial feeTo value is zero address.");
+        
+            let pairsLength = await factory.allPairsLength();
+            expectEqual(pairsLength, 0);
+            console.log("\tThere, initially, are no pairs created.");
+        
+            let factoryOwner = await factory.getOwner();
+            console.log("\tOwner is deployer.");
+            expectEqual(factoryOwner, owner.address);
+            console.log("\tOwner address: %s", factoryOwner.address);
+        });
+      
+        it("\tsetFeeTo function was checked.\n".green, async function () {
+            let tx = factory.connect(alice).setFeeTo(bob.address);
+            await expectRevertedWith(tx, "Caller != owner");
+            console.log("\tAlice, a non-owner, setting feeTo to Bob reverted with <Caller != owner>");
+        
+            tx = factory.setFeeTo(owner.address);
+            await expectNotReverted(tx);
+            console.log("\tThe current owner could set feeTo to Bob.");
+      
+        });     
+
+      });
+      
 
 });

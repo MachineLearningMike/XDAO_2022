@@ -22,6 +22,23 @@ interface IXMaker {
             uint256 liquidity
         );
 
+    function wired_addLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 amountADesired,
+        uint256 amountBDesired,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to,
+        uint256 deadline
+    )
+        external
+        returns (
+            uint256 amountA,
+            uint256 amountB,
+            uint256 liquidity
+        );
+
     function addLiquidityETH(
         address token,
         uint256 amountTokenDesired,
@@ -47,6 +64,22 @@ interface IXMaker {
         address to,
         uint256 deadline
     ) external returns (uint256 amountA, uint256 amountB);
+
+    function wired_removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 liquidity,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to,
+        uint256 deadline
+    ) external returns (uint256 amountA, uint256 amountB);
+
+    function sim_removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 liquidity
+    ) external view returns (uint256 amountA, uint256 amountB);
 
     function removeLiquidityETH(
         address token,

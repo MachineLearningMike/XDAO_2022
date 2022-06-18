@@ -336,17 +336,11 @@ contract TGRToken is Node, Ownable, ITGRToken, SessionRegistrar, SessionFees, Se
         // 0.69% of XDAO/FTM LP has the XDAO side sold for FTM, 
         // then the FTM is used to buy HTZ which is added to XDAO lps airdrop rewards every 12 hours.
 
-        uint256 round = block.timestamp / lp_reward.cycle;
-        if (round > lp_reward.latestRound) {
-            uint256 missingRounds = lp_reward.latestRound - round;
-            lp_reward.latestRound = round;
+        uint256 decayPer1e12 = _getDecayPer1e12(lp_reward); // smaller than its real value.
+        // Use decayPer12 portion of tgrftm pool to obtain FTM to buy HTZ tokens at the htzftm pool, then add them to airdrop rewards.
+        // TGR/FTM price falls and HTZ/FTM price rises, at their respective pools.
 
-            uint256 decayPer1e12 = _getDecayPer1e12(lp_reward); // smaller than its real value.
-            // Use decayPer12 portion of tgrftm pool to obtain FTM to buy HTZ tokens at the htzftm pool, then add them to airdrop rewards.
-            // TGR/FTM price falls and HTZ/FTM price rises, at their respective pools.
-
-            lp_reward.latestTime = block.timestamp;
-        }
+        lp_reward.latestTime = block.timestamp;
     }
 
     function pulse_vote_burn() external {

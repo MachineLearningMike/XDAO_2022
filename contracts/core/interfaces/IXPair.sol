@@ -9,4 +9,5 @@ interface IXPair is IPancakePair {
     function setNodes(address token, address maker, address taker) external;
     function status() external view returns (ListStatus);
     function changeStatus(ListStatus _status) external;
+    function sim_burn(uint256 liquidity) external view returns (uint256 amount0, uint256 amount1);
 }
